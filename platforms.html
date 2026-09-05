@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Platform guides · Modular Media Server</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap');
+:root{--blue:#0081A7;--teal:#00AFB9;--cream:#FDFCDC;--peach:#FED9B7;--coral:#F07167;--ink:#15333b;--muted:#587078;--white:#fffef7;--line:#cfe3e4}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--cream);color:var(--ink);font-family:"DM Sans",sans-serif}a{color:var(--blue);text-decoration:none}a:hover{color:var(--coral)}.wrap{max-width:1160px;margin:auto;padding:0 24px}
+nav{height:82px;display:flex;align-items:center;justify-content:space-between}.brand{font-weight:700;font-size:18px;letter-spacing:-.04em;color:var(--ink)}.brand span{color:var(--coral)}.navlinks{display:flex;gap:25px;color:var(--muted);font-size:14px}.navlinks a{color:var(--muted)}.navlinks a:hover{color:var(--blue)}
+.hero{padding:80px 0 60px;position:relative;overflow:hidden}.hero:after{content:"";position:absolute;width:250px;height:170px;background:var(--peach);border-radius:54% 46% 60% 40%;right:-65px;top:38px;transform:rotate(-7deg);z-index:-1}
+.kicker{text-transform:uppercase;letter-spacing:.15em;font-size:12px;font-weight:700;color:var(--blue)}
+h1,h2,h3{font-family:Fraunces,serif;letter-spacing:-.045em;line-height:1.05}h1{font-size:clamp(48px,7vw,78px);max-width:850px;margin:18px 0}.hero p{font-size:19px;line-height:1.7;color:var(--muted);max-width:720px}
+p,li{color:var(--muted);line-height:1.75}ul,ol{padding-left:22px}code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.88em;background:#eaf8f7;padding:2px 6px;border-radius:6px;color:#0e5a63}
+pre{background:#15333b;color:#fdfcdc;padding:20px;border-radius:16px;overflow:auto;line-height:1.65;font-size:13px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}pre .c{color:#8fb3ae}pre .p{color:#FED9B7}
+
+/* picker */
+.picker{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:0 0 20px}
+.pk{background:var(--white);border:1px solid var(--line);border-radius:20px;padding:20px;text-align:left;cursor:pointer;font-family:inherit;transition:.15s;display:block;width:100%}
+.pk:hover{border-color:var(--teal);transform:translateY(-2px)}
+.pk.on{background:#eaf8f7;border-color:var(--teal)}
+.pk b{display:block;font:700 17px "DM Sans";letter-spacing:-.03em;color:var(--ink);margin-bottom:4px}
+.pk span{font-size:13px;color:var(--muted);line-height:1.5;display:block}
+.verdict{display:inline-block;margin-top:9px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px}
+.v-best{background:#d3f0ef;color:#0e5a63}.v-ok{background:var(--peach);color:#744b32}.v-meh{background:#ffe0dc;color:#96382f}
+
+.panel{display:none}.panel.on{display:block}
+.section{padding:20px 0 70px}
+h2.big{font-size:46px;margin:10px 0 16px}.lead{font-size:17px;color:var(--muted);line-height:1.7;max-width:700px}
+h3{font-size:25px;margin:38px 0 12px}
+.card{background:var(--white);border:1px solid var(--line);border-radius:20px;padding:24px;margin:20px 0}.card.peach{background:#fff1e4;border-color:#f4c8a6}.card.teal{background:#eaf8f7}.card strong{color:var(--ink)}
+.warning{border-left:5px solid var(--coral);background:#fff0e3;padding:18px 20px;border-radius:0 16px 16px 0;margin:22px 0}.tip{border-left:5px solid var(--teal);background:#eaf8f7;padding:18px 20px;border-radius:0 16px 16px 0;margin:22px 0}.warning strong,.tip strong{color:var(--ink)}
+.steps{counter-reset:s;list-style:none;padding:0;margin:28px 0}
+.stp{counter-increment:s;position:relative;padding:0 0 30px 62px;border-left:2px solid var(--line);margin-left:19px}
+.stp:last-child{border-left-color:transparent;padding-bottom:0}
+.stp:before{content:counter(s);position:absolute;left:-20px;top:-4px;width:38px;height:38px;border-radius:50%;background:var(--blue);color:var(--cream);display:grid;place-items:center;font-weight:700;font-size:15px;font-family:"DM Sans"}
+.stp h3{margin:0 0 8px;font-size:21px}.stp p{margin:0 0 12px;font-size:15px}.stp pre{font-size:12.5px}
+.tbl{background:var(--white);border:1px solid var(--line);border-radius:20px;overflow:hidden;margin:24px 0}.tbl table{width:100%;border-collapse:collapse;font-size:14px}.tbl th{text-align:left;padding:14px 18px;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);background:#eaf8f7;font-weight:700}.tbl td{padding:13px 18px;border-top:1px solid var(--line);color:var(--muted);vertical-align:top}.tbl td:first-child{font-weight:700;color:var(--ink)}
+.yes{color:#2f7d5e;font-weight:700}.no{color:#b0463c;font-weight:700}.part{color:#a06a2c;font-weight:700}
+.btn{display:inline-block;border-radius:999px;padding:13px 22px;font-weight:700;font-size:15px;background:var(--blue);color:white}.btn:hover{color:white;background:#00688a}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}.btn.ghost:hover{border-color:var(--teal);color:var(--blue)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:22px 0}
+.mini{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:18px}.mini b{display:block;font-size:15px;color:var(--ink);margin-bottom:5px;letter-spacing:-.02em}.mini span{font-size:13.5px;color:var(--muted);line-height:1.55}
+footer{border-top:1px solid var(--line);padding:25px 0;color:var(--muted);font-size:13px}
+@media(max-width:900px){.navlinks{display:none}.picker{grid-template-columns:1fr 1fr}.two{grid-template-columns:1fr}h2.big{font-size:35px}}
+@media(max-width:520px){.picker{grid-template-columns:1fr}.stp{padding-left:48px}.tbl{overflow-x:auto}}
+</style>
+</head>
+<body>
+<div class="wrap"><nav><a class="brand" href="modular-media-server-site.html">modular<span>.</span>media</a><div class="navlinks"><a href="modular-media-server-site.html">Home</a><a href="guide.html">Guide</a><a href="platforms.html">Platforms</a><a href="access.html">Access</a><a href="documentation.html">Documentation</a><a href="hardware.html">Hardware</a><a href="faq.html">Help</a></div></nav></div>
+
+<section class="hero"><div class="wrap"><div class="kicker">Platform guides</div><h1>Getting Docker running, wherever you are.</h1><p>You don't need a Linux machine to start. Windows and macOS both run this perfectly well for a first server, with two trade-offs worth knowing about before you begin rather than after. Pick your system below.</p></div></section>
+
+<div class="wrap">
+<div class="picker">
+<button class="pk on" data-p="windows"><b>Windows</b><span>Docker Desktop with WSL2</span><span class="verdict v-ok">Works well</span></button>
+<button class="pk" data-p="macos"><b>macOS</b><span>Intel or Apple Silicon</span><span class="verdict v-ok">Works well</span></button>
+<button class="pk" data-p="linux"><b>Linux</b><span>Ubuntu, Debian, Fedora</span><span class="verdict v-best">Best results</span></button>
+<button class="pk" data-p="nas"><b>NAS</b><span>Synology, QNAP, unRAID</span><span class="verdict v-best">Purpose-built</span></button>
+</div>
+</div>
+
+<div class="wrap">
+<div class="card peach"><strong>The one thing that's true on Windows and macOS</strong><p style="margin:10px 0 0">On both, Docker runs inside a hidden Linux virtual machine. That means <strong>hardware transcoding isn't available</strong> — Jellyfin will transcode using your CPU, which realistically means one stream at a time — and <strong>files stored on the Windows or Mac side are reached over a slow network filesystem</strong>. Both have workarounds below. Neither stops you getting started today.</p></div>
+</div>
+
+<!-- ═══════════ WINDOWS ═══════════ -->
+<div class="panel on" id="p-windows"><div class="wrap"><section class="section">
+<div class="kicker">Windows 10 &amp; 11</div>
+<h2 class="big">Windows</h2>
+<p class="lead">Docker Desktop with the WSL2 backend gives you a real Linux environment underneath a normal Windows app. Once it's installed, everything else in these guides works exactly as written.</p>
+
+<ol class="steps">
+
+<li class="stp">
+<h3>Turn on WSL2</h3>
+<p>Open PowerShell <strong style="color:var(--ink)">as Administrator</strong> and run:</p>
+<pre>wsl --install</pre>
+<p>That enables the features, installs Ubuntu and sets WSL2 as the default. Restart when it asks. On first launch Ubuntu asks you to create a username and password — this is your Linux account, separate from your Windows one.</p>
+<p>If WSL was already installed some time ago, make sure it's version 2:</p>
+<pre>wsl --set-default-version 2
+wsl --status</pre>
+</li>
+
+<li class="stp">
+<h3>Install Docker Desktop</h3>
+<p>Download it from <a href="https://www.docker.com/products/docker-desktop/" target="_blank" rel="noopener">docker.com</a> and install as normal. During setup, leave <strong style="color:var(--ink)">"Use WSL 2 instead of Hyper-V"</strong> ticked.</p>
+<p>Once running, open Settings and check two things:</p>
+<ul>
+<li><b>General</b> → "Start Docker Desktop when you log in" should be on, or your server won't come back after a reboot.</li>
+<li><b>Resources → WSL Integration</b> → enable it for your Ubuntu distribution.</li>
+</ul>
+<p>Then open Ubuntu from the Start menu and confirm:</p>
+<pre>docker run hello-world</pre>
+</li>
+
+<li class="stp">
+<h3>Decide where your files live</h3>
+<p>This is the decision that matters most on Windows, and it's easy to get wrong.</p>
+<div class="warning"><strong>Don't put your library on <code>/mnt/c/</code>.</strong> Paths like <code>/mnt/c/Users/You/Videos</code> cross from Linux to Windows through a translation layer. Library scans crawl, file moves copy instead of rename, and Linux file permissions don't survive the trip. It works, but badly.</div>
+<p>Keep everything on the Linux side instead — inside your WSL home folder:</p>
+<pre><span class="c"># Good: native Linux filesystem, fast</span>
+/home/<span class="p">you</span>/media
+/home/<span class="p">you</span>/downloads</pre>
+<p>You can still reach these from Windows Explorer. Type <code>\\wsl$</code> in the address bar, or just <code>explorer.exe .</code> from inside Ubuntu.</p>
+<div class="tip"><strong>Have a big drive full of media already?</strong> If it's a separate physical disk, you can mount it into WSL directly with <code>wsl --mount</code>, which is much faster than going through <code>/mnt/</code>. If your media is on your Windows C: drive and you'd rather not move it, it will still work — just expect slower scanning.</div>
+</li>
+
+<li class="stp">
+<h3>Carry on with the normal guide</h3>
+<p>From here, you're using Linux. Everything in the setup guide applies as written — run it inside your Ubuntu terminal, not PowerShell.</p>
+<p><a class="btn" href="guide.html#arcane-path">Continue with Arcane</a> &nbsp; <a class="btn ghost" href="guide.html#script">Or use the script</a></p>
+</li>
+
+<li class="stp">
+<h3>Stop Windows going to sleep</h3>
+<p>A server that sleeps isn't a server. Under <b>Settings → System → Power</b>, set sleep to Never when plugged in. On a laptop, also set the lid-close action to do nothing.</p>
+<p>Windows Update will still reboot the machine occasionally. As long as Docker Desktop starts on login and your containers use <code>restart: unless-stopped</code>, everything comes back on its own.</p>
+</li>
+
+</ol>
+
+<h3>Worth knowing</h3>
+<div class="two">
+<div class="mini"><b>Memory creep</b><span>WSL2 can hold onto a lot of RAM. Cap it by creating <code>.wslconfig</code> in your Windows user folder with <code>[wsl2]</code> and <code>memory=8GB</code>.</span></div>
+<div class="mini"><b>Firewall prompts</b><span>Windows will ask about network access the first time. Allow it on private networks so other devices can reach Jellyfin.</span></div>
+<div class="mini"><b>Reaching it from your TV</b><span>WSL2 sits behind its own network. Docker Desktop forwards published ports to Windows automatically, so other devices use your Windows machine's IP address.</span></div>
+<div class="mini"><b>Antivirus</b><span>Real-time scanning of the Docker data folder slows things noticeably. Consider an exclusion if scans feel sluggish.</span></div>
+</div>
+
+<div class="tip"><strong>Alternative: skip Docker Desktop entirely.</strong> If you'd rather not run it, you can install Docker Engine directly inside Ubuntu on WSL2 using the standard Linux instructions. Slightly more setup, no licensing considerations for commercial use, and one less background application.</div>
+</section></div></div>
+
+<!-- ═══════════ MACOS ═══════════ -->
+<div class="panel" id="p-macos"><div class="wrap"><section class="section">
+<div class="kicker">Intel &amp; Apple Silicon</div>
+<h2 class="big">macOS</h2>
+<p class="lead">Docker on a Mac also runs in a Linux virtual machine, so the same two trade-offs apply. Setup is quick, and Apple Silicon handles this comfortably as long as you're aware of a couple of images that expect Intel.</p>
+
+<ol class="steps">
+
+<li class="stp">
+<h3>Install Docker</h3>
+<p>Download <a href="https://www.docker.com/products/docker-desktop/" target="_blank" rel="noopener">Docker Desktop</a> and pick the build matching your Mac — Apple Silicon or Intel. Drag it to Applications and launch it.</p>
+<p>In Settings, enable <strong style="color:var(--ink)">"Start Docker Desktop when you sign in"</strong>, and under <b>Resources</b>, give it at least 4&nbsp;GB of memory — 8&nbsp;GB if you're running Immich.</p>
+<p>Check it works in Terminal:</p>
+<pre>docker run hello-world</pre>
+<div class="tip"><strong>Lighter alternatives exist.</strong> <a href="https://orbstack.dev/" target="_blank" rel="noopener">OrbStack</a> is noticeably faster and gentler on battery, and <a href="https://github.com/abiosoft/colima" target="_blank" rel="noopener">Colima</a> is free and open source. Both provide the same <code>docker</code> command, so every instruction here works unchanged.</div>
+</li>
+
+<li class="stp">
+<h3>Share your folders</h3>
+<p>Docker Desktop can only mount folders you've allowed. Under <b>Settings → Resources → File sharing</b>, add the folder holding your media if it isn't already covered.</p>
+<p>Your home folder is usually shared by default, so this is simplest:</p>
+<pre>/Users/<span class="p">you</span>/media
+/Users/<span class="p">you</span>/downloads</pre>
+<p>Make sure <b>VirtioFS</b> is selected under <b>Settings → General</b>. It's substantially faster than the older options for the kind of file access these apps do.</p>
+<div class="warning"><strong>External drives are the awkward part.</strong> A USB drive at <code>/Volumes/Media</code> can be shared, but if macOS unmounts it — sleep, a loose cable — containers keep writing into an empty folder where the mount used to be. If your library lives on an external drive, set the Mac to never sleep and check the mount after any disconnection.</div>
+</li>
+
+<li class="stp">
+<h3>Apple Silicon notes</h3>
+<p>Most images here publish native arm64 builds and run at full speed. A few don't:</p>
+<div class="tbl"><table>
+<thead><tr><th>Service</th><th>On Apple Silicon</th></tr></thead>
+<tbody>
+<tr><td>Jellyfin</td><td><span class="yes">Native</span> — CPU transcoding only</td></tr>
+<tr><td>The *arr apps</td><td><span class="yes">Native</span> — no issues</td></tr>
+<tr><td>qBittorrent, Gluetun</td><td><span class="yes">Native</span></td></tr>
+<tr><td>Immich</td><td><span class="yes">Native</span> — machine learning works well</td></tr>
+<tr><td>Uptime Kuma, ArchiveBox</td><td><span class="yes">Native</span></td></tr>
+<tr><td>Tube Archivist</td><td><span class="part">Mixed</span> — its Elasticsearch has limited ARM support</td></tr>
+</tbody></table></div>
+<p>If an image has no ARM build, Docker will emulate it. That works but is slow and memory-hungry. You can force it per service if needed:</p>
+<pre>services:
+  something:
+    platform: linux/amd64</pre>
+</li>
+
+<li class="stp">
+<h3>Carry on with the normal guide</h3>
+<p>Everything else is identical. Run the commands in Terminal.</p>
+<p><a class="btn" href="guide.html#arcane-path">Continue with Arcane</a> &nbsp; <a class="btn ghost" href="guide.html#script">Or use the script</a></p>
+<p style="margin-top:12px">The install script detects macOS and adjusts its default paths and permissions accordingly.</p>
+</li>
+
+<li class="stp">
+<h3>Stop it sleeping</h3>
+<p>Under <b>System Settings → Displays → Advanced</b>, enable "Prevent automatic sleeping when the display is off". On a laptop this only applies on mains power.</p>
+<p>For something more reliable, the built-in command works well:</p>
+<pre>caffeinate -s</pre>
+<p>Leave that running in a Terminal window and the Mac stays awake while it's open.</p>
+</li>
+
+</ol>
+
+<div class="warning"><strong>Docker Desktop licensing.</strong> It's free for personal use, education and small businesses, but larger companies need a paid subscription. If that applies to you, OrbStack or Colima avoid the question entirely.</div>
+</section></div></div>
+
+<!-- ═══════════ LINUX ═══════════ -->
+<div class="panel" id="p-linux"><div class="wrap"><section class="section">
+<div class="kicker">Ubuntu, Debian, Fedora and friends</div>
+<h2 class="big">Linux</h2>
+<p class="lead">The best results, and the least in your way. Docker runs directly on the kernel with no virtual machine in between, which means full-speed disk access and hardware transcoding that actually works.</p>
+
+<div class="card teal"><strong>What you get here that you don't elsewhere</strong><ul style="margin-bottom:0"><li>Hardware transcoding through <code>/dev/dri</code> — several simultaneous streams instead of one</li><li>Native filesystem speed, so large library scans finish in reasonable time</li><li>Instant file moves between downloads and library on the same filesystem</li><li>Lower idle memory use, since there's no VM to feed</li></ul></div>
+
+<ol class="steps">
+
+<li class="stp">
+<h3>Install Docker</h3>
+<p>The official convenience script handles every major distribution. Read it first — you're about to run it as root.</p>
+<pre>curl -fsSL https://get.docker.com -o get-docker.sh
+less get-docker.sh
+sudo sh get-docker.sh</pre>
+<p>Then let your user drive Docker without <code>sudo</code>:</p>
+<pre>sudo usermod -aG docker $USER</pre>
+<p><strong style="color:var(--ink)">Log out and back in.</strong> Group membership doesn't apply to your current session, and this catches nearly everyone.</p>
+<pre>docker run hello-world</pre>
+</li>
+
+<li class="stp">
+<h3>Set up hardware transcoding</h3>
+<p>Only worth doing if you have an Intel CPU with integrated graphics, and only needed if Jellyfin will transcode. Check the device exists:</p>
+<pre>ls -l /dev/dri</pre>
+<p>If you see <code>renderD128</code>, add yourself to the render group and uncomment the <code>devices:</code> block in Jellyfin's service:</p>
+<pre>sudo usermod -aG render $USER</pre>
+<p>Then enable hardware acceleration in Jellyfin's dashboard under Playback.</p>
+</li>
+
+<li class="stp">
+<h3>Carry on with the normal guide</h3>
+<p><a class="btn" href="guide.html#arcane-path">Continue with Arcane</a> &nbsp; <a class="btn ghost" href="guide.html#script">Or use the script</a></p>
+</li>
+
+<li class="stp">
+<h3>Make it survive reboots</h3>
+<p>Ensure Docker starts at boot:</p>
+<pre>sudo systemctl enable docker</pre>
+<p>Combined with <code>restart: unless-stopped</code> on every service, your stack comes back by itself after a power cut. On a headless machine, also check that BIOS is set to power on after AC loss.</p>
+</li>
+
+</ol>
+</section></div></div>
+
+<!-- ═══════════ NAS ═══════════ -->
+<div class="panel" id="p-nas"><div class="wrap"><section class="section">
+<div class="kicker">Synology, QNAP, unRAID, TrueNAS</div>
+<h2 class="big">NAS</h2>
+<p class="lead">A NAS is already a Linux machine built to stay on and hold drives, which makes it a natural fit. The main differences are that Docker is installed through a package manager, and that paths follow the NAS's own conventions.</p>
+
+<h3>Synology</h3>
+<p>Install <b>Container Manager</b> from Package Center (called Docker on older DSM versions). It includes Compose support under the Project tab, which is where you'll paste your generated file.</p>
+<div class="tbl"><table>
+<thead><tr><th>Setting</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td>Config root</td><td><code>/volume1/docker/modular-media-server</code></td></tr>
+<tr><td>Media root</td><td><code>/volume1/media</code></td></tr>
+<tr><td>Downloads</td><td><code>/volume1/downloads</code></td></tr>
+<tr><td>PUID / PGID</td><td>Run <code>id yourname</code> over SSH to find them</td></tr>
+</tbody></table></div>
+<div class="warning"><strong>Ports below 1024 and some others are reserved by DSM.</strong> If a container won't start because a port is taken, DSM is probably using it. Change the host side of the mapping — <code>"8097:8096"</code> rather than <code>"8096:8096"</code>.</div>
+<p>Transcoding depends on the model. Intel-based units with QuickSync can pass through <code>/dev/dri</code>; Realtek and older ARM models can't transcode meaningfully at all.</p>
+
+<h3>QNAP</h3>
+<p>Install <b>Container Station</b> from the App Center. It supports Compose under Applications. Paths generally start <code>/share/</code> rather than <code>/volume1/</code> — check yours in File Station.</p>
+
+<h3>unRAID</h3>
+<p>Docker is built in and unRAID's Community Applications catalogue already contains most of these services as one-click templates, which many people prefer to a Compose file. If you'd rather use Compose, install the Compose Manager plugin.</p>
+<div class="tip"><strong>Mind the cache drive.</strong> Point downloads and appdata at your cache pool rather than the array, and keep your finished media on the array. Writing torrents directly to spinning disks in the array is slow and keeps them spun up constantly.</div>
+
+<h3>TrueNAS</h3>
+<p>Recent versions run Docker Compose directly. Older Kubernetes-based releases handle custom stacks differently, so check which version you're on before following a Compose-based guide.</p>
+
+<h3>Then carry on</h3>
+<p>Once Docker is available, the rest is the same. Arcane runs on a NAS perfectly well if you'd rather manage things in a browser than through the NAS's own interface.</p>
+<p><a class="btn" href="guide.html#arcane-path">Continue with Arcane</a> &nbsp; <a class="btn ghost" href="guide.html#script">Or use the script</a></p>
+</section></div></div>
+
+<!-- ═══════════ COMPARISON ═══════════ -->
+<div class="wrap"><section class="section" style="border-top:1px solid var(--line);padding-top:60px">
+<div class="kicker">Side by side</div>
+<h2 class="big">What differs between them</h2>
+<div class="tbl"><table>
+<thead><tr><th></th><th>Windows</th><th>macOS</th><th>Linux</th><th>NAS</th></tr></thead>
+<tbody>
+<tr><td>Setup effort</td><td>Moderate</td><td>Easy</td><td>Easy</td><td>Easy</td></tr>
+<tr><td>Hardware transcoding</td><td><span class="no">No</span></td><td><span class="no">No</span></td><td><span class="yes">Yes</span></td><td><span class="part">Model-dependent</span></td></tr>
+<tr><td>Disk speed</td><td><span class="part">Good in WSL</span></td><td><span class="part">Good with VirtioFS</span></td><td><span class="yes">Native</span></td><td><span class="yes">Native</span></td></tr>
+<tr><td>Idle memory</td><td>Higher (VM)</td><td>Higher (VM)</td><td><span class="yes">Low</span></td><td><span class="yes">Low</span></td></tr>
+<tr><td>Always-on suitability</td><td><span class="part">Needs power tweaks</span></td><td><span class="part">Needs power tweaks</span></td><td><span class="yes">Designed for it</span></td><td><span class="yes">Designed for it</span></td></tr>
+<tr><td>Good for starting out</td><td><span class="yes">Yes</span></td><td><span class="yes">Yes</span></td><td><span class="yes">Yes</span></td><td><span class="yes">Yes</span></td></tr>
+</tbody></table></div>
+
+<div class="card"><strong>So should you switch to Linux?</strong><p style="margin:10px 0 0">Not to begin with. Use the computer you already own, get the stack running, and find out what you actually want from it. If you later hit CPU transcoding limits or slow library scans, that's the moment a dedicated Linux box earns its cost — and by then you'll know exactly which parts you need. Your Compose file and config folder move across in minutes.</p></div>
+
+<div class="warning"><strong>Whatever you run it on, the rules don't change.</strong> Only obtain and share content you're legally entitled to. Downloaded files can carry malware regardless of operating system, and a VPN routes traffic without making any file safe. Keep everything updated, don't expose admin interfaces to the internet, and back up what you'd hate to lose.</div>
+
+<p style="margin-top:28px"><a class="btn ghost" href="guide.html">Back to the setup guide</a> &nbsp; <a class="btn ghost" href="hardware.html">Hardware &amp; hosting</a></p>
+</section></div>
+
+<footer><div class="wrap">Modular Media Server · <a href="modular-media-server-site.html">Home</a> · <a href="guide.html">Guide</a> · <a href="documentation.html">Documentation</a> · <a href="hardware.html">Hardware</a> · <a href="faq.html">Help</a> · Start small. Add what you need. Understand what you're running.</div></footer>
+
+<script>
+(function(){
+  var picks=document.querySelectorAll('.pk'), panels=document.querySelectorAll('.panel');
+  function show(p){
+    picks.forEach(function(b){ b.classList.toggle('on', b.dataset.p===p); });
+    panels.forEach(function(el){ el.classList.toggle('on', el.id==='p-'+p); });
+    if(history.replaceState) history.replaceState(null,'','#'+p);
+  }
+  picks.forEach(function(b){ b.addEventListener('click',function(){ show(b.dataset.p); }); });
+  // detect the visitor's platform and open that one first
+  var h=(location.hash||'').replace('#','');
+  if(['windows','macos','linux','nas'].indexOf(h)>-1){ show(h); }
+  else {
+    var ua=navigator.userAgent;
+    if(/Windows/i.test(ua)) show('windows');
+    else if(/Mac OS X|Macintosh/i.test(ua)) show('macos');
+    else if(/Linux|X11/i.test(ua)) show('linux');
+  }
+})();
+</script>
+</body></html>

@@ -1,0 +1,590 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FAQ &amp; troubleshooting · Modular Media Server</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap');
+:root{--blue:#0081A7;--teal:#00AFB9;--cream:#FDFCDC;--peach:#FED9B7;--coral:#F07167;--ink:#15333b;--muted:#587078;--white:#fffef7;--line:#cfe3e4}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--cream);color:var(--ink);font-family:"DM Sans",sans-serif}a{color:var(--blue);text-decoration:none}a:hover{color:var(--coral)}.wrap{max-width:1160px;margin:auto;padding:0 24px}
+nav{height:82px;display:flex;align-items:center;justify-content:space-between}.brand{font-weight:700;font-size:18px;letter-spacing:-.04em;color:var(--ink)}.brand span{color:var(--coral)}.navlinks{display:flex;gap:25px;color:var(--muted);font-size:14px}.navlinks a{color:var(--muted)}.navlinks a:hover{color:var(--blue)}
+.hero{padding:75px 0 45px;position:relative;overflow:hidden}.hero:after{content:"";position:absolute;width:245px;height:165px;background:var(--peach);border-radius:54% 46% 60% 40%;right:-65px;top:35px;transform:rotate(11deg);z-index:-1}
+.kicker{text-transform:uppercase;letter-spacing:.15em;font-size:12px;font-weight:700;color:var(--blue)}
+h1,h2,h3{font-family:Fraunces,serif;letter-spacing:-.045em;line-height:1.05}h1{font-size:clamp(46px,7vw,76px);max-width:850px;margin:18px 0}.hero p{font-size:19px;line-height:1.7;color:var(--muted);max-width:700px}
+p,li{color:var(--muted);line-height:1.75}ul,ol{padding-left:22px}li{margin-bottom:4px}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.87em;background:#eaf8f7;padding:2px 6px;border-radius:6px;color:#0e5a63;word-break:break-word}
+pre{background:#15333b;color:#fdfcdc;padding:18px;border-radius:14px;overflow:auto;line-height:1.65;font-size:12.5px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;margin:14px 0}pre .c{color:#8fb3ae}pre .p{color:#FED9B7}
+
+/* search */
+.searchbar{position:sticky;top:0;z-index:20;background:var(--cream);padding:16px 0 14px;border-bottom:1px solid var(--line)}
+.sbox{position:relative}
+.sbox input{width:100%;font-family:inherit;font-size:16px;color:var(--ink);background:var(--white);border:1px solid var(--line);border-radius:999px;padding:16px 22px 16px 50px;outline:none}
+.sbox input:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,175,185,.13)}
+.sbox input::placeholder{color:#9ab0b6}
+.sbox:before{content:"";position:absolute;left:20px;top:50%;width:15px;height:15px;margin-top:-9px;border:2px solid #9ab0b6;border-radius:50%}
+.sbox:after{content:"";position:absolute;left:32px;top:50%;width:7px;height:2px;background:#9ab0b6;transform:rotate(45deg);margin-top:3px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.chip{font-family:inherit;font-size:13px;font-weight:700;padding:7px 14px;border-radius:999px;border:1px solid var(--line);background:var(--white);color:var(--muted);cursor:pointer;transition:.15s}
+.chip:hover{border-color:var(--teal);color:var(--blue)}
+.chip.on{background:var(--blue);border-color:var(--blue);color:var(--white)}
+.count{font-size:13px;color:var(--muted);margin-top:12px}
+.noresults{display:none;background:var(--white);border:1px solid var(--line);border-radius:20px;padding:34px;text-align:center;margin:30px 0}
+.noresults b{display:block;font:700 19px "DM Sans";color:var(--ink);margin-bottom:6px}
+
+.section{padding:55px 0 0}
+h2.big{font-size:44px;margin:6px 0 14px}.lead{font-size:16.5px;color:var(--muted);line-height:1.7;max-width:680px;margin-bottom:26px}
+
+/* first aid */
+.aid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:26px 0 10px}
+.aidcard{background:var(--white);border:1px solid var(--line);border-radius:20px;padding:22px}
+.aidcard.teal{background:#eaf8f7;border-color:#a9dde0}
+.aidcard b{display:block;font:700 16px "DM Sans";letter-spacing:-.02em;color:var(--ink);margin-bottom:6px}
+.aidcard p{font-size:14px;margin:0 0 10px}
+.aidcard pre{margin:0;font-size:12px;padding:14px}
+
+/* accordions */
+.grp{margin-bottom:14px}
+.grphead{font-family:Fraunces,serif;font-size:26px;letter-spacing:-.04em;color:var(--ink);margin:44px 0 14px}
+details.qa{background:var(--white);border:1px solid var(--line);border-radius:18px;margin-bottom:10px;overflow:hidden}
+details.qa[open]{border-color:#a9dde0;background:#fcfffe}
+details.qa summary{cursor:pointer;padding:19px 52px 19px 22px;font-weight:700;font-size:16px;color:var(--ink);list-style:none;position:relative;line-height:1.45}
+details.qa summary::-webkit-details-marker{display:none}
+details.qa summary:hover{color:var(--blue)}
+details.qa summary:after{content:"";position:absolute;right:24px;top:26px;width:9px;height:9px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);transition:.2s}
+details.qa[open] summary:after{transform:rotate(-135deg);top:29px}
+.qabody{padding:0 22px 22px;border-top:1px solid var(--line);margin-top:2px;padding-top:18px}
+.qabody p{font-size:15px}.qabody p:last-child,.qabody ul:last-child,.qabody pre:last-child{margin-bottom:0}
+.qabody ul{font-size:15px}
+.tag{display:inline-block;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;padding:3px 9px;border-radius:999px;background:var(--peach);color:#744b32;margin-right:6px;vertical-align:2px}
+.tag.t{background:#d3f0ef;color:#0e5a63}.tag.w{background:#ffe0dc;color:#96382f}
+.warning{border-left:5px solid var(--coral);background:#fff0e3;padding:16px 18px;border-radius:0 14px 14px 0;margin:16px 0;font-size:14.5px}
+.tip{border-left:5px solid var(--teal);background:#eaf8f7;padding:16px 18px;border-radius:0 14px 14px 0;margin:16px 0;font-size:14.5px}
+.warning strong,.tip strong{color:var(--ink)}
+.tbl{background:var(--white);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin:16px 0}.tbl table{width:100%;border-collapse:collapse;font-size:14px}.tbl th{text-align:left;padding:12px 16px;font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);background:#eaf8f7;font-weight:700}.tbl td{padding:11px 16px;border-top:1px solid var(--line);color:var(--muted);vertical-align:top}.tbl td:first-child{font-weight:700;color:var(--ink)}
+.btn{display:inline-block;border-radius:999px;padding:13px 22px;font-weight:700;font-size:15px;background:var(--blue);color:white}.btn:hover{color:white;background:#00688a}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}.btn.ghost:hover{border-color:var(--teal);color:var(--blue)}
+.closing{background:var(--white);border:1px solid var(--line);border-radius:24px;padding:34px;margin:50px 0 60px}
+.closing h3{font-size:27px;margin:0 0 12px}
+footer{border-top:1px solid var(--line);padding:25px 0;color:var(--muted);font-size:13px}
+@media(max-width:850px){.navlinks{display:none}.aid{grid-template-columns:1fr}h2.big{font-size:34px}.grphead{font-size:23px}}
+@media(max-width:520px){.tbl{overflow-x:auto}details.qa summary{font-size:15px;padding-right:46px}}
+</style>
+</head>
+<body>
+<div class="wrap"><nav><a class="brand" href="modular-media-server-site.html">modular<span>.</span>media</a><div class="navlinks"><a href="modular-media-server-site.html">Home</a><a href="guide.html">Guide</a><a href="platforms.html">Platforms</a><a href="access.html">Access</a><a href="documentation.html">Documentation</a><a href="hardware.html">Hardware</a></div></nav></div>
+
+<section class="hero"><div class="wrap"><div class="kicker">Help</div><h1>Something's not working. Let's find out what.</h1><p>Most problems with a stack like this are one of about six things wearing different hats. Search your symptom, or browse the categories — and if you're deciding whether to build this at all, the questions further down cover that too.</p></div></section>
+
+<div class="searchbar"><div class="wrap">
+<div class="sbox"><input type="search" id="q" placeholder="Search a symptom or question — try &ldquo;permission&rdquo;, &ldquo;VPN&rdquo;, &ldquo;port&rdquo;" autocomplete="off"></div>
+<div class="chips">
+<button class="chip on" data-f="all">Everything</button>
+<button class="chip" data-f="start">Won't start</button>
+<button class="chip" data-f="network">Can't connect</button>
+<button class="chip" data-f="perms">Permissions</button>
+<button class="chip" data-f="vpn">VPN &amp; downloads</button>
+<button class="chip" data-f="media">Library &amp; playback</button>
+<button class="chip" data-f="platform">Windows &amp; Mac</button>
+<button class="chip" data-f="faq">General questions</button>
+</div>
+<div class="count" id="count"></div>
+</div></div>
+
+<div class="wrap">
+
+<div class="noresults" id="noresults"><b>Nothing matched that.</b><p style="margin:0">Try a shorter word — &ldquo;disk&rdquo; rather than &ldquo;disk space running out&rdquo;. Or clear the search to browse everything.</p></div>
+
+<!-- ─────────── FIRST AID ─────────── -->
+<section class="section" id="firstaid" data-always="1">
+<div class="kicker">Before anything else</div>
+<h2 class="big">The four commands</h2>
+<p class="lead">Run these before changing a single setting. Between them they identify the cause of most problems, and they never make anything worse.</p>
+<div class="aid">
+<div class="aidcard teal"><b>1. What's actually running?</b><p>Look at the STATUS column. &ldquo;Restarting&rdquo; means it's crash-looping. &ldquo;Exited&rdquo; means it gave up.</p><pre>docker compose ps</pre></div>
+<div class="aidcard teal"><b>2. What is it complaining about?</b><p>This is where the answer usually is. Read from the bottom up — the last error before a restart is the real one.</p><pre>docker compose logs --tail 50 <span class="p">servicename</span></pre></div>
+<div class="aidcard"><b>3. Is the disk full?</b><p>A full disk causes bizarre, unrelated-looking failures across every container at once.</p><pre>df -h
+docker system df</pre></div>
+<div class="aidcard"><b>4. Did a restart fix it?</b><p>Worth one try. If it comes back broken, it's configuration, not a glitch — go back to the logs.</p><pre>docker compose restart <span class="p">servicename</span></pre></div>
+</div>
+<div class="tip"><strong>Reading logs is the whole skill.</strong> It feels intimidating, but you're only looking for one line: the first thing that says <code>error</code>, <code>failed</code>, <code>denied</code> or <code>refused</code>. Everything above it is usually normal startup chatter. If you paste that one line into a search engine along with the app's name, you'll almost always find your answer.</div>
+</section>
+
+<!-- ─────────── WON'T START ─────────── -->
+<h2 class="grphead" data-grp="start">A container won't start</h2>
+
+<details class="qa" data-cat="start" data-terms="restart loop restarting crash boot exited container keeps stopping">
+<summary><span class="tag w">Common</span>A container keeps restarting over and over</summary>
+<div class="qabody">
+<p>A restart loop means the app starts, hits a fatal error, and dies — repeatedly. The error is in the logs every single time.</p>
+<pre>docker compose logs --tail 60 <span class="p">servicename</span></pre>
+<p>In this stack it's nearly always one of four things:</p>
+<div class="tbl"><table>
+<thead><tr><th>What the log says</th><th>What it means</th></tr></thead>
+<tbody>
+<tr><td>permission denied</td><td>PUID/PGID don't match the folder owner. See the permissions section.</td></tr>
+<tr><td>no such file or directory</td><td>A path in your <code>.env</code> doesn't exist on the host yet.</td></tr>
+<tr><td>address already in use</td><td>Another program has that port. See the port conflict entry.</td></tr>
+<tr><td>database is locked / corrupt</td><td>Usually an unclean shutdown. Restore the config folder from backup.</td></tr>
+</tbody></table></div>
+<p>If the logs are empty, the container is dying before it can write anything — that points at a bad image, an unsupported architecture, or a malformed environment variable.</p>
+</div></details>
+
+<details class="qa" data-cat="start network" data-terms="port already in use address bind conflict 8096 8080 occupied">
+<summary>&ldquo;Port is already allocated&rdquo; or &ldquo;address already in use&rdquo;</summary>
+<div class="qabody">
+<p>Something else on the machine is using that port. Find out what:</p>
+<pre><span class="c"># Linux / macOS</span>
+sudo ss -tulpn | grep <span class="p">8096</span>
+<span class="c"># or</span>
+sudo lsof -i :<span class="p">8096</span></pre>
+<p>Then either stop that program, or change the <em>host</em> side of the mapping in your Compose file. The left number is the host, the right is inside the container — only change the left one:</p>
+<pre>ports:
+  - "<span class="p">8097</span>:8096"   <span class="c"># now reachable on :8097</span></pre>
+<div class="warning"><strong>On a Synology NAS this is common.</strong> DSM reserves a lot of ports for itself. Shifting the host side by one or two is the normal fix and breaks nothing.</div>
+</div></details>
+
+<details class="qa" data-cat="start perms" data-terms="no such file directory path missing mount volume empty folder">
+<summary>&ldquo;No such file or directory&rdquo; on a volume</summary>
+<div class="qabody">
+<p>Docker will happily create an empty directory where you meant to point at real data, so this often shows up as an app that starts but sees nothing.</p>
+<p>Check the paths in your <code>.env</code> actually exist, exactly as written:</p>
+<pre>ls -la /srv/media /srv/downloads</pre>
+<p>Watch for typos, a missing letter of case (<code>/Media</code> vs <code>/media</code> matters on Linux), and trailing slashes. If a folder is genuinely missing, create it and set ownership:</p>
+<pre>sudo mkdir -p /srv/media/{movies,tv,music}
+sudo chown -R $USER:$USER /srv/media</pre>
+</div></details>
+
+<details class="qa" data-cat="start" data-terms="image pull failed manifest architecture arm platform not supported">
+<summary>&ldquo;No matching manifest&rdquo; or the image won't pull</summary>
+<div class="qabody">
+<p>The image has no build for your CPU architecture. This turns up on Raspberry Pi and Apple Silicon.</p>
+<pre>uname -m   <span class="c"># aarch64 or arm64 means ARM</span></pre>
+<p>You can force emulation as a stopgap, at a real speed cost:</p>
+<pre>services:
+  something:
+    platform: linux/amd64</pre>
+<p>In this stack, Tube Archivist's Elasticsearch component is the usual culprit on ARM. Everything else has native builds.</p>
+</div></details>
+
+<details class="qa" data-cat="start" data-terms="disk full space no left device storage cleanup prune">
+<summary>Everything broke at once and I changed nothing</summary>
+<div class="qabody">
+<p>Check the disk first. A full disk produces failures that look like anything but a full disk.</p>
+<pre>df -h
+docker system df</pre>
+<p>If Docker itself is hoarding space, clear what isn't in use:</p>
+<pre>docker image prune -a
+docker system prune</pre>
+<div class="warning"><strong>Read what prune offers to delete before confirming.</strong> <code>docker system prune --volumes</code> will remove unused volumes, and if a container happens to be stopped at that moment, its data can be considered unused. Avoid the <code>--volumes</code> flag unless you're certain.</div>
+<p>The usual cause is a downloads folder nobody has emptied, or old images from months of updates.</p>
+</div></details>
+
+<!-- ─────────── CAN'T CONNECT ─────────── -->
+<h2 class="grphead" data-grp="network">I can't reach it</h2>
+
+<details class="qa" data-cat="network" data-terms="cant access web ui page wont load refused browser localhost ip">
+<summary><span class="tag w">Common</span>The web page won't load at all</summary>
+<div class="qabody">
+<p>Work through this in order — it's almost always number 2 or 3.</p>
+<ul>
+<li><b>Is it running?</b> <code>docker compose ps</code> — if it's not up, this is a startup problem, not a network one.</li>
+<li><b>Right address?</b> From another device you need the server's IP, not <code>localhost</code>. Find it with <code>hostname -I</code> on Linux, or <code>ipconfig</code> on Windows.</li>
+<li><b>Right port?</b> Check the left-hand number in the <code>ports:</code> mapping.</li>
+<li><b>Firewall?</b> On Ubuntu, <code>sudo ufw allow 8096</code>. On Windows, allow Docker Desktop through on private networks.</li>
+<li><b>Behind the VPN?</b> qBittorrent and Jackett publish through Gluetun. If Gluetun is unhealthy, both become unreachable even though they're running.</li>
+</ul>
+</div></details>
+
+<details class="qa" data-cat="network vpn" data-terms="sonarr radarr cant connect qbittorrent download client localhost 127.0.0.1 refused test failed">
+<summary><span class="tag w">Very common</span>Sonarr or Radarr can't connect to qBittorrent</summary>
+<div class="qabody">
+<p>This is the single most frequent problem with this stack, and the fix is counter-intuitive.</p>
+<p>Inside a container, <code>localhost</code> means <em>that container</em> — not your server. So pointing Sonarr at <code>127.0.0.1:8080</code> makes it look inside itself, find nothing, and report a connection failure.</p>
+<p>Containers reach each other by <strong>container name</strong>. But qBittorrent is a special case here: because it uses <code>network_mode: service:gluetun</code>, it has no network identity of its own — it lives inside Gluetun's network. So other containers must ask for <em>Gluetun</em>.</p>
+<div class="tbl"><table>
+<thead><tr><th>In Sonarr, set download client to</th><th>Host</th><th>Port</th></tr></thead>
+<tbody>
+<tr><td>qBittorrent behind a VPN</td><td><code>gluetun</code></td><td>8080</td></tr>
+<tr><td>qBittorrent with no VPN</td><td><code>qbittorrent</code></td><td>8080</td></tr>
+<tr><td>Jackett behind a VPN</td><td><code>gluetun</code></td><td>9117</td></tr>
+</tbody></table></div>
+<p>The same rule applies everywhere: Jellyseerr finds Sonarr at <code>sonarr:8989</code>, Bazarr finds Radarr at <code>radarr:7878</code>.</p>
+<div class="tip"><strong>Quick way to prove it.</strong> <code>docker compose exec sonarr ping -c2 gluetun</code> — if that resolves, the name is right and your problem is the port or the password instead.</div>
+</div></details>
+
+<details class="qa" data-cat="network" data-terms="remote access outside home away internet remote streaming domain https">
+<summary>How do I reach my server from outside the house?</summary>
+<div class="qabody">
+<p>Three approaches, in the order most people should consider them.</p>
+<ul>
+<li><b>Tailscale</b> — install it on the server and your phone, and they behave as though on the same network. Nothing is exposed publicly, it works around CGNAT, and it takes about five minutes. Start here.</li>
+<li><b>Cloudflare Tunnel</b> — gives you a real public address without opening any ports. Good when you want other people to reach it. Note their terms on proxying large video streams.</li>
+<li><b>Reverse proxy with port forwarding</b> — the traditional route. Most flexible, most to get wrong. You'll want proper certificates and, ideally, an auth layer in front of anything administrative.</li>
+</ul>
+<div class="warning"><strong>Whatever you choose, don't forward Arcane, Sonarr, Radarr or qBittorrent directly to the internet.</strong> Those interfaces assume they're on a trusted network. Arcane in particular holds the Docker socket, which is root access to the whole machine.</div>
+</div></details>
+
+<!-- ─────────── PERMISSIONS ─────────── -->
+<h2 class="grphead" data-grp="perms">Permissions and file ownership</h2>
+
+<details class="qa" data-cat="perms" data-terms="permission denied cant write folder puid pgid ownership chown 1000 access">
+<summary><span class="tag w">Very common</span>&ldquo;Permission denied&rdquo; or an app can't write to its folder</summary>
+<div class="qabody">
+<p>The container runs as a specific user ID, and that ID doesn't have rights to the folder you mounted.</p>
+<p>Find your own IDs:</p>
+<pre>id
+<span class="c"># uid=1000(you) gid=1000(you) ...</span></pre>
+<p>Put those numbers in <code>.env</code> as <code>PUID</code> and <code>PGID</code>, then make sure the folders are actually owned by that user:</p>
+<pre>sudo chown -R 1000:1000 /srv/media /srv/downloads
+docker compose up -d</pre>
+<p>Check what a container thinks it is, if you're unsure:</p>
+<pre>docker compose exec sonarr id</pre>
+<div class="tip"><strong>On Docker Desktop this works differently.</strong> Windows and macOS handle ownership at the VM boundary, so your real user ID often doesn't apply — 1000 is the safe default there regardless of what <code>id</code> reports.</div>
+</div></details>
+
+<details class="qa" data-cat="perms media" data-terms="hardlink copy instead of move slow import duplicate space atomic same filesystem">
+<summary>Imports copy the file instead of moving it, and I'm using double the space</summary>
+<div class="qabody">
+<p>Sonarr and Radarr can hardlink — effectively giving a file two names for free — but only when the download and the library are on the <strong>same filesystem</strong> and are visible through a <strong>single mount</strong> inside the container.</p>
+<p>Mounting them separately breaks it, even on the same disk:</p>
+<pre><span class="c"># Breaks hardlinks — two separate mounts</span>
+- /srv/downloads:/downloads
+- /srv/media/tv:/tv</pre>
+<p>Mount one shared parent instead, and keep both underneath it:</p>
+<pre><span class="c"># Works — one mount, consistent paths</span>
+- /srv/data:/data
+
+<span class="c"># on the host:</span>
+<span class="c">#   /srv/data/downloads</span>
+<span class="c">#   /srv/data/media/tv</span></pre>
+<p>Then point qBittorrent at <code>/data/downloads</code> and Sonarr's library at <code>/data/media/tv</code>. Every app must see the same path for the same file.</p>
+<div class="warning"><strong>This is worth fixing early.</strong> Restructuring paths after a library is established means re-importing everything. If you're at the start, set it up this way now.</div>
+</div></details>
+
+<details class="qa" data-cat="perms" data-terms="remote path mapping sonarr download client different path cannot find file imported">
+<summary>Sonarr says the download finished but can't find the file</summary>
+<div class="qabody">
+<p>The download client is reporting a path that means nothing to Sonarr. qBittorrent says the file is at <code>/downloads/x</code>, Sonarr looks at <code>/downloads/x</code>, and if those two containers mount different host folders under the same name, they disagree about reality.</p>
+<p>The proper fix is consistent mounts, as above. The patch is a remote path mapping in Sonarr under <b>Settings → Download Clients → Remote Path Mappings</b>, telling it that the client's <code>/downloads</code> is its own <code>/data/downloads</code>.</p>
+<p>Verify what each container actually sees:</p>
+<pre>docker compose exec qbittorrent ls /downloads
+docker compose exec sonarr ls /downloads</pre>
+<p>If those two listings differ, that's your problem in one command.</p>
+</div></details>
+
+<!-- ─────────── VPN ─────────── -->
+<h2 class="grphead" data-grp="vpn">VPN and downloads</h2>
+
+<details class="qa" data-cat="vpn" data-terms="gluetun unhealthy wont start vpn wireguard key provider error connection">
+<summary><span class="tag w">Common</span>Gluetun won't start or shows as unhealthy</summary>
+<div class="qabody">
+<p>Read its logs first — Gluetun is unusually clear about what's wrong.</p>
+<pre>docker compose logs --tail 40 gluetun</pre>
+<p>Ranked by how often each is the cause:</p>
+<ul>
+<li><b>Provider name spelled differently.</b> It must match Gluetun's own spelling exactly, lowercase — <code>private internet access</code>, not <code>PIA</code>.</li>
+<li><b>Wrong key.</b> A WireGuard <em>private</em> key is required, not the public one. It ends in <code>=</code> and is about 44 characters.</li>
+<li><b>Missing address.</b> WireGuard also needs <code>WIREGUARD_ADDRESSES</code>, something like <code>10.64.0.2/32</code>.</li>
+<li><b>No TUN device.</b> The container needs <code>/dev/net/tun</code> and <code>NET_ADMIN</code>. Both are in the generated file — check they weren't dropped.</li>
+<li><b>A country with no servers.</b> Leave <code>SERVER_COUNTRIES</code> empty to test.</li>
+</ul>
+<div class="warning"><strong>When Gluetun is down, qBittorrent has no network at all.</strong> That's the design working correctly — the kill switch means no traffic leaks while the VPN is broken.</div>
+</div></details>
+
+<details class="qa" data-cat="vpn media" data-terms="kima soulseek download vpn built in p2p music not routed gluetun">
+<summary>Kima has its own downloader — is that behind the VPN?</summary>
+<div class="qabody">
+<p>No, and this is worth understanding before you use it.</p>
+<p>Kima includes built-in Soulseek support for finding music directly, plus optional Lidarr-driven downloads. Unlike qBittorrent, <strong>Kima is not routed through Gluetun</strong> in the generated stack — it runs on the normal Docker network, because it also has to serve your library to your devices.</p>
+<p>So if you enter Soulseek credentials in Kima\'s settings, that peer-to-peer traffic uses your ordinary connection. That may be perfectly fine for you, but it should be a decision rather than a surprise.</p>
+<div class="warning"><strong>The same rules apply as anywhere else.</strong> Soulseek is a peer-to-peer network; other users see you as a peer. Only obtain music you are legally entitled to, and treat downloaded files as untrusted — a VPN would change the routing, not the contents.</div>
+<p>If you want that traffic tunnelled, you would need to route Kima through Gluetun as well, which complicates reaching its web interface. Leaving the Soulseek integration unconfigured avoids the question entirely — everything else in Kima works without it.</p>
+</div></details>
+
+<details class="qa" data-cat="vpn" data-terms="check vpn working ip address leak verify test real ip exposed">
+<summary>How do I confirm the VPN is actually working?</summary>
+<div class="qabody">
+<p>Ask the container what the internet thinks its address is:</p>
+<pre>docker compose exec gluetun wget -qO- https://ipinfo.io/ip</pre>
+<p>Compare it to your real address:</p>
+<pre>curl -s https://ipinfo.io/ip</pre>
+<p>Those two must be different. If they match, traffic is not going through the VPN — stop and fix that before downloading anything.</p>
+<p>Confirm qBittorrent is genuinely sharing that network:</p>
+<pre>docker compose exec qbittorrent wget -qO- https://ipinfo.io/ip</pre>
+<p>It should return the same address as Gluetun. Worth re-checking after any change to the download stack.</p>
+</div></details>
+
+<details class="qa" data-cat="vpn" data-terms="qbittorrent password login default admin adminadmin temporary cant log in">
+<summary>I can't log into qBittorrent</summary>
+<div class="qabody">
+<p>Recent qBittorrent versions no longer ship a fixed default password. On first start they generate a temporary one and write it to the log:</p>
+<pre>docker compose logs qbittorrent | grep -i password</pre>
+<p>Log in as <code>admin</code> with that value, then change it immediately in <b>Tools → Options → Web UI</b>.</p>
+<div class="warning"><strong>Change it even on a home network.</strong> qBittorrent's web interface can add torrents and write files anywhere it has access. It shouldn't be reachable by anything you don't control.</div>
+</div></details>
+
+<details class="qa" data-cat="vpn" data-terms="downloads slow stalled no peers seeds stuck zero speed port forwarding">
+<summary>Downloads are stalled or crawling</summary>
+<div class="qabody">
+<p>Separate the two possible causes before changing settings.</p>
+<ul>
+<li><b>Nothing is downloading at all</b> — likely the VPN. Check Gluetun is healthy and that qBittorrent has connectivity.</li>
+<li><b>It connects but stays slow</b> — often no forwarded port. Without one you can only reach peers who can accept incoming connections, which cuts your available swarm considerably.</li>
+</ul>
+<p>Some providers support port forwarding through Gluetun; many don't. Mullvad, AirVPN and Proton have historically been options, though policies change — check your provider's current position.</p>
+<p>Also worth ruling out: a queue paused after a disk-full event, or speed limits left on in qBittorrent's options.</p>
+</div></details>
+
+<!-- ─────────── MEDIA ─────────── -->
+<h2 class="grphead" data-grp="media">Library and playback</h2>
+
+<details class="qa" data-cat="media" data-terms="jellyfin buffering stuttering transcoding cpu 100% playback stops direct play">
+<summary><span class="tag w">Common</span>Jellyfin buffers or stutters</summary>
+<div class="qabody">
+<p>Almost always transcoding. Start playback, then look at the Jellyfin dashboard — if the active stream says &ldquo;Transcoding&rdquo; rather than &ldquo;Direct Play&rdquo;, your CPU is rebuilding the video in real time.</p>
+<p>Common reasons a file gets transcoded:</p>
+<ul>
+<li>The client can't decode that codec — HEVC on older devices is the usual one.</li>
+<li>Burned-in subtitle rendering, which forces a full transcode.</li>
+<li>Limited upload bandwidth when watching remotely.</li>
+<li>A quality cap set in the client's own playback settings.</li>
+</ul>
+<p>On native Linux with an Intel chip, enable hardware acceleration under <b>Dashboard → Playback</b> and pass the device through:</p>
+<pre>devices:
+  - /dev/dri:/dev/dri</pre>
+<div class="warning"><strong>On Windows and macOS this isn't available.</strong> Docker Desktop's virtual machine can't reach the GPU, so transcoding is CPU-only — realistically one stream. Storing files your devices can play directly is the practical answer there.</div>
+</div></details>
+
+<details class="qa" data-cat="media" data-terms="jellyfin empty library no media scan not showing files missing">
+<summary>Jellyfin can't see my files</summary>
+<div class="qabody">
+<p>Check what Jellyfin actually sees, from inside the container:</p>
+<pre>docker compose exec jellyfin ls /media</pre>
+<p>Empty output means the mount is wrong — the host path in <code>.env</code> doesn't point where you think. Files listed but no library means it's a Jellyfin-side setting instead:</p>
+<ul>
+<li>Library folders must be added using the <em>container</em> path (<code>/media/movies</code>), not the host path.</li>
+<li>Naming matters for metadata matching. <code>Film Name (2019).mkv</code> works; <code>film.final.copy.mkv</code> often won't.</li>
+<li>Films and TV need separate libraries with the right content type set.</li>
+<li>Trigger a scan manually after adding folders.</li>
+</ul>
+</div></details>
+
+<details class="qa" data-cat="media" data-terms="immich slow photos upload failing machine learning memory ram database">
+<summary>Immich is slow or keeps failing</summary>
+<div class="qabody">
+<p>Immich is the most demanding thing in this stack. It runs a database, a cache and a machine-learning service alongside the app itself.</p>
+<ul>
+<li><b>Memory.</b> Give it at least 4&nbsp;GB, ideally more during an initial import. On Docker Desktop, raise the VM's allocation in Settings.</li>
+<li><b>First import is heavy.</b> Thumbnails and face recognition for a large library take hours. That's normal.</li>
+<li><b>Don't change the database password after setup.</b> The existing database still expects the old one, and the app will fail to connect. Restore the old value or start the database fresh.</li>
+<li><b>Version mismatches.</b> The server and machine-learning images should be on the same release.</li>
+</ul>
+<div class="tip"><strong>Back up the Immich database separately.</strong> The photo files alone aren't your library — albums, faces and metadata live in Postgres. Losing it means keeping your photos but losing all the organisation.</div>
+</div></details>
+
+<details class="qa" data-cat="media" data-terms="wrong metadata wrong movie matched incorrectly artwork naming rename">
+<summary>The wrong artwork or metadata keeps getting matched</summary>
+<div class="qabody">
+<p>Matching relies on filenames. Ambiguous names get ambiguous results.</p>
+<pre>Movies/The Thing (1982)/The Thing (1982).mkv
+TV/Show Name/Season 01/Show Name - S01E01.mkv</pre>
+<p>The year is what separates remakes from originals. If a specific item is stubborn, most apps let you set the match by ID manually — in Jellyfin, &ldquo;Identify&rdquo; on the item lets you paste a database ID directly.</p>
+<p>Letting Sonarr and Radarr handle renaming avoids most of this, since they name files in the format these scanners expect.</p>
+</div></details>
+
+<!-- ─────────── PLATFORM ─────────── -->
+<h2 class="grphead" data-grp="platform">Windows and macOS specifics</h2>
+
+<details class="qa" data-cat="platform" data-terms="windows wsl slow scanning mnt c drive performance filesystem">
+<summary>Everything is slow on Windows</summary>
+<div class="qabody">
+<p>Most likely your files are on the Windows side of the divide. Paths under <code>/mnt/c/</code> cross a translation layer between Linux and Windows, and it's slow for the many-small-reads pattern that library scanning produces.</p>
+<p>Keep media inside the WSL filesystem instead:</p>
+<pre><span class="c"># Slow</span>
+/mnt/c/Users/You/Videos
+
+<span class="c"># Fast</span>
+/home/you/media</pre>
+<p>You can still browse those from Explorer via <code>\\wsl$</code>. If the media must stay on a Windows disk, mounting the whole physical disk into WSL with <code>wsl --mount</code> is faster than going through <code>/mnt/</code>.</p>
+<p>Also worth checking: antivirus scanning Docker's data folder in real time, and WSL's memory cap in <code>.wslconfig</code>.</p>
+</div></details>
+
+<details class="qa" data-cat="platform" data-terms="mac docker desktop folder sharing external drive volumes unmounted virtiofs">
+<summary>macOS can't see my external drive</summary>
+<div class="qabody">
+<p>Docker Desktop only mounts folders you've explicitly shared. Add the path under <b>Settings → Resources → File sharing</b>, and make sure <b>VirtioFS</b> is selected under General for reasonable speed.</p>
+<div class="warning"><strong>The real hazard with external drives.</strong> If macOS unmounts the drive — sleep, a knocked cable — the mount point becomes an ordinary empty folder, and containers cheerfully keep writing into it. You end up with files on your system disk that you thought were on the external. Set the Mac to never sleep, and verify the mount after any disconnection.</div>
+</div></details>
+
+<details class="qa" data-cat="platform" data-terms="server sleeps stops overnight wake power settings laptop lid">
+<summary>My server stops working overnight</summary>
+<div class="qabody">
+<p>The machine is sleeping. Desktop operating systems assume nobody wants a computer running at 3am.</p>
+<ul>
+<li><b>Windows</b> — Settings → System → Power, sleep set to Never on mains. On a laptop, set lid-close to do nothing.</li>
+<li><b>macOS</b> — System Settings → Displays → Advanced → prevent sleeping when the display is off. Or run <code>caffeinate -s</code> in a Terminal window.</li>
+<li><b>Linux</b> — usually already fine on a desktop install; check <code>systemctl status sleep.target</code> if not.</li>
+</ul>
+<p>Also confirm Docker starts on login (Desktop) or at boot (<code>sudo systemctl enable docker</code>), and that services use <code>restart: unless-stopped</code> so they come back after a reboot.</p>
+</div></details>
+
+<!-- ─────────── FAQ ─────────── -->
+<h2 class="grphead" data-grp="faq">General questions</h2>
+
+<details class="qa" data-cat="faq" data-terms="legal illegal piracy copyright allowed law torrenting">
+<summary>Is any of this legal?</summary>
+<div class="qabody">
+<p>The software is entirely legal. Every application here is open source with legitimate uses — organising media you own, streaming your own recordings, archiving public-domain and Creative Commons material, backing up your own photos, downloading Linux distributions.</p>
+<p>What you do with it is a separate question, and it's yours to answer. Downloading or sharing copyrighted material you have no right to is unlawful in most places, and no tool on this page changes that. Copyright law also differs meaningfully between countries.</p>
+<p>This project doesn't provide, host, index or endorse unauthorised copies of anything, and nothing here is legal advice. If you don't have the right to a file, don't use this to obtain it.</p>
+</div></details>
+
+<details class="qa" data-cat="faq vpn" data-terms="need vpn required necessary safe anonymous privacy">
+<summary>Do I actually need a VPN?</summary>
+<div class="qabody">
+<p>If you're running qBittorrent, this project treats it as required, and the generator won't produce a torrent stack without one. BitTorrent publishes your IP address to every peer in a swarm by design — that's how the protocol finds people.</p>
+<p>For everything else here, no. Jellyfin, Immich, the *arr apps and monitoring have no need for one.</p>
+<div class="warning"><strong>Be clear about what a VPN does.</strong> It changes how your traffic is routed. It does not make a downloaded file safe, it doesn't verify what you're downloading, and it doesn't make unlawful activity lawful. Treat every downloaded file as untrusted regardless.</div>
+</div></details>
+
+<details class="qa" data-cat="faq" data-terms="cost price expensive how much money budget cheap">
+<summary>What does this cost to run?</summary>
+<div class="qabody">
+<p>The software is free. Costs are hardware, electricity, and optionally a VPN.</p>
+<p>A used mini PC at around $150 that lasts three years works out near $4 a month before electricity — a low-power machine typically adds a few dollars a month. Drives are the ongoing expense as a library grows.</p>
+<p>The <a href="hardware.html#pricing">hardware page</a> compares the options properly, including why renting a VPS is usually more expensive than owning hardware for anything storage-heavy.</p>
+</div></details>
+
+<details class="qa" data-cat="faq" data-terms="beginner hard difficult experience linux knowledge required newbie">
+<summary>Do I need to know Linux?</summary>
+<div class="qabody">
+<p>No. The Arcane path is designed so that after the initial install you manage everything from a web page — starting, stopping, updating and reading logs are all buttons.</p>
+<p>You'll type commands twice: once to install Docker, once to start Arcane. Both are copy-paste, and the <a href="platforms.html">platform guide</a> covers Windows, macOS, Linux and NAS separately.</p>
+<p>That said, some understanding accumulates whether you plan it or not — and it's worth having. Reading a log file is the single most useful skill here, and it's less intimidating than it looks.</p>
+</div></details>
+
+<details class="qa" data-cat="faq" data-terms="all modules everything install need required minimum start small">
+<summary>Do I have to install all of it?</summary>
+<div class="qabody">
+<p>No, and you shouldn't. That's the point of the project.</p>
+<p>Start with Jellyfin. Add Jellyseerr when you want others to request things. Add Sonarr and Radarr when manually managing files gets tedious. Add Immich when you want your photos off someone else's cloud.</p>
+<p>Every module you add is another thing to configure, update and eventually debug. A stack of three services you understand beats fifteen you don't.</p>
+</div></details>
+
+<details class="qa" data-cat="faq media" data-terms="plex jellyfin difference compare which better emby">
+<summary>Why Jellyfin rather than Plex?</summary>
+<div class="qabody">
+<p>Jellyfin is fully open source with no paid tier, no account with a third party, and no feature gated behind a subscription. Everything runs on your hardware.</p>
+<p>Plex is more polished in places, has broader client support on older TVs, and its remote access setup is simpler for non-technical users. Those are real advantages.</p>
+<p>This project builds around Jellyfin because self-hosting the whole stack is the goal. If Plex suits you better, most of the surrounding pieces — Sonarr, Radarr, Bazarr, qBittorrent — work identically with it.</p>
+</div></details>
+
+<details class="qa" data-cat="faq" data-terms="update updating upgrade maintenance keep current watchtower">
+<summary>How often should I update?</summary>
+<div class="qabody">
+<p>Monthly is a reasonable rhythm. Security updates for anything reachable from outside your network deserve more urgency.</p>
+<pre>docker compose pull
+docker compose up -d</pre>
+<p>In Arcane it's pull, then redeploy. Read release notes before major version jumps, particularly for Immich, which occasionally requires migration steps.</p>
+<div class="tip"><strong>On automatic updates.</strong> Watchtower can do this unattended, but an update that breaks something at 4am while you're asleep is worse than a manual update you're present for. Consider it for small services, not for anything holding data you care about.</div>
+</div></details>
+
+<details class="qa" data-cat="faq" data-terms="backup restore lost data safe copy disaster recovery">
+<summary>What should I back up?</summary>
+<div class="qabody">
+<p>Your config folder and your <code>.env</code>. That's every setting, key and connection you patiently configured, and it's small.</p>
+<ul>
+<li><b>Essential</b> — the config directory, <code>.env</code>, <code>docker-compose.yml</code></li>
+<li><b>Essential and irreplaceable</b> — your Immich photo library and its database</li>
+<li><b>Nice to have</b> — media, which can generally be re-acquired</li>
+</ul>
+<p>Stop the stack before backing up databases, so you copy a consistent state:</p>
+<pre>docker compose stop
+<span class="c"># run your backup</span>
+docker compose start</pre>
+<div class="warning"><strong>A backup you've never restored isn't a backup.</strong> Test it once, on purpose, while nothing is wrong.</div>
+</div></details>
+
+<details class="qa" data-cat="faq" data-terms="raspberry pi arm low power weak hardware minimum specs">
+<summary>Will this run on a Raspberry Pi?</summary>
+<div class="qabody">
+<p>Partly. A Pi 4 or 5 handles Jellyfin for direct play, the *arr apps, and Uptime Kuma comfortably.</p>
+<p>It won't transcode meaningfully, and Immich and Tube Archivist will struggle. Use an SSD rather than an SD card — SD cards fail under constant database writes, usually at the least convenient moment.</p>
+<p>As a first server to learn on, it's a good choice. As the machine your household relies on, a used mini PC costs little more and does considerably more.</p>
+</div></details>
+
+<details class="qa" data-cat="faq" data-terms="arcane portainer difference why docker manager gui">
+<summary>Why Arcane instead of Portainer?</summary>
+<div class="qabody">
+<p>Both manage Docker through a browser and either would work. Arcane is a newer, lighter Go application with a clearer interface for Compose projects, which is most of what this stack needs. It's BSD-3-Clause licensed.</p>
+<p>Portainer is more established with a larger community and more documentation available. If you already run it, there's no reason to switch — everything here deploys the same way.</p>
+<div class="warning"><strong>Either way, treat it as privileged.</strong> Both mount the Docker socket, which is equivalent to root on the host. Keep them off the public internet.</div>
+</div></details>
+
+<details class="qa" data-cat="faq" data-terms="move migrate transfer another machine new server change hardware">
+<summary>Can I move everything to a different machine later?</summary>
+<div class="qabody">
+<p>Yes, and it's easier than people expect. Copy three things: your <code>docker-compose.yml</code>, your <code>.env</code>, and your config directory. Then <code>docker compose up -d</code> on the new machine.</p>
+<p>Points to watch: keep the same paths or update <code>.env</code> to match the new ones, check PUID and PGID against the new machine's user, and move media separately since it's usually far larger.</p>
+<p>This is a good argument for starting on whatever computer you already own. Outgrowing it later costs you an afternoon, not a rebuild.</p>
+</div></details>
+
+<!-- ─────────── STILL STUCK ─────────── -->
+<div class="closing" data-always="1">
+<h3>Still stuck?</h3>
+<p>When you go looking for help, bring the log line. &ldquo;Sonarr won't connect&rdquo; is hard to answer; the actual error text, your Compose file with secrets removed, and what you already tried usually gets a fast reply.</p>
+<p>Useful first stops: each project's own GitHub issues and documentation — they're linked from the <a href="modular-media-server-site.html#apps">apps list</a> — and the r/selfhosted and TRaSH Guides communities for stack-wide questions.</p>
+<div class="warning" style="margin-bottom:0"><strong>Redact before you paste.</strong> Logs and Compose files contain API keys, VPN keys and passwords. Replace them with <code>REDACTED</code> before posting anywhere public — this catches people out regularly.</div>
+<p style="margin-top:24px"><a class="btn ghost" href="guide.html">Setup guide</a> &nbsp; <a class="btn ghost" href="documentation.html">Documentation</a> &nbsp; <a class="btn ghost" href="platforms.html">Platform guides</a></p>
+</div>
+
+</div>
+
+<footer><div class="wrap">Modular Media Server · <a href="modular-media-server-site.html">Home</a> · <a href="guide.html">Guide</a> · <a href="documentation.html">Documentation</a> · <a href="hardware.html">Hardware</a> · <a href="faq.html">Help</a> · Start small. Add what you need. Understand what you're running.</div></footer>
+
+<script>
+(function(){
+  var q=document.getElementById('q'), chips=document.querySelectorAll('.chip'),
+      items=document.querySelectorAll('details.qa'), heads=document.querySelectorAll('.grphead'),
+      count=document.getElementById('count'), none=document.getElementById('noresults'),
+      always=document.querySelectorAll('[data-always]'), filter='all';
+
+  function apply(){
+    var term=(q.value||'').toLowerCase().trim(), shown=0;
+
+    items.forEach(function(el){
+      var cats=(el.dataset.cat||''), terms=(el.dataset.terms||''),
+          text=el.textContent.toLowerCase();
+      var matchCat = filter==='all' || cats.indexOf(filter)>-1;
+      var matchTerm = !term || text.indexOf(term)>-1 || terms.indexOf(term)>-1;
+      var show = matchCat && matchTerm;
+      el.style.display = show ? '' : 'none';
+      if(show){ shown++; if(term) el.open=true; }
+    });
+
+    // hide a group heading when nothing under it is visible
+    heads.forEach(function(h){
+      var n=h.nextElementSibling, any=false;
+      while(n && n.tagName==='DETAILS'){ if(n.style.display!=='none') any=true; n=n.nextElementSibling; }
+      h.style.display = any ? '' : 'none';
+    });
+
+    // the intro blocks only make sense when browsing, not when filtering
+    var browsing = !term && filter==='all';
+    always.forEach(function(el){ el.style.display = browsing ? '' : 'none'; });
+
+    none.style.display = shown ? 'none' : 'block';
+    count.textContent = browsing ? '' : shown+(shown===1?' answer':' answers')+' shown';
+  }
+
+  q.addEventListener('input', apply);
+  chips.forEach(function(c){
+    c.addEventListener('click', function(){
+      chips.forEach(function(x){ x.classList.remove('on'); });
+      c.classList.add('on'); filter=c.dataset.f; apply();
+    });
+  });
+  apply();
+})();
+</script>
+</body></html>

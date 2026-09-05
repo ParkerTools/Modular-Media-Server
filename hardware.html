@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hardware & hosting · Modular Media Server</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap');
+:root{--blue:#0081A7;--teal:#00AFB9;--cream:#FDFCDC;--peach:#FED9B7;--coral:#F07167;--ink:#15333b;--muted:#587078;--white:#fffef7;--line:#cfe3e4}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--cream);color:var(--ink);font-family:"DM Sans",sans-serif}a{color:var(--blue);text-decoration:none}a:hover{color:var(--coral)}.wrap{max-width:1160px;margin:auto;padding:0 24px}
+nav{height:82px;display:flex;align-items:center;justify-content:space-between}.brand{font-weight:700;font-size:18px;letter-spacing:-.04em;color:var(--ink)}.brand span{color:var(--coral)}.navlinks{display:flex;gap:25px;color:var(--muted);font-size:14px}.navlinks a{color:var(--muted)}.navlinks a:hover{color:var(--blue)}
+.hero{padding:80px 0 70px;border-bottom:1px solid var(--line);position:relative;overflow:hidden}.hero:after{content:"";position:absolute;width:250px;height:170px;background:var(--peach);border-radius:54% 46% 60% 40%;right:-60px;top:40px;transform:rotate(-6deg);z-index:-1}
+.kicker{text-transform:uppercase;letter-spacing:.15em;font-size:12px;font-weight:700;color:var(--blue)}
+h1,h2,h3{font-family:Fraunces,serif;letter-spacing:-.045em;line-height:1.05}h1{font-size:clamp(52px,7vw,82px);max-width:850px;margin:18px 0}.hero p{font-size:19px;line-height:1.7;color:var(--muted);max-width:720px}
+.layout{display:grid;grid-template-columns:230px 1fr;gap:55px;padding:65px 0 90px}.toc{position:sticky;top:25px;height:max-content}.toc strong{display:block;margin-bottom:12px}.toc a{display:block;padding:7px 0;color:var(--muted);font-size:14px}.toc a:hover{color:var(--blue)}
+section{scroll-margin-top:25px;margin-bottom:70px}h2{font-size:44px;margin:10px 0 18px}h3{font-size:27px;margin:35px 0 12px}p,li{color:var(--muted);line-height:1.75}ul,ol{padding-left:22px}
+.card{background:var(--white);border:1px solid var(--line);border-radius:20px;padding:24px;margin:20px 0}.card.peach{background:#fff1e4;border-color:#f4c8a6}.card.teal{background:#eaf8f7}.card strong{color:var(--ink)}
+.flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:25px 0}.flow span{background:var(--white);border:1px solid var(--line);padding:10px 13px;border-radius:999px;font-size:13px;font-weight:700;color:var(--ink)}.flow b{color:var(--coral)}
+pre{background:#15333b;color:#fdfcdc;padding:20px;border-radius:16px;overflow:auto;line-height:1.6;font-size:13px}
+.warning{border-left:5px solid var(--coral);background:#fff0e3;padding:18px 20px;border-radius:0 16px 16px 0}.tip{border-left:5px solid var(--teal);background:#eaf8f7;padding:18px 20px;border-radius:0 16px 16px 0}.warning strong,.tip strong{color:var(--ink)}
+.tbl{background:var(--white);border:1px solid var(--line);border-radius:20px;overflow:hidden;margin:25px 0}.tbl table{width:100%;border-collapse:collapse;font-size:14px}.tbl th{text-align:left;padding:15px 18px;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);background:#eaf8f7;font-weight:700}.tbl td{padding:14px 18px;border-top:1px solid var(--line);color:var(--muted);vertical-align:top}.tbl td:first-child{font-weight:700;color:var(--ink)}.tbl tr:nth-child(even) td{background:#fdfcfa}
+.pill{display:inline-block;font-size:11px;font-weight:700;padding:4px 9px;border-radius:999px;background:var(--peach);color:#744b32;white-space:nowrap}.pill.teal{background:#d3f0ef;color:#0e5a63}.pill.coral{background:#ffe0dc;color:#96382f}
+.picks{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:25px}.pick{background:var(--white);border:1px solid var(--line);border-radius:20px;padding:23px}.pick:nth-child(4n+2){background:#eaf8f7}.pick:nth-child(4n+3){background:#fff1e4}.pick h3{font:700 19px "DM Sans";letter-spacing:-.03em;margin:0 0 4px}.pick .who{font-size:12px;font-weight:700;color:var(--coral);margin-bottom:10px}.pick p{font-size:14px;margin:0 0 12px}.pick ul{margin:0;padding-left:18px}.pick li{font-size:13px;line-height:1.6}
+.prices{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:25px}.price{background:var(--white);border:1px solid var(--line);border-radius:20px;padding:23px;display:flex;flex-direction:column}.price .tier{font:700 17px "DM Sans";letter-spacing:-.03em}.price .eg{font-size:12px;color:var(--muted);margin-top:3px}.price .big{font:700 34px Fraunces;color:var(--blue);letter-spacing:-.05em;margin:16px 0 2px}.price .lbl{font-size:12px;color:var(--muted)}.price .mo{font-size:14px;font-weight:700;color:var(--coral);margin-top:8px}.price .sep{height:1px;background:var(--line);margin:16px 0}.price p{font-size:13px;margin:0 0 14px;flex:1}
+.provs{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:22px}.prov{background:var(--white);border:1px solid var(--line);border-radius:20px;padding:22px}.prov h3{font:700 19px "DM Sans";letter-spacing:-.03em;margin:0 0 8px}.prov p{font-size:14px;margin:0 0 14px}.prov .links{display:flex;gap:10px;flex-wrap:wrap}.prov .links a{font-size:12px;font-weight:700;border-bottom:1px solid #9bcbd2}
+.utils{margin-top:22px}.ugroup{margin-bottom:26px}.ugroup>strong{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--blue);margin-bottom:12px}.ulist{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.util{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:14px 16px}.util b{display:block;font-size:14px;letter-spacing:-.02em;color:var(--ink)}.util span{font-size:12.5px;color:var(--muted);line-height:1.5}
+.blob{background:var(--peach);border-radius:50% 45% 52% 43%;min-height:230px;display:grid;place-items:center;text-align:center;padding:35px;transform:rotate(-3deg)}.blob p{font:27px/1.25 Fraunces;max-width:330px;color:#653f32}
+.closing{display:grid;grid-template-columns:1fr 1fr;gap:55px;align-items:center;margin-top:20px}
+footer{border-top:1px solid var(--line);padding:25px 0;color:var(--muted);font-size:13px}
+@media(max-width:850px){.navlinks{display:none}.layout{grid-template-columns:1fr;gap:0}.toc{position:static;margin-bottom:35px}.picks,.provs,.closing{grid-template-columns:1fr}.prices,.ulist{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.prices,.ulist{grid-template-columns:1fr}h2{font-size:36px}.tbl{overflow-x:auto}}
+</style>
+</head>
+<body>
+<div class="wrap"><nav><a class="brand" href="modular-media-server-site.html">modular<span>.</span>media</a><div class="navlinks"><a href="modular-media-server-site.html">Home</a><a href="guide.html">Guide</a><a href="platforms.html">Platforms</a><a href="modular-media-server-site.html#apps">Apps</a><a href="modular-media-server-site.html#generator">Generator</a><a href="access.html">Access</a><a href="documentation.html">Documentation</a><a href="hardware.html">Hardware</a><a href="faq.html">Help</a></div></nav></div>
+
+<section class="hero"><div class="wrap"><div class="kicker">Hardware &amp; hosting</div><h1>What should you actually run this on?</h1><p>Almost anything that runs Docker can run some of this. The honest answer depends on how many people watch at once, how much you want to keep, and whether you'd rather pay once or pay monthly. Here's how to decide without overbuying.</p></div></section>
+
+<div class="wrap layout">
+<aside class="toc"><strong>On this page</strong>
+<a href="#requirements">What each app needs</a>
+<a href="#transcoding">Transcoding</a>
+<a href="#devices">Choosing a device</a>
+<a href="#selfhosting">Self-hosting at home</a>
+<a href="#vps">When a VPS makes sense</a>
+<a href="#pricing">Cost comparison</a>
+<a href="#providers">VPN &amp; VPS providers</a>
+<a href="#utilities">Other useful tools</a>
+<a href="#summary">Putting it together</a>
+</aside>
+<main>
+
+<section id="requirements"><div class="kicker">01 · The short version</div><h2>What each app needs</h2>
+<p>Most of these services sit idle most of the time. The ones that will actually stress your machine are Jellyfin when it transcodes, Immich when it processes a photo backlog, and Tube Archivist when it downloads. Everything else is comfortable on very modest hardware.</p>
+<div class="tbl"><table>
+<thead><tr><th>App</th><th>CPU</th><th>RAM</th><th>GPU</th><th>Storage</th></tr></thead>
+<tbody>
+<tr><td>Jellyfin (direct play)</td><td>Low</td><td>Low</td><td>Not needed</td><td>However big your library is</td></tr>
+<tr><td>Jellyfin (transcoding)</td><td>Medium–High</td><td>Medium</td><td><span class="pill teal">Really helps</span></td><td>Same, plus scratch space</td></tr>
+<tr><td>Jellyseerr</td><td>Low</td><td>Low</td><td>No</td><td>Small</td></tr>
+<tr><td>Sonarr / Radarr / Lidarr</td><td>Low</td><td>Low</td><td>No</td><td>Small — config and databases</td></tr>
+<tr><td>Bazarr</td><td>Low</td><td>Low</td><td>No</td><td>Small</td></tr>
+<tr><td>Jackett</td><td>Low</td><td>Low</td><td>No</td><td>Small</td></tr>
+<tr><td>qBittorrent + Gluetun</td><td>Low</td><td>Low–Medium</td><td>No</td><td>Working space for downloads</td></tr>
+<tr><td>Immich</td><td>Medium</td><td>Medium–High</td><td><span class="pill teal">Helps a lot</span></td><td>Large and always growing</td></tr>
+<tr><td>Kima</td><td>Medium</td><td>Medium</td><td><span class="pill teal">Optional</span></td><td>Your music library</td></tr>
+<tr><td>Uptime Kuma</td><td>Very low</td><td>Very low</td><td>No</td><td>Tiny</td></tr>
+<tr><td>ArchiveBox</td><td>Medium</td><td>Medium</td><td>No</td><td>Grows steadily</td></tr>
+<tr><td>Tube Archivist</td><td>Medium</td><td>Medium–High</td><td>No</td><td>Large — video adds up fast</td></tr>
+</tbody></table></div>
+<div class="tip"><strong>RAM is usually the first thing you run out of.</strong> Immich and Tube Archivist both bring their own database and search containers along, and Kima bundles Postgres, Redis and audio-analysis models inside its single container — all of which quietly adds a couple of gigabytes before you've stored anything. 8&nbsp;GB is a comfortable floor for a mixed stack; 16&nbsp;GB means you stop thinking about it.</div>
+</section>
+
+<section id="transcoding"><div class="kicker">02 · The part people get wrong</div><h2>Transcoding</h2>
+<p>Direct play is when the device you're watching on can already handle the file, so Jellyfin just hands it over. Almost no CPU. Transcoding is when it can't, so Jellyfin has to rebuild the video on the fly. That's where a weak machine falls over.</p>
+<div class="card teal"><strong>How to need less of it</strong><p style="margin:12px 0 0">Store files in formats your devices actually play, keep subtitles as separate files rather than burned-in where you can, and remember that remote viewing over limited upload bandwidth will force a transcode no matter how good your files are.</p></div>
+<p>If you do need it, hardware transcoding is the difference between one struggling stream and several easy ones. Intel QuickSync — available on most Intel chips with integrated graphics — is the most straightforward option, well supported and cheap to get hold of in used and mini PC hardware. A dedicated GPU works too, but is rarely necessary at home.</p>
+<div class="warning"><strong>Passing hardware into a container takes a little care.</strong> Hardware transcoding needs the right device mapped into Jellyfin's container and the right drivers on the host. It's very doable, but it's a step that catches people out, so treat it as a follow-up task rather than something to solve on day one.</div>
+</section>
+
+<section id="devices"><div class="kicker">03 · Pick a machine</div><h2>Choosing a device</h2>
+<p>There's no single right answer here. These are the paths most people end up on, and what each one is genuinely good at.</p>
+<div class="picks">
+
+<div class="pick"><h3>Mini PC</h3><div class="who">The easy default</div><p>Small, quiet, low power, and most Intel models include QuickSync for transcoding. The best balance of effort and result for a first server.</p><ul><li>Very low running cost</li><li>Storage usually needs an external enclosure</li><li>Sits happily on a shelf</li></ul></div>
+
+<div class="pick"><h3>Used business desktop</h3><div class="who">The cheapest good option</div><p>Ex-office machines are plentiful, well built and easy to work on. Room for several drives, easy to upgrade, and parts are everywhere.</p><ul><li>Best value per pound spent</li><li>Bigger and louder than a mini PC</li><li>Check it has the ports and bays you need</li></ul></div>
+
+<div class="pick"><h3>NAS</h3><div class="who">When storage is the point</div><p>Purpose-built for always-on storage with drive redundancy. Most modern models run Docker, though usually with less CPU headroom than a comparable PC.</p><ul><li>Drive redundancy handled for you</li><li>Simple to manage and expand</li><li>Weaker transcoding on entry models</li></ul></div>
+
+<div class="pick"><h3>Old laptop</h3><div class="who">Free, if you have one</div><p>A perfectly reasonable place to start. The built-in battery even acts as a small UPS, so a brief power cut won't take the server down.</p><ul><li>Set it to stay awake with the lid shut</li><li>Storage expansion is limited</li><li>Watch heat if it lives in a cupboard</li></ul></div>
+
+<div class="pick"><h3>Raspberry Pi</h3><div class="who">Light stacks only</div><p>Fine for Jellyfin direct play, the *arr apps and Uptime Kuma. Not the machine for transcoding, Immich processing or heavy archiving.</p><ul><li>Tiny power draw</li><li>Use an SSD, not an SD card</li><li>Some images need ARM builds</li></ul></div>
+
+<div class="pick"><h3>Custom build</h3><div class="who">When you know what you want</div><p>Maximum control over drives, transcoding and expansion. Worth it once you've outgrown something else and know what your bottleneck actually is.</p><ul><li>Most expensive up front</li><li>Most work to plan and assemble</li><li>Best long-term headroom</li></ul></div>
+
+</div>
+<div class="tip"><strong>Buy for the library, not the CPU.</strong> Most people's first upgrade isn't a faster processor — it's more drive space. Whatever you pick, think about how you'll add storage to it in a year.</div>
+</section>
+
+<section id="selfhosting"><div class="kicker">04 · Running it at home</div><h2>Self-hosting realities</h2>
+<p>The server itself is usually the easy part. The things that catch people out are the boring realities of a home internet connection.</p>
+<div class="card"><strong>Worth checking before you commit</strong>
+<ul style="margin-bottom:0">
+<li><strong style="color:var(--ink)">Upload speed.</strong> Watching from outside your house uses upload, not download, and home connections are often lopsided. This is the single biggest limit on remote streaming.</li>
+<li><strong style="color:var(--ink)">CGNAT.</strong> Some providers don't give you a real public address, which makes traditional port forwarding impossible. A mesh VPN like Tailscale sidesteps this entirely.</li>
+<li><strong style="color:var(--ink)">A changing IP address.</strong> Most home connections don't keep the same address forever. Dynamic DNS or a tunnel solves it.</li>
+<li><strong style="color:var(--ink)">Power cuts.</strong> Decide whether the server should come back on by itself, and whether a small UPS is worth it.</li>
+<li><strong style="color:var(--ink)">Drives fail.</strong> Not if — when. Redundancy keeps you running; backups are what actually save your data. They aren't the same thing.</li>
+<li><strong style="color:var(--ink)">Noise and heat.</strong> A server in a living room has different requirements from one in a garage.</li>
+</ul></div>
+<div class="warning"><strong>Think carefully before opening ports.</strong> Exposing admin interfaces straight to the internet is how self-hosted servers get compromised. A reverse proxy with proper certificates, or a mesh VPN so nothing is public at all, are both far safer starting points than forwarding a port and hoping.</div>
+</section>
+
+<section id="vps"><div class="kicker">05 · The rented option</div><h2>When a VPS makes sense</h2>
+<p>A VPS is someone else's computer with good uptime and a real public address. That makes it excellent for some jobs in this stack and a poor fit for others, and the dividing line is almost always storage.</p>
+<div class="picks">
+<div class="pick"><h3>Good fits</h3><div class="who">Small, always-on, public</div><ul><li>Uptime Kuma, so your monitoring isn't on the machine it monitors</li><li>A reverse proxy or entry point for remote access</li><li>A VPN endpoint back into your home network</li><li>Status pages and small websites</li></ul></div>
+<div class="pick"><h3>Poor fits</h3><div class="who">Anything that eats disk</div><ul><li>A large Jellyfin library</li><li>A growing Immich photo collection</li><li>Tube Archivist and long-term archives</li><li>Anything where bandwidth charges could surprise you</li></ul></div>
+</div>
+<p>The common pattern is a hybrid: bulk storage and media at home where drives are cheap, with a small VPS handling monitoring and the public-facing side of things. You get reliable remote access without paying monthly for terabytes.</p>
+</section>
+
+<section id="pricing"><div class="kicker">06 · What it costs</div><h2>Cost comparison</h2>
+<p>Owned hardware costs more on day one and almost nothing after that. Rented hardware is the reverse. Over a couple of years the gap is usually wider than people expect.</p>
+<div class="prices">
+
+<div class="price"><div class="tier">Used mini PC</div><div class="eg">Ex-office micro form factor</div><div class="big">$100–200</div><div class="lbl">up front</div><div class="mo">plus electricity</div><div class="sep"></div><p>Quiet, low power, often has QuickSync. Storage generally lives in an external enclosure.</p><span class="pill teal">Easiest start</span></div>
+
+<div class="price"><div class="tier">Used desktop</div><div class="eg">Tower or small form factor</div><div class="big">$150–400</div><div class="lbl">up front</div><div class="mo">plus electricity</div><div class="sep"></div><p>More drive bays and more room to grow. Bigger, warmer and a little louder.</p><span class="pill">Best value</span></div>
+
+<div class="price"><div class="tier">NAS</div><div class="eg">Multi-bay enclosure</div><div class="big">$300–1,000+</div><div class="lbl">up front, before drives</div><div class="mo">plus electricity</div><div class="sep"></div><p>Built for storage and redundancy. Drives are a serious separate cost worth planning for.</p><span class="pill teal">Storage first</span></div>
+
+<div class="price"><div class="tier">Custom build</div><div class="eg">Self-assembled server</div><div class="big">$500–2,000+</div><div class="lbl">up front</div><div class="mo">plus electricity</div><div class="sep"></div><p>Exactly the machine you want. Most expensive and most work, but the most headroom.</p><span class="pill coral">Advanced</span></div>
+
+<div class="price"><div class="tier">VPS</div><div class="eg">Rented virtual server</div><div class="big">$0</div><div class="lbl">up front</div><div class="mo">$5–50+ every month</div><div class="sep"></div><p>Running in minutes with a real public address. Storage is limited and gets pricey quickly.</p><span class="pill teal">Small services</span></div>
+
+<div class="price"><div class="tier">VPS + cloud storage</div><div class="eg">Server plus object storage</div><div class="big">$0</div><div class="lbl">up front</div><div class="mo">$20–100+ every month</div><div class="sep"></div><p>Scales without buying drives. Watch retrieval and bandwidth charges, which are easy to miss.</p><span class="pill">Archives</span></div>
+
+</div>
+<div class="tip"><strong>The comparison people forget:</strong> a $150 mini PC that lasts three years works out around $4 a month before electricity. A $15/month VPS is $540 over the same period, with less storage. Renting buys convenience and uptime, not savings.</div>
+<p style="font-size:13px;margin-top:22px">These are rough estimates for orientation only, and they move around constantly. Drive costs, electricity rates and provider pricing all vary — check current prices yourself before buying anything.</p>
+</section>
+
+<section id="providers"><div class="kicker">07 · Services</div><h2>VPN &amp; VPS providers</h2>
+<p>Gluetun works with a wide range of VPN providers, so this is mostly a question of price, privacy policy and which countries you want to appear in. VPS choice comes down to what you're running and where.</p>
+<div class="card peach"><strong>About links on this page</strong><p style="margin:12px 0 0">Some links here may eventually be affiliate links, and where that's the case it will say so plainly right next to the link. No service is listed because it pays a commission, and none of the technical guidance changes based on who does. Right now none of the links below are affiliate links. Prices and terms change often, so check with the provider directly.</p></div>
+
+<h3>VPN providers</h3>
+<div class="provs">
+<div class="prov"><h3>Mullvad</h3><p>Flat pricing, no accounts tied to your identity, and a long-standing privacy record. Well supported by Gluetun including WireGuard.</p><div class="links"><a href="https://mullvad.net/" target="_blank" rel="noopener">Website</a></div></div>
+<div class="prov"><h3>Proton VPN</h3><p>From the Proton Mail team, with a clear privacy stance and solid WireGuard support. Works well as a Gluetun provider.</p><div class="links"><a href="https://protonvpn.com/" target="_blank" rel="noopener">Website</a></div></div>
+<div class="prov"><h3>Private Internet Access</h3><p>Long-established provider with broad Gluetun support and a large server network. Runs an affiliate programme we haven't joined.</p><div class="links"><a href="https://www.privateinternetaccess.com/" target="_blank" rel="noopener">Website</a></div></div>
+<div class="prov"><h3>Surfshark</h3><p>Competitively priced with unlimited device connections and Gluetun compatibility. Also runs an affiliate programme we haven't joined.</p><div class="links"><a href="https://surfshark.com/" target="_blank" rel="noopener">Website</a></div></div>
+</div>
+<div class="tip"><strong>What matters when choosing:</strong> that Gluetun supports it, that the provider allows the traffic you intend to send, that WireGuard is available, and that the privacy policy actually says what you think it says. Speed differences between reputable providers matter far less than people assume.</div>
+
+<h3>VPS providers</h3>
+<div class="provs">
+<div class="prov"><h3>Hetzner</h3><p>Consistently good value with reliable hardware and generous transfer allowances. A community favourite for small always-on services.</p><div class="links"><a href="https://www.hetzner.com/" target="_blank" rel="noopener">Website</a></div></div>
+<div class="prov"><h3>DigitalOcean</h3><p>Straightforward interface and unusually good documentation, which makes it friendly if this is your first server. Runs an affiliate programme we haven't joined.</p><div class="links"><a href="https://www.digitalocean.com/" target="_blank" rel="noopener">Website</a></div></div>
+<div class="prov"><h3>Vultr</h3><p>Wide choice of locations and instance sizes, useful if you want the server geographically close to you.</p><div class="links"><a href="https://www.vultr.com/" target="_blank" rel="noopener">Website</a></div></div>
+<div class="prov"><h3>Contabo</h3><p>Notably more storage per pound than most competitors, which suits archive workloads. Performance is less consistent, so match it to the job.</p><div class="links"><a href="https://contabo.com/" target="_blank" rel="noopener">Website</a></div></div>
+</div>
+</section>
+
+<section id="utilities"><div class="kicker">08 · Worth knowing about</div><h2>Other tools you might want</h2>
+<p>None of these are part of the core modules, and you don't need any of them to start. They're the things people tend to add once the server has been running a while and they've found the rough edges.</p>
+<div class="utils">
+
+<div class="ugroup"><strong>Getting to your server</strong><div class="ulist">
+<div class="util"><b>Tailscale</b><span>Mesh VPN that works around CGNAT with almost no setup</span></div>
+<div class="util"><b>Cloudflare Tunnel</b><span>Reach your services without opening any ports</span></div>
+<div class="util"><b>Nginx Proxy Manager</b><span>Reverse proxy and certificates with a friendly interface</span></div>
+<div class="util"><b>Caddy</b><span>Reverse proxy that handles HTTPS automatically</span></div>
+<div class="util"><b>WireGuard</b><span>Roll your own VPN back into your network</span></div>
+</div></div>
+
+<div class="ugroup"><strong>Managing containers</strong><div class="ulist">
+<div class="util"><b>Arcane</b><span>The Docker manager this project is built around</span></div>
+<div class="util"><b>Portainer</b><span>The long-established alternative</span></div>
+<div class="util"><b>Dozzle</b><span>Live container logs in the browser</span></div>
+<div class="util"><b>Watchtower</b><span>Automatic image updates — use thoughtfully</span></div>
+</div></div>
+
+<div class="ugroup"><strong>Keeping an eye on things</strong><div class="ulist">
+<div class="util"><b>Glances</b><span>Quick overview of system resources</span></div>
+<div class="util"><b>Netdata</b><span>Detailed real-time metrics</span></div>
+<div class="util"><b>Scrutiny</b><span>Drive health monitoring, so failures aren't a surprise</span></div>
+</div></div>
+
+<div class="ugroup"><strong>Backups</strong><div class="ulist">
+<div class="util"><b>Restic</b><span>Encrypted, deduplicated, straightforward</span></div>
+<div class="util"><b>Borg</b><span>Efficient deduplicating backups</span></div>
+<div class="util"><b>Rclone</b><span>Sync to almost any cloud storage</span></div>
+<div class="util"><b>Duplicati</b><span>Backups with a web interface</span></div>
+</div></div>
+
+<div class="ugroup"><strong>Locking things down</strong><div class="ulist">
+<div class="util"><b>Authelia</b><span>Single sign-on and two-factor in front of your apps</span></div>
+<div class="util"><b>Authentik</b><span>Fuller identity provider if you outgrow Authelia</span></div>
+<div class="util"><b>CrowdSec</b><span>Community-driven intrusion prevention</span></div>
+<div class="util"><b>Fail2ban</b><span>Blocks repeated failed login attempts</span></div>
+</div></div>
+
+<div class="ugroup"><strong>More media</strong><div class="ulist">
+<div class="util"><b>Kometa</b><span>Better artwork and collections in Jellyfin</span></div>
+<div class="util"><b>Tdarr</b><span>Bulk transcoding so playback doesn't have to</span></div>
+<div class="util"><b>Audiobookshelf</b><span>Audiobooks and podcasts</span></div>
+<div class="util"><b>Kavita</b><span>Books, comics and manga</span></div>
+</div></div>
+
+<div class="ugroup"><strong>Files</strong><div class="ulist">
+<div class="util"><b>Syncthing</b><span>Keep folders in sync between machines</span></div>
+<div class="util"><b>File Browser</b><span>Simple web access to your files</span></div>
+<div class="util"><b>Nextcloud</b><span>Fuller cloud replacement if you want one</span></div>
+</div></div>
+
+</div></section>
+
+<section id="summary"><div class="kicker">09 · In short</div><h2>Putting it together</h2>
+<div class="closing">
+<div>
+<p>If you want a shortcut through all of the above: get a used mini PC or office desktop with 16&nbsp;GB of RAM and an Intel chip with QuickSync, put a decent-sized drive in it, and use Tailscale so you never have to open a port. That covers most of this stack comfortably and costs less than a couple of months of streaming subscriptions.</p>
+<p>Add a small VPS later if you want monitoring that survives your server going down. Add drives when you run out. Upgrade the machine when you actually hit a wall, not before.</p>
+<div class="flow"><span>Buy modest</span><b>→</b><span>Run it a while</span><b>→</b><span>Find the real limit</span><b>→</b><span>Upgrade that one thing</span></div>
+</div>
+<div class="blob"><p>The best server is the one you'll actually keep running.</p></div>
+</div>
+<div class="warning" style="margin-top:35px"><strong>Whatever you build it on, the rules don't change.</strong> Only obtain, store and share content you're legally permitted to use, treat downloaded files as untrusted regardless of what your VPN is doing, keep your host and images updated, and back up anything you'd be upset to lose. Better hardware doesn't make any of that optional.</div>
+</section>
+
+</main></div>
+<footer><div class="wrap">Modular Media Server · <a href="documentation.html">Documentation</a> · <a href="platforms.html">Platforms</a> · <a href="modular-media-server-site.html#generator">Build a stack</a> · Start small. Add what you need. Understand what you're running.</div></footer>
+</body></html>

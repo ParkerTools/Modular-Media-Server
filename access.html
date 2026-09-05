@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Access &amp; accounts · Modular Media Server</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap');
+:root{--blue:#0081A7;--teal:#00AFB9;--cream:#FDFCDC;--peach:#FED9B7;--coral:#F07167;--ink:#15333b;--muted:#587078;--white:#fffef7;--line:#cfe3e4}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--cream);color:var(--ink);font-family:"DM Sans",sans-serif}a{color:var(--blue);text-decoration:none}a:hover{color:var(--coral)}.wrap{max-width:1160px;margin:auto;padding:0 24px}
+nav{height:82px;display:flex;align-items:center;justify-content:space-between}.brand{font-weight:700;font-size:18px;letter-spacing:-.04em;color:var(--ink)}.brand span{color:var(--coral)}.navlinks{display:flex;gap:24px;color:var(--muted);font-size:14px}.navlinks a{color:var(--muted)}.navlinks a:hover{color:var(--blue)}
+.hero{padding:78px 0 58px;position:relative;overflow:hidden}.hero:after{content:"";position:absolute;width:255px;height:172px;background:var(--peach);border-radius:54% 46% 60% 40%;right:-68px;top:36px;transform:rotate(-9deg);z-index:-1}
+.kicker{text-transform:uppercase;letter-spacing:.15em;font-size:12px;font-weight:700;color:var(--blue)}
+h1,h2,h3{font-family:Fraunces,serif;letter-spacing:-.045em;line-height:1.05}h1{font-size:clamp(46px,7vw,76px);max-width:860px;margin:18px 0}.hero p{font-size:19px;line-height:1.7;color:var(--muted);max-width:710px}
+p,li{color:var(--muted);line-height:1.75}ul,ol{padding-left:22px}li{margin-bottom:5px}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.87em;background:#eaf8f7;padding:2px 6px;border-radius:6px;color:#0e5a63;word-break:break-word}
+pre{background:#15333b;color:#fdfcdc;padding:19px;border-radius:15px;overflow:auto;line-height:1.65;font-size:12.5px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;margin:16px 0}pre .c{color:#8fb3ae}pre .p{color:#FED9B7}
+.layout{display:grid;grid-template-columns:225px 1fr;gap:55px;padding:10px 0 90px}
+.toc{position:sticky;top:25px;height:max-content}.toc strong{display:block;margin-bottom:12px;font-size:14px;color:var(--ink)}.toc a{display:block;padding:6px 0;color:var(--muted);font-size:13.5px;line-height:1.4}.toc a:hover{color:var(--blue)}.toc .sub{padding-left:14px;font-size:13px}
+.toc hr{border:0;border-top:1px solid var(--line);margin:14px 0}
+section{scroll-margin-top:25px;margin-bottom:65px}
+h2.big{font-size:42px;margin:8px 0 16px}h3{font-size:25px;margin:38px 0 12px}h4{font-family:"DM Sans";font-size:17px;font-weight:700;letter-spacing:-.02em;color:var(--ink);margin:26px 0 8px}
+.lead{font-size:16.5px;color:var(--muted);line-height:1.75;max-width:690px;margin-bottom:24px}
+.card{background:var(--white);border:1px solid var(--line);border-radius:20px;padding:24px;margin:20px 0}.card.peach{background:#fff1e4;border-color:#f4c8a6}.card.teal{background:#eaf8f7;border-color:#a9dde0}.card strong{color:var(--ink)}
+.warning{border-left:5px solid var(--coral);background:#fff0e3;padding:17px 19px;border-radius:0 15px 15px 0;margin:20px 0;font-size:15px}.tip{border-left:5px solid var(--teal);background:#eaf8f7;padding:17px 19px;border-radius:0 15px 15px 0;margin:20px 0;font-size:15px}.warning strong,.tip strong{color:var(--ink)}
+.tbl{background:var(--white);border:1px solid var(--line);border-radius:18px;overflow:hidden;margin:20px 0}.tbl table{width:100%;border-collapse:collapse;font-size:14px}.tbl th{text-align:left;padding:13px 17px;font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);background:#eaf8f7;font-weight:700}.tbl td{padding:12px 17px;border-top:1px solid var(--line);color:var(--muted);vertical-align:top}.tbl td:first-child{font-weight:700;color:var(--ink)}
+.yes{color:#2f7d5e;font-weight:700}.no{color:#b0463c;font-weight:700}.part{color:#a06a2c;font-weight:700}
+.steps{counter-reset:s;list-style:none;padding:0;margin:26px 0}
+.stp{counter-increment:s;position:relative;padding:0 0 30px 60px;border-left:2px solid var(--line);margin-left:19px}
+.stp:last-child{border-left-color:transparent;padding-bottom:0}
+.stp:before{content:counter(s);position:absolute;left:-20px;top:-4px;width:38px;height:38px;border-radius:50%;background:var(--blue);color:var(--cream);display:grid;place-items:center;font-weight:700;font-size:15px;font-family:"DM Sans"}
+.stp h4{margin:0 0 8px;font-size:19px;font-family:Fraunces,serif;font-weight:700;letter-spacing:-.03em}
+.stp p{margin:0 0 12px;font-size:15px}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:24px 0}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:20px 0}
+.opt{background:var(--white);border:1px solid var(--line);border-radius:20px;padding:22px;display:flex;flex-direction:column}
+.opt.pick{background:#eaf8f7;border-color:#a9dde0}
+.opt .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--coral);margin-bottom:6px}
+.opt.pick .lbl{color:var(--blue)}
+.opt h4{margin:0 0 8px;font-size:18px}
+.opt p{font-size:14px;margin:0 0 12px}
+.opt ul{margin:0;padding-left:18px}.opt li{font-size:13px;margin-bottom:3px}
+.mini{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:17px}.mini b{display:block;font-size:15px;color:var(--ink);margin-bottom:4px;letter-spacing:-.02em}.mini span{font-size:13.5px;color:var(--muted);line-height:1.55}
+.flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:22px 0}.flow span{background:var(--white);border:1px solid var(--line);padding:10px 13px;border-radius:999px;font-size:13px;font-weight:700;color:var(--ink)}.flow b{color:var(--coral)}
+.btn{display:inline-block;border-radius:999px;padding:12px 20px;font-weight:700;font-size:14.5px;background:var(--blue);color:white}.btn:hover{color:white;background:#00688a}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}.btn.ghost:hover{border-color:var(--teal);color:var(--blue)}
+.check{list-style:none;padding:0}.check li{position:relative;padding-left:30px;margin-bottom:10px;font-size:15px}
+.check li:before{content:"";position:absolute;left:4px;top:7px;width:11px;height:6px;border-left:2.5px solid var(--teal);border-bottom:2.5px solid var(--teal);transform:rotate(-45deg)}
+footer{border-top:1px solid var(--line);padding:25px 0;color:var(--muted);font-size:13px}
+@media(max-width:900px){.navlinks{display:none}.layout{grid-template-columns:1fr;gap:0}.toc{position:static;margin-bottom:35px}.three,.two{grid-template-columns:1fr}h2.big{font-size:33px}}
+@media(max-width:520px){.stp{padding-left:46px}.tbl{overflow-x:auto}}
+</style>
+</head>
+<body>
+<div class="wrap"><nav><a class="brand" href="modular-media-server-site.html">modular<span>.</span>media</a><div class="navlinks"><a href="modular-media-server-site.html">Home</a><a href="guide.html">Guide</a><a href="platforms.html">Platforms</a><a href="access.html">Access</a><a href="documentation.html">Documentation</a><a href="faq.html">Help</a></div></nav></div>
+
+<section class="hero"><div class="wrap"><div class="kicker">Access &amp; accounts</div><h1>Letting other people in, safely.</h1><p>Three related jobs: reaching your server from outside the house, giving everyone one login instead of nine, and deciding who can actually do what. They have to be done in that order, because single sign-on needs a real HTTPS address before it will work at all.</p></div></section>
+
+<div class="wrap"><div class="layout">
+<aside class="toc"><strong>On this page</strong>
+<a href="#order">Do these in order</a>
+<hr>
+<a href="#remote">1 · Reaching your server</a>
+<a class="sub" href="#choosing">Choosing an approach</a>
+<a class="sub" href="#tailscale">Tailscale</a>
+<a class="sub" href="#proxy">Reverse proxy</a>
+<a class="sub" href="#never">Never expose these</a>
+<hr>
+<a href="#pocketid">2 · Pocket ID</a>
+<a class="sub" href="#pid-install">Installing it</a>
+<a class="sub" href="#pid-first">First passkey</a>
+<a class="sub" href="#pid-client">Adding a client</a>
+<hr>
+<a href="#apps">3 · Connecting your apps</a>
+<a class="sub" href="#support">What actually supports it</a>
+<a class="sub" href="#immich-oidc">Immich</a>
+<a class="sub" href="#jellyfin-oidc">Jellyfin</a>
+<a class="sub" href="#therest">Everything else</a>
+<hr>
+<a href="#users">4 · User management</a>
+<a class="sub" href="#household">Household setup</a>
+<a class="sub" href="#removing">Removing someone</a>
+<hr>
+<a href="#checklist">Security checklist</a>
+</aside>
+
+<main>
+
+<!-- ─────────── ORDER ─────────── -->
+<section id="order">
+<div class="kicker">Start here</div>
+<h2 class="big">Do these in order</h2>
+<p class="lead">Each step depends on the one before it. Skipping ahead is the main reason people get stuck — particularly with passkeys, which simply refuse to work without HTTPS.</p>
+<div class="flow"><span>Get a domain</span><b>→</b><span>HTTPS working</span><b>→</b><span>Install Pocket ID</span><b>→</b><span>Connect apps</span><b>→</b><span>Add people</span></div>
+<div class="warning"><strong>Passkeys require a secure context.</strong> Browsers only allow them on <code>https://</code> with a real domain name, or on <code>localhost</code>. You cannot run Pocket ID at <code>http://192.168.1.50:1411</code> and register a passkey — the browser blocks it, and no setting changes that. Sort out HTTPS first.</div>
+<div class="tip"><strong>You may not need any of this.</strong> If you're the only user and you're happy reaching things through Tailscale, you can stop after part one. Single sign-on earns its keep when several people need accounts across several apps — not before.</div>
+</section>
+
+<!-- ─────────── REMOTE ─────────── -->
+<section id="remote">
+<div class="kicker">Part one</div>
+<h2 class="big">Reaching your server</h2>
+<p class="lead">Your server sits on your home network. The internet can't see it, which is a feature. There are three ways to change that, and they differ enormously in how much they expose.</p>
+
+<h3 id="choosing">Choosing an approach</h3>
+<div class="three">
+
+<div class="opt pick">
+<div class="lbl">Start here</div>
+<h4>Tailscale</h4>
+<p>A private network between your own devices. Nothing is published to the internet; your phone simply behaves as though it's at home.</p>
+<ul>
+<li>Set up in minutes</li>
+<li>Works around CGNAT</li>
+<li>No ports opened</li>
+<li>Only for people you invite</li>
+</ul>
+</div>
+
+<div class="opt">
+<div class="lbl">For sharing</div>
+<h4>Cloudflare Tunnel</h4>
+<p>A public address with no open ports. An outbound connection from your server does the work.</p>
+<ul>
+<li>Real public URL</li>
+<li>Router untouched</li>
+<li>Cloudflare sees your traffic</li>
+<li>Check their terms on video</li>
+</ul>
+</div>
+
+<div class="opt">
+<div class="lbl">Most control</div>
+<h4>Reverse proxy</h4>
+<p>Your own server answering on ports 80 and 443, forwarded through your router.</p>
+<ul>
+<li>Full control, no middleman</li>
+<li>Needs a static-ish IP or DDNS</li>
+<li>Genuinely public — hardening matters</li>
+<li>Required for Pocket ID</li>
+</ul>
+</div>
+
+</div>
+
+<div class="card teal"><strong>Which should you pick?</strong><p style="margin:10px 0 0">If it's just you and your own devices, use Tailscale and skip the rest of this page. If you want family members to watch Jellyfin on a TV without installing anything, you need a public address — a reverse proxy or Cloudflare Tunnel. <strong>Pocket ID needs a public HTTPS address too</strong>, so single sign-on implies one of the latter two.</p></div>
+
+<h3 id="tailscale">Tailscale</h3>
+<p>The least you can do while still getting remote access, and for many people it's genuinely enough.</p>
+<pre>curl -fsSL https://tailscale.com/install.sh | sh
+sudo tailscale up</pre>
+<p>Install the app on your phone and laptop, sign into the same account, and your server appears at a stable address like <code>http://server:8096</code>. No ports opened, nothing public.</p>
+<div class="tip"><strong>Sharing with family without giving them your account.</strong> Tailscale can share an individual machine with another Tailscale user, and Funnel can publish a single service publicly if you want one exception to the rule. Both are narrower than opening a port.</div>
+
+<h3 id="proxy">Reverse proxy with Caddy</h3>
+<p>A reverse proxy sits in front of everything, terminates HTTPS, and routes by hostname. Caddy is the friendliest option because it obtains and renews certificates without being asked.</p>
+
+<ol class="steps">
+
+<li class="stp">
+<h4>Point a domain at your home</h4>
+<p>Buy a domain, then create records pointing at your public address. If your address changes — most home connections — use a dynamic DNS updater, or Cloudflare's API with a small updater container.</p>
+<pre><span class="c"># One record per service, or a wildcard</span>
+jellyfin.example.com  →  your.public.ip
+id.example.com        →  your.public.ip</pre>
+</li>
+
+<li class="stp">
+<h4>Forward two ports</h4>
+<p>In your router, forward <strong>80</strong> and <strong>443</strong> to your server. Those two only — never the application ports themselves.</p>
+<div class="warning"><strong>Port 80 is needed for certificate issuance</strong>, not for serving your site. Caddy redirects it to HTTPS automatically once certificates exist.</div>
+</li>
+
+<li class="stp">
+<h4>Add Caddy to your stack</h4>
+<pre>  caddy:
+    image: caddy:latest
+    container_name: caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ${CONFIG_ROOT}/caddy/data:/data
+      - ${CONFIG_ROOT}/caddy/config:/config
+    restart: unless-stopped</pre>
+<p>The <code>/data</code> volume holds your certificates. Losing it means re-issuing them, and issuers apply rate limits — so keep it.</p>
+</li>
+
+<li class="stp">
+<h4>Write the Caddyfile</h4>
+<p>One block per service. Caddy handles certificates for each name automatically.</p>
+<pre>id.example.com {
+    reverse_proxy pocket-id:1411
+}
+
+jellyfin.example.com {
+    reverse_proxy jellyfin:8096
+}
+
+photos.example.com {
+    reverse_proxy immich-server:2283
+}</pre>
+<p>Services are addressed by container name, because Caddy is on the same Docker network — not <code>localhost</code>, which inside Caddy's container means Caddy.</p>
+<div class="tip"><strong>Testing without burning your rate limit.</strong> Certificate authorities limit failed attempts. While experimenting, add <code>acme_ca https://acme-staging-v02.api.letsencrypt.org/directory</code> at the top of the Caddyfile. Certificates won't be trusted by browsers, but you can confirm routing works, then remove the line.</div>
+</li>
+
+<li class="stp">
+<h4>Bring it up and check</h4>
+<pre>docker compose up -d caddy
+docker compose logs -f caddy</pre>
+<p>Watch for certificate issuance. Errors here are almost always DNS not resolving yet, or port 80 not actually reaching the server.</p>
+</li>
+
+</ol>
+
+<h3 id="never">What to never expose</h3>
+<p>Publishing a hostname makes it reachable by everyone, including automated scanners that will find it within hours. Some things in this stack must not be among them.</p>
+<div class="tbl"><table>
+<thead><tr><th>Service</th><th>Public?</th><th>Why</th></tr></thead>
+<tbody>
+<tr><td>Jellyfin</td><td><span class="yes">Reasonable</span></td><td>Designed for it, has real user accounts</td></tr>
+<tr><td>Jellyseerr</td><td><span class="yes">Reasonable</span></td><td>Built for household requests</td></tr>
+<tr><td>Immich</td><td><span class="yes">Reasonable</span></td><td>Needs it for phone backup away from home</td></tr>
+<tr><td>Pocket ID</td><td><span class="yes">Required</span></td><td>Can't function otherwise</td></tr>
+<tr><td>Arcane</td><td><span class="no">Never</span></td><td>Holds the Docker socket — root on your machine</td></tr>
+<tr><td>qBittorrent</td><td><span class="no">Never</span></td><td>Can write files anywhere it can reach</td></tr>
+<tr><td>Sonarr / Radarr / Lidarr</td><td><span class="no">Never</span></td><td>Weak auth, can execute scripts on import</td></tr>
+<tr><td>Jackett</td><td><span class="no">Never</span></td><td>No meaningful authentication</td></tr>
+<tr><td>Uptime Kuma</td><td><span class="part">Status page only</span></td><td>Publish the status page, not the admin interface</td></tr>
+</tbody></table></div>
+<p>Reach the "never" items through Tailscale instead. You can run both: a public proxy for the things family use, and a private network for everything administrative.</p>
+</section>
+
+<!-- ─────────── POCKET ID ─────────── -->
+<section id="pocketid">
+<div class="kicker">Part two</div>
+<h2 class="big">Pocket ID</h2>
+<p class="lead">Pocket ID is a small, OpenID Connect certified identity provider built entirely around passkeys. One login for every app that supports it, no passwords stored anywhere, and a single Go binary with a SQLite database rather than the sprawl of Keycloak.</p>
+
+<div class="card"><strong>What a passkey actually is</strong><p style="margin:10px 0 0">A key pair held by your phone, laptop or a physical security key, unlocked by your fingerprint, face or device PIN. The private half never leaves the device and is never sent anywhere. There's no password to reuse, leak or guess — which removes most of the ways accounts get broken into.</p></div>
+
+<div class="warning"><strong>Passkeys only work over HTTPS on a real domain.</strong> This is a browser rule, not a Pocket ID setting. Finish part one first — you need <code>https://id.example.com</code> resolving and trusted before anything below will work.</div>
+
+<h3 id="pid-install">Installing it</h3>
+
+<ol class="steps">
+
+<li class="stp">
+<h4>Generate an encryption key</h4>
+<pre>openssl rand -base64 32</pre>
+<p>Put it in your <code>.env</code>. Pocket ID uses it to encrypt sensitive values at rest.</p>
+<pre>POCKETID_ENCRYPTION_KEY=<span class="p">your-generated-key</span>
+POCKETID_URL=https://id.example.com</pre>
+</li>
+
+<li class="stp">
+<h4>Add the service</h4>
+<pre>  pocket-id:
+    image: ghcr.io/pocket-id/pocket-id:v2
+    container_name: pocket-id
+    ports:
+      - "1411:1411"
+    volumes:
+      - ${CONFIG_ROOT}/pocket-id:/app/data
+    environment:
+      - APP_URL=${POCKETID_URL}
+      - ENCRYPTION_KEY=${POCKETID_ENCRYPTION_KEY}
+      - TRUST_PROXY=true
+      - PUID=${PUID}
+      - PGID=${PGID}
+    restart: unless-stopped</pre>
+<p><code>APP_URL</code> must exactly match the address you'll visit, including <code>https://</code>. Passkeys are bound to that origin, so a mismatch means they silently stop working.</p>
+<p><code>TRUST_PROXY=true</code> tells it to honour the forwarded headers from Caddy. Without it, it sees every request as coming from the proxy.</p>
+<div class="tip"><strong>The default database is SQLite</strong>, which is fine for a household. Pocket ID also supports Postgres via <code>DB_PROVIDER</code> if you'd rather consolidate databases.</div>
+</li>
+
+<li class="stp">
+<h4>Add it to the Caddyfile and start</h4>
+<pre>id.example.com {
+    reverse_proxy pocket-id:1411
+}</pre>
+<pre>docker compose up -d pocket-id caddy</pre>
+<p>Visit <code>https://id.example.com</code>. You should get a valid certificate and a login page. If the certificate isn't trusted, fix that before continuing — passkeys will not register.</p>
+</li>
+
+</ol>
+
+<h3 id="pid-first">Creating your first passkey</h3>
+<p>There's no admin password in an environment variable, because there are no passwords at all. On first run a setup wizard creates the initial admin account, and you register a passkey immediately afterwards.</p>
+<p>If you need to get back in later without a working passkey, Pocket ID's CLI issues a one-time access link:</p>
+<pre>docker compose exec pocket-id /app/pocket-id one-time-access-token <span class="p">admin</span></pre>
+<p>That prints a URL valid once, for a short window. Open it and register a new passkey.</p>
+<div class="warning"><strong>Register at least two passkeys before you rely on this.</strong> One on your phone, one on a laptop or a hardware key kept somewhere safe. A single passkey on a single device means a lost phone locks you out of every connected app at once. This is the most important paragraph on this page.</div>
+
+<h3 id="pid-client">Adding an application</h3>
+<p>Every app you connect needs a client entry. The process is the same each time.</p>
+<ol class="steps">
+<li class="stp">
+<h4>Create the client</h4>
+<p>In Pocket ID, go to <b>Administration → OIDC Clients → Add OIDC Client</b>. Give it the app's name and set the callback URL, which each application specifies in its own documentation.</p>
+</li>
+<li class="stp">
+<h4>Copy the credentials</h4>
+<p>You'll get a <b>Client ID</b> and a <b>Client Secret</b>. The secret is shown once. Store it in your <code>.env</code> rather than pasting it into a Compose file.</p>
+</li>
+<li class="stp">
+<h4>Point the app at Pocket ID</h4>
+<p>Most apps only need the issuer URL and will discover the rest themselves:</p>
+<pre>https://id.example.com/.well-known/openid-configuration</pre>
+</li>
+</ol>
+</section>
+
+<!-- ─────────── APPS ─────────── -->
+<section id="apps">
+<div class="kicker">Part three</div>
+<h2 class="big">Connecting your apps</h2>
+<p class="lead">This is where expectations need managing. Single sign-on across a media stack is not the solved problem it appears to be — most of these applications have no OIDC support at all, and the most important one has an awkward caveat.</p>
+
+<h3 id="support">What actually supports it</h3>
+<div class="tbl"><table>
+<thead><tr><th>App</th><th>OIDC</th><th>Reality</th></tr></thead>
+<tbody>
+<tr><td>Immich</td><td><span class="yes">Native</span></td><td>Works properly, including the mobile app</td></tr>
+<tr><td>Arcane</td><td><span class="yes">Native</span></td><td>Supported directly</td></tr>
+<tr><td>Jellyfin</td><td><span class="part">Plugin</span></td><td>Community plugin, <strong>web browser only</strong> — see below</td></tr>
+<tr><td>Jellyseerr</td><td><span class="part">Varies</span></td><td>Signs in through Jellyfin; check your version's options</td></tr>
+<tr><td>Sonarr / Radarr / Lidarr</td><td><span class="no">None</span></td><td>Basic forms login only</td></tr>
+<tr><td>Bazarr</td><td><span class="no">None</span></td><td>Basic login only</td></tr>
+<tr><td>qBittorrent</td><td><span class="no">None</span></td><td>Its own single account</td></tr>
+<tr><td>Uptime Kuma</td><td><span class="no">None</span></td><td>Its own accounts</td></tr>
+<tr><td>ArchiveBox</td><td><span class="no">None</span></td><td>Django accounts, LDAP possible</td></tr>
+<tr><td>Tube Archivist</td><td><span class="no">None</span></td><td>Its own accounts</td></tr>
+</tbody></table></div>
+
+<div class="card peach"><strong>So what's it actually worth?</strong><p style="margin:10px 0 0">Realistically, Pocket ID gives you one login for <strong>Immich, Arcane and Jellyfin in a browser</strong>. That's a genuine improvement if those are the apps other people touch. It does not give you one login for the whole stack, and anyone claiming otherwise hasn't tried it on a television.</p></div>
+
+<h3 id="immich-oidc">Immich</h3>
+<p>The best-supported of the three, and the one where SSO is most worth having, since it's the app family members use daily on their phones.</p>
+<p>In Pocket ID, create a client with these callback URLs:</p>
+<pre>https://photos.example.com/auth/login
+https://photos.example.com/user-settings
+app.immich:///oauth-callback   <span class="c"># for the mobile app</span></pre>
+<p>Then in Immich, under <b>Administration → Settings → OAuth</b>:</p>
+<div class="tbl"><table>
+<tbody>
+<tr><td>Issuer URL</td><td><code>https://id.example.com/.well-known/openid-configuration</code></td></tr>
+<tr><td>Client ID</td><td>from Pocket ID</td></tr>
+<tr><td>Client Secret</td><td>from Pocket ID</td></tr>
+<tr><td>Scope</td><td><code>openid email profile</code></td></tr>
+<tr><td>Auto register</td><td>on, to create accounts on first login</td></tr>
+</tbody></table></div>
+<div class="warning"><strong>Don't disable password login until you've tested it.</strong> Immich can hide the password form entirely. Do that only once OIDC login has worked in a private browser window — otherwise a misconfiguration locks you out of your own photo library.</div>
+
+<h3 id="jellyfin-oidc">Jellyfin — read this before starting</h3>
+<p>Jellyfin has no native OpenID Connect support. There's a community SSO plugin that works well, but it carries a limitation that matters enormously for a media server.</p>
+<div class="warning"><strong>The plugin only works in a web browser.</strong> Native clients — Swiftfin, Jellyfin for Android and Android TV, Roku, Kodi — cannot use SSO login at all. They need a normal Jellyfin username and password. If your family watches on a TV app, which is the usual case, every one of them still needs a Jellyfin account regardless of what you set up here.</div>
+<p>Native OIDC has been proposed upstream and is being worked on, but it isn't in a released version at the time of writing, and the discussion points at a future major release. Until then, this is the situation.</p>
+<p>Given that, decide honestly whether it's worth it:</p>
+<div class="two">
+<div class="mini"><b>Worth doing if</b><span>People mostly use the web interface, you want central account control, or you're already running Pocket ID for Immich anyway.</span></div>
+<div class="mini"><b>Skip it if</b><span>Everyone watches on TV apps. You'll maintain SSO that nobody's device can use, alongside the passwords they'll actually use.</span></div>
+</div>
+<h4>If you're proceeding</h4>
+<p>Install the SSO plugin by adding its repository under <b>Dashboard → Plugins → Repositories</b>, then install from the catalogue and restart Jellyfin.</p>
+<p>In Pocket ID, create a client whose callback URL follows the plugin's pattern — the provider name at the end is whatever you choose to call it, and must match on both sides:</p>
+<pre>https://jellyfin.example.com/sso/OID/redirect/<span class="p">pocketid</span></pre>
+<p>Configure the plugin with your issuer URL, client ID and secret, enable it, tick folder access, and <strong>restart Jellyfin</strong> — configuration changes don't take effect until you do.</p>
+<p>The login button isn't added automatically. Add a custom link in Jellyfin's <code>config/web/config.json</code>:</p>
+<pre>{
+  "customLinks": [
+    { "name": "Sign in with SSO",
+      "url": "/sso/OID/start/<span class="p">pocketid</span>",
+      "icon": "lock" }
+  ]
+}</pre>
+<div class="tip"><strong>Test in a private window.</strong> Your existing session will mask problems. And keep one local admin account with a password — if the plugin breaks after an update, that account is how you get back in.</div>
+
+<h3 id="therest">Everything else</h3>
+<p>For apps with no OIDC support, you have three honest options.</p>
+<div class="three">
+<div class="opt pick">
+<div class="lbl">Recommended</div>
+<h4>Keep them private</h4>
+<p>Don't publish them at all. Reach Sonarr, Radarr, qBittorrent and Arcane through Tailscale. Their own login is then a second layer, not the only one.</p>
+</div>
+<div class="opt">
+<div class="lbl">More work</div>
+<h4>Forward auth</h4>
+<p>A proxy component checks authentication before passing the request on, putting a login in front of apps that don't support one.</p>
+</div>
+<div class="opt">
+<div class="lbl">Simplest</div>
+<h4>Just use their logins</h4>
+<p>Set a strong unique password on each. Unglamorous, but these are admin tools you touch rarely, and a password manager makes it a non-issue.</p>
+</div>
+</div>
+<div class="warning"><strong>Pocket ID alone cannot protect apps that don't speak OIDC.</strong> It's an identity provider, not a gateway — it can't sit in front of Sonarr and demand a login. Forward authentication needs an additional component such as oauth2-proxy, or a proxy with an auth module. If that sounds like more moving parts than you want, the first option is genuinely the better engineering choice for a home setup.</div>
+</section>
+
+<!-- ─────────── USERS ─────────── -->
+<section id="users">
+<div class="kicker">Part four</div>
+<h2 class="big">User management</h2>
+<p class="lead">Accounts live in several places at once, and knowing which system owns what saves a lot of confusion later.</p>
+
+<div class="tbl"><table>
+<thead><tr><th>System</th><th>Owns</th></tr></thead>
+<tbody>
+<tr><td>Pocket ID</td><td>Who a person is, their passkeys, and group membership</td></tr>
+<tr><td>Jellyfin</td><td>What they can watch, and playback permissions</td></tr>
+<tr><td>Jellyseerr</td><td>What they may request, and how much</td></tr>
+<tr><td>Immich</td><td>Their photo library and sharing</td></tr>
+</tbody></table></div>
+<p>Pocket ID authenticates. Each app authorises. Deleting someone from Pocket ID stops them logging in through it, but doesn't remove their Jellyfin account or their data — those need handling separately.</p>
+
+<h3>Groups</h3>
+<p>Create groups in Pocket ID and assign people to them. Applications that read group claims can map them to their own permissions.</p>
+<div class="two">
+<div class="mini"><b>media-users</b><span>Everyone who watches things. Standard access, no administrative rights.</span></div>
+<div class="mini"><b>media-admins</b><span>You, and anyone you genuinely trust with settings.</span></div>
+</div>
+<p>Two groups is usually plenty for a household. Elaborate role hierarchies are for organisations, and they mostly create work for you.</p>
+
+<h3 id="household">Setting up the household</h3>
+<ol class="steps">
+<li class="stp">
+<h4>Create the person in Pocket ID</h4>
+<p>Add them under Users, then send them a one-time link so they can register their own passkey on their own device. You never handle a credential for them.</p>
+</li>
+<li class="stp">
+<h4>Give them a Jellyfin account</h4>
+<p>Because TV apps can't use SSO, create a normal Jellyfin user too. Set library access, and turn off downloading and management unless they need it.</p>
+<div class="tip"><strong>Untick "Allow media playback that requires transcoding"</strong> for casual users if your server is CPU-limited. It's the difference between one person's device quietly overloading your machine and it politely refusing.</div>
+</li>
+<li class="stp">
+<h4>Add them to Jellyseerr</h4>
+<p>Import users from Jellyfin, then set request quotas — something like five movies a week prevents enthusiastic new users filling your disk in an afternoon. Leave auto-approve off until you know how they use it.</p>
+</li>
+<li class="stp">
+<h4>Immich, if they want it</h4>
+<p>With auto-registration on, they just sign in and get their own library. Photos are private per user unless explicitly shared, so this needs no configuration from you.</p>
+</li>
+<li class="stp">
+<h4>Write down what you did</h4>
+<p>Keep a short note of which accounts exist where. In a year, when someone leaves or an app misbehaves, you'll want it — and it takes two minutes now.</p>
+</li>
+</ol>
+
+<h3 id="removing">Removing someone</h3>
+<p>Because accounts are spread across systems, offboarding is a checklist rather than one button.</p>
+<ul class="check">
+<li>Delete or disable them in Pocket ID — stops SSO logins immediately</li>
+<li>Delete their Jellyfin user — their TV apps keep working until you do</li>
+<li>Remove them from Jellyseerr, so pending requests don't linger</li>
+<li>Decide what happens to their Immich library before deleting the account, since that removes their photos</li>
+<li>Revoke active sessions in Jellyfin, or a logged-in device continues to play</li>
+</ul>
+<div class="warning"><strong>Deleting the Pocket ID account is not enough on its own.</strong> Anyone with a Jellyfin password and a TV app never touches Pocket ID, and will carry on watching indefinitely. This surprises people.</div>
+</section>
+
+<!-- ─────────── CHECKLIST ─────────── -->
+<section id="checklist">
+<div class="kicker">Before you call it done</div>
+<h2 class="big">Security checklist</h2>
+<div class="card">
+<ul class="check" style="margin-bottom:0">
+<li>Only ports 80 and 443 forwarded — never application ports</li>
+<li>Arcane, qBittorrent, Sonarr, Radarr and Jackett are not publicly reachable</li>
+<li>At least two passkeys registered, on separate devices</li>
+<li>One local admin account kept on Jellyfin as a fallback</li>
+<li>Every remaining app has a unique password, stored in a password manager</li>
+<li>Certificates renewing automatically — check once after 60 days</li>
+<li>Caddy's <code>/data</code> volume included in your backups</li>
+<li><code>.env</code> is mode 600 and excluded from git</li>
+<li>You've tested logging in from outside your network, in a private window</li>
+<li>You know how to get back in if Pocket ID is unavailable</li>
+</ul>
+</div>
+<div class="warning"><strong>Publishing anything to the internet changes your risk.</strong> Automated scanners find new hostnames within hours of a certificate being issued. That's normal and not cause for alarm, but it does mean weak authentication gets discovered rather than overlooked. Keep things updated, keep the administrative tools private, and expose only what genuinely needs to be reachable.</div>
+<p style="margin-top:26px"><a class="btn ghost" href="faq.html">Troubleshooting</a> &nbsp; <a class="btn ghost" href="guide.html">Setup guide</a> &nbsp; <a class="btn ghost" href="documentation.html">Documentation</a></p>
+</section>
+
+</main>
+</div></div>
+
+<footer><div class="wrap">Modular Media Server · <a href="modular-media-server-site.html">Home</a> · <a href="guide.html">Guide</a> · <a href="documentation.html">Documentation</a> · <a href="hardware.html">Hardware</a> · <a href="faq.html">Help</a> · Start small. Add what you need. Understand what you're running.</div></footer>
+</body></html>

@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Setup guide · Modular Media Server</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap');
+:root{--blue:#0081A7;--teal:#00AFB9;--cream:#FDFCDC;--peach:#FED9B7;--coral:#F07167;--ink:#15333b;--muted:#587078;--white:#fffef7;--line:#cfe3e4}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--cream);color:var(--ink);font-family:"DM Sans",sans-serif}a{color:var(--blue);text-decoration:none}a:hover{color:var(--coral)}.wrap{max-width:1160px;margin:auto;padding:0 24px}
+nav{height:82px;display:flex;align-items:center;justify-content:space-between}.brand{font-weight:700;font-size:18px;letter-spacing:-.04em;color:var(--ink)}.brand span{color:var(--coral)}.navlinks{display:flex;gap:25px;color:var(--muted);font-size:14px}.navlinks a{color:var(--muted)}.navlinks a:hover{color:var(--blue)}
+.hero{padding:80px 0 70px;position:relative;overflow:hidden}.hero:after{content:"";position:absolute;width:260px;height:175px;background:var(--peach);border-radius:54% 46% 60% 40%;right:-70px;top:35px;transform:rotate(9deg);z-index:-1}
+.kicker{text-transform:uppercase;letter-spacing:.15em;font-size:12px;font-weight:700;color:var(--blue)}
+h1,h2,h3{font-family:Fraunces,serif;letter-spacing:-.045em;line-height:1.05}h1{font-size:clamp(50px,7vw,80px);max-width:850px;margin:18px 0}.hero p{font-size:19px;line-height:1.7;color:var(--muted);max-width:700px}
+p,li{color:var(--muted);line-height:1.75}ul,ol{padding-left:22px}code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.88em;background:#eaf8f7;padding:2px 6px;border-radius:6px;color:#0e5a63}
+
+/* fork */
+.fork{display:grid;grid-template-columns:1fr 1fr;gap:18px;padding:10px 0 30px}
+.road{background:var(--white);border:1px solid var(--line);border-radius:24px;padding:32px;display:flex;flex-direction:column}
+.road.a{background:#eaf8f7;border-color:#a9dde0}.road.b{background:#fff1e4;border-color:#f4c8a6}
+.road .who{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--coral)}
+.road.a .who{color:var(--blue)}
+.road h2{font-size:33px;margin:12px 0 10px}
+.road p{font-size:15px;margin:0 0 18px}
+.road ul{margin:0 0 22px;padding-left:20px}.road li{font-size:14.5px;margin-bottom:5px}
+.road .go{margin-top:auto}
+.btn{display:inline-block;border-radius:999px;padding:13px 22px;font-weight:700;font-size:15px;background:var(--blue);color:white}.btn:hover{color:white;background:#00688a}
+.btn.coral{background:var(--coral)}.btn.coral:hover{background:#d95a51}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}.btn.ghost:hover{border-color:var(--teal);color:var(--blue);background:transparent}
+
+.section{padding:75px 0;border-top:1px solid var(--line)}
+h2.big{font-size:48px;margin:10px 0 18px}.lead{font-size:17px;color:var(--muted);line-height:1.7;max-width:680px}
+h3{font-size:26px;margin:40px 0 12px}
+.card{background:var(--white);border:1px solid var(--line);border-radius:20px;padding:24px;margin:20px 0}.card.peach{background:#fff1e4;border-color:#f4c8a6}.card.teal{background:#eaf8f7}.card strong{color:var(--ink)}
+.warning{border-left:5px solid var(--coral);background:#fff0e3;padding:18px 20px;border-radius:0 16px 16px 0;margin:22px 0}.tip{border-left:5px solid var(--teal);background:#eaf8f7;padding:18px 20px;border-radius:0 16px 16px 0;margin:22px 0}.warning strong,.tip strong{color:var(--ink)}
+pre{background:#15333b;color:#fdfcdc;padding:20px;border-radius:16px;overflow:auto;line-height:1.65;font-size:13px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}pre .c{color:#8fb3ae}pre .p{color:#FED9B7}
+.steps{counter-reset:s;list-style:none;padding:0;margin:30px 0}
+.stp{counter-increment:s;position:relative;padding:0 0 30px 62px;border-left:2px solid var(--line);margin-left:19px}
+.stp:last-child{border-left-color:transparent;padding-bottom:0}
+.stp:before{content:counter(s);position:absolute;left:-20px;top:-4px;width:38px;height:38px;border-radius:50%;background:var(--blue);color:var(--cream);display:grid;place-items:center;font-weight:700;font-size:15px;font-family:"DM Sans"}
+.stp h3{margin:0 0 8px;font-size:22px}
+.stp p{margin:0 0 12px;font-size:15px}
+.stp pre{font-size:12.5px}
+.tour{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:22px}
+.tour div{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:18px}
+.tour b{display:block;font-size:15px;letter-spacing:-.02em;color:var(--ink);margin-bottom:4px}
+.tour span{font-size:13.5px;color:var(--muted);line-height:1.55}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:25px 0}
+.opt{background:var(--white);border:1px solid var(--line);border-radius:20px;padding:22px}
+.opt b{display:block;font:700 17px "DM Sans";letter-spacing:-.03em;margin-bottom:6px;color:var(--ink)}
+.opt p{font-size:14px;margin:0 0 12px}
+.tbl{background:var(--white);border:1px solid var(--line);border-radius:20px;overflow:hidden;margin:25px 0}.tbl table{width:100%;border-collapse:collapse;font-size:14px}.tbl th{text-align:left;padding:14px 18px;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);background:#eaf8f7;font-weight:700}.tbl td{padding:13px 18px;border-top:1px solid var(--line);color:var(--muted)}.tbl td:first-child{font-weight:700;color:var(--ink)}
+.flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:25px 0}.flow span{background:var(--white);border:1px solid var(--line);padding:10px 13px;border-radius:999px;font-size:13px;font-weight:700;color:var(--ink)}.flow b{color:var(--coral)}
+footer{border-top:1px solid var(--line);padding:25px 0;color:var(--muted);font-size:13px}
+@media(max-width:850px){.navlinks{display:none}.fork,.tour,.opts{grid-template-columns:1fr}h2.big{font-size:36px}.road h2{font-size:29px}}
+@media(max-width:520px){.stp{padding-left:48px}.tbl{overflow-x:auto}}
+</style>
+</head>
+<body>
+<div class="wrap"><nav><a class="brand" href="modular-media-server-site.html">modular<span>.</span>media</a><div class="navlinks"><a href="modular-media-server-site.html">Home</a><a href="platforms.html">Platforms</a><a href="access.html">Access</a><a href="documentation.html">Documentation</a><a href="hardware.html">Hardware</a><a href="faq.html">Help</a><a href="modular-media-server-site.html#generator">Generator</a></div></nav></div>
+
+<section class="hero"><div class="wrap"><div class="kicker">Setup guide</div><h1>Two ways in. Pick the one that sounds like you.</h1><p>There's no single correct route. If the terminal makes you nervous, take the first path and never open one. If you already have Docker running and just want the files, take the second and be done in a couple of minutes.</p><p style="margin-top:14px;font-size:16px">Running Windows or a Mac? Both work — start with the <a href="platforms.html">platform guide</a> to get Docker in place, then come back here.</p></div></section>
+
+<div class="wrap">
+<div class="fork">
+
+<div class="road a">
+<div class="who">Path one</div>
+<h2>I'd rather not touch the command line.</h2>
+<p>You'll install Docker once, then Arcane, and manage everything else from a web page after that. Arcane is a Docker manager with buttons instead of commands.</p>
+<ul>
+<li>One-time terminal setup, then never again</li>
+<li>Start, stop and update containers by clicking</li>
+<li>Paste stacks in, watch logs, see what's broken</li>
+<li>Best if this is your first server</li>
+</ul>
+<div class="go"><a class="btn" href="#arcane-path">Start with Arcane</a></div>
+</div>
+
+<div class="road b">
+<div class="who">Path two</div>
+<h2>I already have Docker. Just give me the files.</h2>
+<p>Skip all the setup. Use the generator to pick your services and download a Compose file, or run the install script and answer a few questions.</p>
+<ul>
+<li>Nothing to install beyond what you have</li>
+<li>Generator in the browser, or script in a terminal</li>
+<li>Dependencies and secrets handled for you</li>
+<li>Best if you know your way around a stack</li>
+</ul>
+<div class="go"><a class="btn coral" href="modular-media-server-site.html#generator">Open the generator</a> &nbsp; <a class="btn ghost" href="#script">or use the script</a></div>
+</div>
+
+</div>
+</div>
+
+<!-- ══════════════ PATH ONE ══════════════ -->
+<section class="section" id="arcane-path"><div class="wrap">
+<div class="kicker">Path one · No command line after this</div>
+<h2 class="big">Setting up with Arcane</h2>
+<p class="lead">Docker doesn't come with a screen. Arcane gives it one — a web page where your containers are things you can see and click, rather than commands you have to remember. You'll need the terminal for the first two steps, then you're done with it.</p>
+
+<div class="tip"><strong>What you need before starting:</strong> a machine that stays on — a mini PC, an old laptop, a NAS that runs Docker, or a VPS. Not sure? The <a href="hardware.html">hardware page</a> walks through the options.</div>
+
+<ol class="steps">
+
+<li class="stp">
+<h3>Install Docker</h3>
+<p>This part depends on what you're running, so it has its own page with proper instructions for each system — including the two Windows and macOS gotchas that are much easier to handle now than to unpick later.</p>
+<p><a class="btn" href="platforms.html">Docker setup for your system</a></p>
+<div class="tour" style="margin-top:20px">
+<div><b>Windows</b><span>WSL2 and Docker Desktop, plus where to keep your files so scans aren't painfully slow.</span></div>
+<div><b>macOS</b><span>Docker Desktop or lighter alternatives, folder sharing, and Apple Silicon notes.</span></div>
+<div><b>Linux</b><span>One command, plus hardware transcoding — the only platform where that works.</span></div>
+<div><b>NAS</b><span>Synology, QNAP, unRAID and TrueNAS, with their own paths and reserved ports.</span></div>
+</div>
+<p style="margin-top:16px">Come back here once <code>docker run hello-world</code> works.</p>
+</li>
+
+<li class="stp">
+<h3>Install Arcane</h3>
+<p>Arcane needs two secrets of its own. Generate them, then paste them into the file you're about to make.</p>
+<pre><span class="c"># Run this twice — you need two different values</span>
+openssl rand -base64 32</pre>
+<p>Make a folder and a Compose file:</p>
+<pre>mkdir -p ~/arcane &amp;&amp; cd ~/arcane
+nano docker-compose.yml</pre>
+<p>Paste this in, replacing the two secrets and the timezone:</p>
+<pre>services:
+  arcane:
+    image: ghcr.io/getarcaneapp/arcane:latest
+    container_name: arcane
+    ports:
+      - "3552:3552"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - arcane-data:/app/data
+      - ./projects:/app/data/projects
+    environment:
+      - APP_URL=http://localhost:3552
+      - PUID=1000
+      - PGID=1000
+      - ENCRYPTION_KEY=<span class="p">paste-your-first-secret</span>
+      - JWT_SECRET=<span class="p">paste-your-second-secret</span>
+    restart: unless-stopped
+
+volumes:
+  arcane-data:</pre>
+<p>Save with <code>Ctrl+O</code>, exit with <code>Ctrl+X</code>, then start it:</p>
+<pre>docker compose up -d</pre>
+<p>Open <code>http://your-server-address:3552</code>. Create your admin account on first visit. <strong style="color:var(--ink)">That's the last command you need to run.</strong></p>
+</li>
+
+<li class="stp">
+<h3>Find your way around</h3>
+<p>Before adding anything, have a look at what Arcane shows you. Everything below is a page in the sidebar.</p>
+<div class="tour">
+<div><b>Containers</b><span>Every running service. Start, stop, restart and remove them here.</span></div>
+<div><b>Projects</b><span>Your Compose stacks. This is where you'll paste the generated file.</span></div>
+<div><b>Images</b><span>The downloaded application templates. Update and clean up old ones.</span></div>
+<div><b>Volumes</b><span>Where container data actually lives on disk.</span></div>
+<div><b>Networks</b><span>How containers talk to each other.</span></div>
+<div><b>Logs</b><span>What a container is saying. The first place to look when something breaks.</span></div>
+</div>
+</li>
+
+<li class="stp">
+<h3>Get your stack file</h3>
+<p>Now choose what you want to run. The generator asks a few questions and gives you a Compose file and an environment file.</p>
+<p><a class="btn" href="modular-media-server-site.html#generator">Open the generator</a></p>
+<p style="margin-top:14px">You'll end up with two things that matter: <code>docker-compose.yml</code>, which describes your services, and <code>.env</code>, which holds your paths and passwords.</p>
+</li>
+
+<li class="stp">
+<h3>Deploy it in Arcane</h3>
+<p>In Arcane, go to <b>Projects</b> and create a new one. Give it a name like <code>media</code>. Paste your <code>docker-compose.yml</code> into the Compose field and your <code>.env</code> contents into the environment field.</p>
+<p>Press deploy. Arcane pulls the images and starts everything. The first run downloads several gigabytes, so give it a few minutes.</p>
+<div class="warning"><strong>If a container keeps restarting, open its logs before changing anything.</strong> The answer is almost always in there, and it's usually one of three things: a folder that doesn't exist, a permissions mismatch, or a port already in use.</div>
+</li>
+
+<li class="stp">
+<h3>Set your apps up</h3>
+<p>Each service now has its own web page. Open each one and set a password — some start with no protection at all.</p>
+<div class="tbl"><table>
+<thead><tr><th>Service</th><th>Address</th><th>First thing to do</th></tr></thead>
+<tbody>
+<tr><td>Jellyfin</td><td>:8096</td><td>Create your account, add media folders</td></tr>
+<tr><td>Jellyseerr</td><td>:5055</td><td>Connect it to Jellyfin, then to Sonarr and Radarr</td></tr>
+<tr><td>Sonarr</td><td>:8989</td><td>Add your download client and indexers</td></tr>
+<tr><td>Radarr</td><td>:7878</td><td>Same as Sonarr, for films</td></tr>
+<tr><td>Bazarr</td><td>:6767</td><td>Connect to Sonarr and Radarr, pick languages</td></tr>
+<tr><td>qBittorrent</td><td>:8080</td><td>Change the default password immediately</td></tr>
+<tr><td>Jackett</td><td>:9117</td><td>Add indexers, copy the API key into the *arr apps</td></tr>
+<tr><td>Immich</td><td>:2283</td><td>Create your account, install the phone app</td></tr>
+<tr><td>Uptime Kuma</td><td>:3001</td><td>Add a monitor for each of the above</td></tr>
+</tbody></table></div>
+<p>Services find each other by container name, not by <code>localhost</code>. Inside Sonarr, your download client lives at <code>gluetun</code> or <code>qbittorrent</code> — not <code>127.0.0.1</code>. This is the single most common setup mistake.</p>
+</li>
+
+<li class="stp">
+<h3>Keeping it running</h3>
+<p>Updating in Arcane is: open the project, pull, redeploy. Do it every month or so, and read release notes before major version jumps.</p>
+<div class="warning"><strong>Arcane can control your whole machine.</strong> It mounts the Docker socket, which is effectively root access to the host. Keep it on your home network or behind a VPN like Tailscale. Don't forward port 3552 to the internet.</div>
+</li>
+
+</ol>
+</div></section>
+
+<!-- ══════════════ PATH TWO ══════════════ -->
+<section class="section" id="script"><div class="wrap">
+<div class="kicker">Path two · You know what you're doing</div>
+<h2 class="big">The generator, or one script</h2>
+<p class="lead">If Docker is already running, you don't need any of the above. Two options, same output — a Compose file, an environment file, and a README, ready to bring up however you normally do.</p>
+
+<div class="opts">
+<div class="opt"><b>The web generator</b><p>Pick services in the browser, fill in your paths, download the files. Nothing runs on your machine until you bring the stack up yourself.</p><a class="btn" href="modular-media-server-site.html#generator">Open the generator</a></div>
+<div class="opt"><b>The install script</b><p>Same result without leaving the terminal. Asks a handful of questions, or takes a preset and answers nothing. Supports a dry run.</p><a class="btn coral" href="install.sh" download>Download install.sh</a></div>
+</div>
+
+<h3>Running the script</h3>
+<pre><span class="c"># Fetch it, read it, then run it. Please actually read it.</span>
+curl -fsSL https://<span class="p">your-pages-url</span>/install.sh -o install.sh
+less install.sh
+bash install.sh</pre>
+
+<div class="tip"><strong>It won't install Docker for you, on purpose.</strong> If Docker is missing it tells you the command and stops. Piping a downloaded script into a root shell should be something you decide to do, not something that happens as a side effect of running something else.</div>
+
+<h3>Options</h3>
+<div class="tbl"><table>
+<thead><tr><th>Flag</th><th>What it does</th></tr></thead>
+<tbody>
+<tr><td>--preset &lt;name&gt;</td><td>Skip the menu and use a ready-made selection</td></tr>
+<tr><td>--dir &lt;path&gt;</td><td>Where to write the stack</td></tr>
+<tr><td>--dry-run</td><td>Print the Compose file, write nothing</td></tr>
+<tr><td>--yes</td><td>Accept every default, ask nothing</td></tr>
+<tr><td>--deploy</td><td>Bring the stack up when finished</td></tr>
+<tr><td>--help</td><td>Everything above, plus the preset list</td></tr>
+</tbody></table></div>
+
+<h3>Presets</h3>
+<div class="tbl"><table>
+<thead><tr><th>Name</th><th>What you get</th></tr></thead>
+<tbody>
+<tr><td>player</td><td>Jellyfin on its own</td></tr>
+<tr><td>basic</td><td>Arcane, Jellyfin, Jellyseerr</td></tr>
+<tr><td>automated</td><td>The full media stack with downloads behind a VPN</td></tr>
+<tr><td>music</td><td>Jellyfin, Lidarr, Kima, downloads</td></tr>
+<tr><td>photos</td><td>Immich and its database</td></tr>
+<tr><td>archive</td><td>ArchiveBox and Tube Archivist</td></tr>
+<tr><td>monitoring</td><td>Uptime Kuma</td></tr>
+</tbody></table></div>
+
+<p>See exactly what a preset produces without writing anything:</p>
+<pre>bash install.sh --preset automated --dry-run</pre>
+
+<h3>What it writes</h3>
+<div class="card"><strong>In the directory you choose</strong>
+<ul style="margin-bottom:0">
+<li><code>docker-compose.yml</code> — your services, with every value pulled from the environment file</li>
+<li><code>.env</code> — real paths and generated secrets, written mode 600</li>
+<li><code>.env.example</code> — the same shape with placeholders, safe to commit</li>
+<li><code>.gitignore</code> — already ignoring <code>.env</code></li>
+<li><code>README.md</code> — your service addresses and the commands you'll want</li>
+</ul></div>
+
+<p>Secrets come from <code>openssl rand</code>, falling back to <code>/dev/urandom</code>. Each one is generated separately, so no two services share a password. An existing <code>.env</code> is backed up with a timestamp rather than overwritten.</p>
+
+<div class="warning"><strong>qBittorrent will not be written without a VPN.</strong> Select it and Gluetun is added automatically. If you don't supply credentials, the script writes <code>CHANGEME</code> placeholders and tells you the stack won't start until you fill them in — it won't quietly generate a torrent client with a direct connection to your home address.</div>
+
+<h3>After it finishes</h3>
+<div class="flow"><span>cd into the directory</span><b>→</b><span>read the .env</span><b>→</b><span>docker compose up -d</span><b>→</b><span>set passwords</span></div>
+<p>If you used a VPN, check it's actually carrying traffic before downloading anything:</p>
+<pre>docker compose exec gluetun wget -qO- https://ipinfo.io/ip</pre>
+<p>That should not be your home address. If it is, stop and fix Gluetun first.</p>
+</div></section>
+
+<!-- ══════════════ COMMON GROUND ══════════════ -->
+<section class="section"><div class="wrap">
+<div class="kicker">Either way</div>
+<h2 class="big">Things that catch everyone</h2>
+
+<div class="card teal"><strong>Permissions</strong><p style="margin:10px 0 0">Most of these images want a <code>PUID</code> and <code>PGID</code> matching the user that owns your media folders. Run <code>id</code> to find yours. Mismatched ownership is behind a large share of "it can't write to the folder" problems.</p></div>
+
+<div class="card"><strong>Containers don't share your idea of localhost</strong><p style="margin:10px 0 0">Inside a container, <code>localhost</code> means that container. Services reach each other by container name. Sonarr connects to <code>qbittorrent</code>, not <code>127.0.0.1:8080</code>.</p></div>
+
+<div class="card peach"><strong>Downloads and libraries want to live together</strong><p style="margin:10px 0 0">If your downloads folder and your media folder sit on the same filesystem and are mounted consistently, files can be moved instantly instead of copied. Split them across different mounts and you'll copy everything twice and wonder where the disk went.</p></div>
+
+<div class="card"><strong>Back up config, not just media</strong><p style="margin:10px 0 0">Your config folder holds every setting, key and connection you've patiently set up. It's small, and it's the thing you'd most hate to redo. Media can be re-acquired; your Immich library often can't.</p></div>
+
+<div class="warning" style="margin-top:30px"><strong>The same rules apply on both paths.</strong> Only obtain and share content you're legally entitled to. Downloaded files can carry malware, and a VPN routes your traffic without making any file safe. Keep your host and images updated, don't expose admin interfaces to the internet, and keep backups of anything you'd be upset to lose.</div>
+
+<p style="margin-top:30px"><a class="btn ghost" href="documentation.html">Read the full documentation</a> &nbsp; <a class="btn ghost" href="hardware.html">Hardware &amp; hosting</a></p>
+</div></section>
+
+<footer><div class="wrap">Modular Media Server · <a href="modular-media-server-site.html">Home</a> · <a href="documentation.html">Documentation</a> · <a href="hardware.html">Hardware</a> · <a href="faq.html">Help</a> · Start small. Add what you need. Understand what you're running.</div></footer>
+</body></html>
