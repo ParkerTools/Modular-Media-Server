@@ -51,6 +51,38 @@ If you do not have the legal right to download, copy, store, or distribute somet
 
 ---
 
+⚠️ IMPORTANT — TORRENTS, DOWNLOADS & MALWARE
+
+If you use qBittorrent, torrenting introduces security risks in addition to
+the legal considerations described above.
+
+Torrent files and downloaded content may come from untrusted sources and
+could contain malware, ransomware, trojans, cryptominers, malicious scripts,
+or other harmful software. A filename, file extension, torrent comment,
+tracker, or indexer does not guarantee that a file is safe.
+
+A VPN does NOT make downloaded files safe. A VPN primarily changes how your
+network traffic is routed and does not protect you from malicious files.
+
+Recommended precautions:
+
+• Only download content from sources you trust.
+• Only download content you are legally permitted to obtain.
+• Keep your server, Docker Engine, Docker images, and applications updated.
+• Do not blindly execute programs or scripts obtained through torrents.
+• Avoid exposing download clients directly to the public Internet.
+• Use appropriate firewall and network-access controls.
+• Maintain current backups of important data.
+• Consider malware scanning appropriate to your environment.
+• Treat downloaded files as untrusted until you have verified them.
+
+The Modular Media Server project does not scan, verify, guarantee, or endorse
+the safety of files obtained through torrenting or other download mechanisms.
+You are responsible for the security of your server and the files you choose
+to download, store, or execute.
+
+---
+
 # Project Philosophy
 
 ## Build your server. Your way.
