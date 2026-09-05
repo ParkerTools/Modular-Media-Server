@@ -51,7 +51,7 @@ If you do not have the legal right to download, copy, store, or distribute somet
 
 ---
 
-⚠️ IMPORTANT — TORRENTS, DOWNLOADS & MALWARE
+## ⚠️ IMPORTANT — TORRENTS, DOWNLOADS & MALWARE
 
 If you use qBittorrent, torrenting introduces security risks in addition to
 the legal considerations described above.
