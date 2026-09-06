@@ -11,20 +11,22 @@
 <meta property="og:description" content="Pick your modules and get a complete Docker Compose stack: dependencies resolved, secrets generated in your browser, files ready to deploy.">
 <meta property="og:url" content="https://parkertools.github.io/Modular-Media-Server/generator.html">
 <meta name="twitter:card" content="summary">
-<meta name="theme-color" content="#0081A7">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230081A7'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23FDFCDC'/%3E%3Ccircle cx='16' cy='16' r='2.5' fill='%23F07167'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#006C87">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23006C87'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23FDFCDC'/%3E%3Ccircle cx='16' cy='16' r='2.5' fill='%23F07167'/%3E%3C/svg%3E">
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Fraunces:opsz,wght@9..144,700&display=swap">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap');
-:root{--blue:#0081A7;--teal:#00AFB9;--cream:#FDFCDC;--peach:#FED9B7;--coral:#F07167;--ink:#15333b;--muted:#587078;--white:#fffef7;--line:#cfe3e4}
+:root{--blue:#006C87;--teal:#00AFB9;--cream:#FDFCDC;--peach:#FED9B7;--coral:#F07167;--ink:#15333b;--muted:#4a626b;--white:#fffef7;--line:#cfe3e4}
 *{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font-family:"DM Sans",sans-serif}
-a{color:var(--blue);text-decoration:none}a:hover{color:var(--coral)}
+a{color:var(--blue);text-decoration:none}a:hover{color:var(--coral);text-decoration:underline}
 .wrap{max-width:1240px;margin:auto;padding:0 24px}
 nav{height:78px;display:flex;align-items:center;justify-content:space-between}
 .brand{font-weight:700;font-size:18px;letter-spacing:-.04em;color:var(--ink)}.brand span{color:var(--coral)}
 .navlinks{display:flex;gap:22px;color:var(--muted);font-size:14px}.navlinks a{color:var(--muted)}.navlinks a:hover{color:var(--blue)}
 h1,h2,h3{font-family:Fraunces,serif;letter-spacing:-.045em;line-height:1.05}
-.head{padding:34px 0 26px}.kicker{text-transform:uppercase;letter-spacing:.15em;font-size:12px;font-weight:700;color:var(--blue)}
+.head{padding:38px 34px;margin:8px 0 26px;background:#eaf8f7;border:1px solid #cbe8e7;border-radius:26px;position:relative;overflow:hidden}.head:after{content:"";position:absolute;width:190px;height:130px;background:var(--peach);border-radius:54% 46% 60% 40%;right:-46px;top:-26px;transform:rotate(-8deg);opacity:.75}.head>*{position:relative;z-index:1}@media(max-width:900px){.head{padding:26px 20px;border-radius:20px}.head:after{display:none}}.kicker{text-transform:uppercase;letter-spacing:.15em;font-size:12px;font-weight:700;color:var(--blue)}
 h1{font-size:clamp(38px,5.5vw,58px);margin:14px 0 12px;max-width:800px}
 .head p{color:var(--muted);font-size:17px;line-height:1.7;max-width:660px;margin:0}
 p,li{color:var(--muted);line-height:1.7}
@@ -43,7 +45,7 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.87em;bac
 h2.ph{font-size:32px;margin:0 0 10px}.pd{color:var(--muted);font-size:15.5px;line-height:1.7;max-width:680px;margin:0 0 24px}
 
 /* module picker */
-.build{display:grid;grid-template-columns:1fr 330px;gap:22px;align-items:start}
+.build{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:22px;align-items:start}
 .cat{margin-bottom:24px}
 .cath{display:flex;align-items:center;gap:10px;font-family:ui-monospace,monospace;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:10px}
 .cath .bar{height:2px;width:22px;border-radius:2px;background:var(--teal)}
@@ -52,19 +54,19 @@ h2.ph{font-size:32px;margin:0 0 10px}.pd{color:var(--muted);font-size:15.5px;lin
 .mod:hover{border-color:var(--teal)}
 .mod.on{background:#eaf8f7;border-color:var(--teal)}
 .mod.auto{background:#fff1e4;border-color:#f4c8a6}
-.mod .top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:3px}
-.mod b{font-size:14.5px;letter-spacing:-.02em;color:var(--ink)}
+.mod .top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:3px;padding-right:24px}
+.mod b{font-size:14.5px;letter-spacing:-.02em;color:var(--ink);min-width:0}
 .mod .pt{font-family:ui-monospace,monospace;font-size:10.5px;color:var(--muted)}
-.mod p{font-size:12.5px;margin:0;line-height:1.5}
+.mod p{font-size:12.5px;margin:0;line-height:1.5;overflow-wrap:anywhere}
 .mod .flag{display:inline-block;margin-top:6px;font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:999px;background:#ffe0dc;color:#96382f}
 .mod .flag.auto{background:var(--peach);color:#744b32}
 .mod .tick{position:absolute;top:13px;right:13px;width:16px;height:16px;border-radius:50%;border:1.5px solid var(--line);background:#fff}
 .mod.on .tick{background:var(--teal);border-color:var(--teal)}
 .mod.on .tick:after{content:"";position:absolute;left:4px;top:5px;width:7px;height:3.5px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg)}
-.mod.on .top,.mod.auto .top{padding-right:22px}
+
 
 /* stack panel */
-.side{position:sticky;top:16px;background:var(--white);border:1px solid var(--line);border-radius:20px;padding:20px}
+.side{position:sticky;top:16px;z-index:2;background:var(--white);border:1px solid var(--line);border-radius:20px;padding:20px}
 .side h3{font-size:19px;margin:0 0 4px}
 .side .sub{font-size:12.5px;color:var(--muted);margin-bottom:14px}
 .stacklist{list-style:none;padding:0;margin:0 0 14px;max-height:340px;overflow:auto}
@@ -122,7 +124,7 @@ h2.ph{font-size:32px;margin:0 0 10px}.pd{color:var(--muted);font-size:15.5px;lin
 .outacts{display:flex;gap:7px}
 .sbtn{font-family:inherit;font-size:12px;font-weight:700;padding:6px 12px;border-radius:8px;border:1px solid #2c4a52;background:transparent;color:#cfe3e4;cursor:pointer}
 .sbtn:hover{border-color:var(--teal);color:#fff}
-pre{margin:0;padding:19px;overflow:auto;max-height:520px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;line-height:1.65;color:#fdfcdc;white-space:pre}
+pre{margin:0;padding:19px;overflow:auto;max-width:100%;max-height:520px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;line-height:1.65;color:#fdfcdc;white-space:pre}
 .btn{display:inline-block;border-radius:999px;padding:13px 24px;font-weight:700;font-size:15px;background:var(--blue);color:#fff;border:none;cursor:pointer;font-family:inherit}
 .btn:hover{background:#00688a;color:#fff}
 .btn:disabled{background:#b9ccd0;cursor:not-allowed}
@@ -131,12 +133,90 @@ pre{margin:0;padding:19px;overflow:auto;max-height:520px;font-family:ui-monospac
 .nav2{display:flex;justify-content:space-between;gap:12px;margin:32px 0 60px;padding-top:22px;border-top:1px solid var(--line);flex-wrap:wrap}
 .count{font-size:13px;color:var(--muted)}
 footer{border-top:1px solid var(--line);padding:24px 0;color:var(--muted);font-size:13px}
-@media(max-width:980px){.navlinks{display:none}.build{grid-template-columns:1fr}.side{position:static}.mods{grid-template-columns:1fr}.fgrid{grid-template-columns:1fr}}
+@media(max-width:980px){.build{grid-template-columns:1fr}.side{position:static}.mods{grid-template-columns:1fr}.fgrid{grid-template-columns:1fr}}
+
+.navbtn{display:none;background:none;border:1px solid var(--line);border-radius:10px;padding:8px 11px;cursor:pointer;font:inherit;color:var(--ink);line-height:1}
+.navbtn span{display:block;width:17px;height:2px;background:var(--ink);border-radius:2px;margin:3px 0;transition:.2s}
+.navopen .navbtn span:nth-child(1){transform:translateY(5px) rotate(45deg)}
+.navopen .navbtn span:nth-child(2){opacity:0}
+.navopen .navbtn span:nth-child(3){transform:translateY(-5px) rotate(-45deg)}
+@media(max-width:900px){
+.navbtn{display:block}
+nav{position:relative}
+.navlinks{display:none;position:absolute;top:66px;right:0;left:0;background:var(--white);border:1px solid var(--line);border-radius:16px;flex-direction:column;gap:0;padding:8px;z-index:60;box-shadow:0 10px 30px rgba(21,51,59,.09)}
+.navopen .navlinks{display:flex}
+.navlinks a{padding:11px 13px;border-radius:10px;font-size:15px}
+.navlinks a:hover{background:#eaf8f7;text-decoration:none}
+}
+
+/* ── colour system ─────────────────────────────────────────────── */
+/* Tinted section shells break up long cream pages with rhythm. */
+.tinted{background:#eaf8f7;border:1px solid #cbe8e7;border-radius:26px;padding:38px 34px;margin-bottom:62px}
+.tinted-peach{background:#fff6ee;border:1px solid #f6d5b8;border-radius:26px;padding:38px 34px;margin-bottom:62px}
+.tinted h2,.tinted-peach h2{margin-top:0}
+
+/* Cards cycle through tints instead of all-white. */
+.cyc>.card:nth-of-type(3n+2){background:#eaf8f7;border-color:#bfe3e2}
+.cyc>.card:nth-of-type(3n){background:#fff6ee;border-color:#f4d3b6}
+
+/* Second hero blob adds depth behind the first. */
+.hero:before{content:"";position:absolute;width:210px;height:210px;border-radius:52% 48% 44% 56%;
+  background:var(--hero2,rgba(0,175,185,.20));right:130px;top:-40px;z-index:-2}
+@media(max-width:900px){.hero:before{display:none}
+.tinted,.tinted-peach{padding:28px 20px;border-radius:20px}}
+
+/* ── page texture ──────────────────────────────────────────────────
+   Tunable: --grain (speckle strength) and --bloom (colour wash).
+   Everything sits BEHIND content — cards and panels have their own
+   opaque backgrounds, so text contrast is never softened by it.     */
+:root{--grain:.06;--bloom:1}
+body{
+  background-color:var(--cream);
+  background-image:
+    /* chromatic speckle — fine paper/film tooth */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23g)' opacity='0.5'/%3E%3C/svg%3E"),
+    /* soft colour blooms drifting in from the edges */
+    radial-gradient(ellipse 900px 620px at 8% 2%,rgba(0,175,185,calc(.10*var(--bloom))),transparent 62%),
+    radial-gradient(ellipse 760px 540px at 95% 14%,rgba(254,217,183,calc(.26*var(--bloom))),transparent 64%),
+    radial-gradient(ellipse 820px 600px at 78% 62%,rgba(240,113,103,calc(.08*var(--bloom))),transparent 62%),
+    radial-gradient(ellipse 900px 640px at 15% 88%,rgba(0,108,135,calc(.07*var(--bloom))),transparent 62%);
+  background-repeat:repeat,no-repeat,no-repeat,no-repeat,no-repeat;
+  background-size:220px 220px,auto,auto,auto,auto;
+  background-attachment:fixed,fixed,fixed,fixed,fixed;
+}
+/* The grain layer is drawn at low opacity via its own alpha; this keeps
+   it from muddying the blooms underneath. */
+body{background-blend-mode:soft-light,normal,normal,normal,normal}
+
+/* Cards lift off the textured page rather than melting into it. */
+.card,.mini,.tbl,.util,.mod,.side,.opt,.pick,.price,.prov,.aidcard,.stp pre,
+details.qa,details.m,.shell,.genout{box-shadow:0 1px 2px rgba(21,51,59,.04),0 6px 18px rgba(21,51,59,.045)}
+
+@media(max-width:900px){
+  /* fixed attachment is costly to repaint on mobile scroll */
+  body{background-attachment:scroll,scroll,scroll,scroll,scroll;--bloom:.7}
+}
+@media print{body{background-image:none}}
+
+.deploy{display:grid;gap:14px;margin:6px 0 10px}
+.dcard{background:var(--white);border:1px solid var(--line);border-radius:20px;padding:22px 24px;position:relative}
+.dcard:nth-child(2){background:#eaf8f7;border-color:#bfe3e2}
+.dcard:nth-child(3){background:#fff6ee;border-color:#f4d3b6}
+.dnum{position:absolute;top:20px;right:22px;font-family:Fraunces,serif;font-size:30px;color:var(--line);line-height:1}
+.dcard h4{font-family:Fraunces,serif;font-size:21px;letter-spacing:-.03em;margin:0 0 3px;color:var(--ink)}
+.dcard .dwho{font-size:12px;font-weight:700;color:var(--coral);margin:0 0 12px;text-transform:uppercase;letter-spacing:.07em}
+.dcard p{font-size:14.5px;margin:0 0 12px}
+.dcard pre{background:#15333b;color:#fdfcdc;padding:15px 17px;border-radius:13px;font-size:12.5px;line-height:1.7;margin:0 0 12px;overflow:auto}
+.dcard pre .cm{color:#8fb3ae}
+.dwarn{border-left:4px solid var(--coral);background:#fff0e3;padding:13px 15px;border-radius:0 12px 12px 0;font-size:13.5px;line-height:1.6}
+.dnote{border-left:4px solid var(--teal);background:#e4f5f4;padding:13px 15px;border-radius:0 12px 12px 0;font-size:13.5px;line-height:1.6}
+.dwarn b,.dnote b{color:var(--ink)}
+@media(min-width:1000px){.deploy{grid-template-columns:repeat(3,1fr);align-items:start}}
 </style>
 </head>
 <body>
 <div class="wrap"><nav><a class="brand" href="index.html">modular<span>.</span>media</a>
-<div class="navlinks"><a href="index.html">Home</a><a href="guide.html">Guide</a><a href="platforms.html">Platforms</a><a href="access.html">Access</a><a href="documentation.html">Documentation</a><a href="faq.html">Help</a></div></nav></div>
+<div class="navlinks"><a href="index.html">Home</a><a href="guide.html">Guide</a><a href="platforms.html">Platforms</a><a href="access.html">Access</a><a href="documentation.html">Documentation</a><a href="faq.html">Help</a></div><button class="navbtn" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button></nav></div>
 
 <div class="wrap">
 <div class="head">
@@ -220,6 +300,51 @@ footer{border-top:1px solid var(--line);padding:24px 0;color:var(--muted);font-s
 <pre id="outbody"></pre>
 </div>
 <div id="postnotes"></div>
+
+<h3 style="font-family:Fraunces,serif;font-size:26px;letter-spacing:-.04em;margin:38px 0 12px">Where do these files go?</h3>
+<p class="pd" style="margin-bottom:18px">Downloading them is half the job. Below are the three ways to get them running, easiest first.</p>
+
+<div class="deploy">
+
+<div class="dcard">
+<div class="dnum">1</div>
+<h4>Arcane, via a project folder</h4>
+<p class="dwho">Simplest if you already run Arcane</p>
+<p>Arcane shows any folder in its projects directory as a project. Make a folder, put the files in it, and it appears in the UI ready to deploy.</p>
+<pre>cd /opt/stacks          <span class="cm"># your Arcane projects dir</span>
+mkdir media
+<span class="cm"># put docker-compose.yml and .env inside</span></pre>
+<p>Refresh Arcane's <b>Projects</b> page and it is there. Press deploy.</p>
+<div class="dwarn"><b>Mount paths must match.</b> If your stacks live at <code>/opt/stacks</code>, mount them into Arcane as <code>/opt/stacks:/opt/stacks</code> — the same path on both sides. Compose files use relative paths and break if the two differ.</div>
+</div>
+
+<div class="dcard">
+<div class="dnum">2</div>
+<h4>Arcane, via Git Sync</h4>
+<p class="dwho">Best if you want history and rollbacks</p>
+<p>Arcane has GitOps built in. Keep your Compose file in a repository, point Arcane at it, and pushing a change redeploys the stack.</p>
+<pre><span class="cm"># in a new, PRIVATE repository</span>
+git init
+git add docker-compose.yml .env.example .gitignore README.md
+git commit -m "Initial stack"
+git push</pre>
+<p>Then in Arcane: <b>Projects → Git Sync</b>, give it the repository URL, a branch, and the path to the compose file inside the repo.</p>
+<div class="dnote"><b>Your secrets stay out of git — by design.</b> The generated <code>.gitignore</code> already excludes <code>.env</code>, and Git Sync only pulls the compose file itself, not sibling files. So set your real values in Arcane instead: <b>Customization → Variables</b> for values shared across projects, or the project's own <code>.env</code> in Arcane. Commit <code>.env.example</code> so you have a record of which variables exist.</div>
+</div>
+
+<div class="dcard">
+<div class="dnum">3</div>
+<h4>Straight from a terminal</h4>
+<p class="dwho">No Arcane needed</p>
+<p>Put every file in one folder and bring it up.</p>
+<pre>mkdir -p ~/media-server &amp;&amp; cd ~/media-server
+<span class="cm"># put the generated files here</span>
+docker compose up -d
+docker compose logs -f</pre>
+<p>Keep <code>.env</code> beside <code>docker-compose.yml</code> — Compose reads it automatically from the same directory.</p>
+</div>
+
+</div>
 </div>
 
 <div class="nav2">
@@ -846,7 +971,7 @@ if(typeof module!=="undefined"&&module.exports){module.exports=CORE;}
 var M = CORE.MODULES;
 
 var state = {
-  selected:[], auto:[], layout:"unified",
+  selected:[], chosen:[], auto:[], layout:"unified",
   configRoot:"/srv/media-server/config", dataRoot:"/srv/data",
   mediaRoot:"/srv/media", downloadsRoot:"/srv/downloads", photosRoot:"/srv/photos",
   puid:"1000", pgid:"1000", tz:"",
@@ -934,26 +1059,34 @@ function renderCats(){
 }
 function toggle(id){
   var i = state.selected.indexOf(id);
-  if(i === -1) state.selected.push(id);
-  else {
-    // removing something another module needs takes its dependant with it
+  if(i === -1){
+    state.selected.push(id);
+    state.chosen.push(id);                 // explicitly picked by the user
+  } else {
     state.selected.splice(i,1);
-    state.selected = state.selected.filter(function(s){
-      var m = M[s];
-      if(!m.requires) return true;
-      return m.requires.every(function(r){ return state.selected.indexOf(r) !== -1 || r === id ? m.requires.indexOf(id)===-1 : true; });
-    });
-    state.selected = state.selected.filter(function(s){
-      var m = M[s];
-      return !m.requires || m.requires.indexOf(id) === -1;
-    });
+    state.chosen = state.chosen.filter(function(c){ return c !== id; });
+    // anything that required it goes too — no orphaned dependants
+    var changed = true;
+    while(changed){
+      changed = false;
+      state.selected.slice().forEach(function(s2){
+        var m = M[s2];
+        if(m && m.requires && m.requires.some(function(r){ return state.selected.indexOf(r) === -1; })){
+          state.selected = state.selected.filter(function(x){ return x !== s2; });
+          state.chosen = state.chosen.filter(function(c){ return c !== s2; });
+          changed = true;
+        }
+      });
+    }
   }
   applyDeps();
 }
 function applyDeps(){
-  var r = CORE.resolve(state.selected);
+  // resolve required dependencies for what the user actually chose
+  var r = CORE.resolve(state.chosen);
   state.selected = r.list;
-  state.auto = r.added.map(function(a){ return a.dep; });
+  state.auto = r.added.map(function(a){ return a.dep; })
+                      .filter(function(d){ return state.chosen.indexOf(d) === -1; });
   state.secrets = {};
   renderCats(); renderStack(); renderSteps();
 }
@@ -978,7 +1111,7 @@ function renderPresets(){
   var w = $("presets"); w.innerHTML = "";
   Object.keys(CORE.PRESETS).forEach(function(name){
     var b = el("button","pbtn",name);
-    b.onclick = function(){ state.selected = CORE.PRESETS[name].slice(); applyDeps(); };
+    b.onclick = function(){ state.chosen = CORE.PRESETS[name].slice(); applyDeps(); };
     w.appendChild(b);
   });
 }
@@ -1298,6 +1431,25 @@ $("next").onclick = function(){ if(step < STEPS.length-1) go(step+1); };
 $("back").onclick = function(){ go(step-1); };
 
 renderCats(); renderStack(); renderPresets(); renderSteps();
+})();
+</script>
+<script>
+(function(){
+  var b=document.querySelector('.navbtn'), n=document.querySelector('nav');
+  if(!b||!n) return;
+  b.addEventListener('click',function(){
+    var open=n.classList.toggle('navopen');
+    b.setAttribute('aria-expanded',open?'true':'false');
+  });
+  n.addEventListener('click',function(e){
+    if(e.target.tagName==='A') n.classList.remove('navopen');
+  });
+  document.addEventListener('click',function(e){
+    if(!n.contains(e.target)) n.classList.remove('navopen');
+  });
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape') n.classList.remove('navopen');
+  });
 })();
 </script>
 </body></html>
