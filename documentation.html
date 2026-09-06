@@ -3,42 +3,804 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Documentation · Modular Media Server</title>
+<meta name="description" content="How the pieces fit together: Docker, Compose, storage, permissions, networking and a full reference for every module in your stack.">
+<link rel="canonical" href="https://parkertools.github.io/Modular-Media-Server/documentation.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Modular Media Server">
+<meta property="og:title" content="Documentation · Modular Media Server">
+<meta property="og:description" content="How the pieces fit together: Docker, Compose, storage, permissions, networking and a full reference for every module in your stack.">
+<meta property="og:url" content="https://parkertools.github.io/Modular-Media-Server/documentation.html">
+<meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#0081A7">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230081A7'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23FDFCDC'/%3E%3Ccircle cx='16' cy='16' r='2.5' fill='%23F07167'/%3E%3C/svg%3E">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap');
 :root{--blue:#0081A7;--teal:#00AFB9;--cream:#FDFCDC;--peach:#FED9B7;--coral:#F07167;--ink:#15333b;--muted:#587078;--white:#fffef7;--line:#cfe3e4}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--cream);color:var(--ink);font-family:"DM Sans",sans-serif}a{color:var(--blue);text-decoration:none}a:hover{color:var(--coral)}.wrap{max-width:1160px;margin:auto;padding:0 24px}nav{height:82px;display:flex;align-items:center;justify-content:space-between}.brand{font-weight:700;font-size:18px;letter-spacing:-.04em;color:var(--ink)}.brand span{color:var(--coral)}.navlinks{display:flex;gap:25px;color:var(--muted);font-size:14px}.navlinks a{color:var(--muted)}
-.hero{padding:80px 0 70px;border-bottom:1px solid var(--line)}.kicker{text-transform:uppercase;letter-spacing:.15em;font-size:12px;font-weight:700;color:var(--blue)}h1,h2,h3{font-family:Fraunces,serif;letter-spacing:-.045em;line-height:1.05}h1{font-size:clamp(52px,7vw,82px);max-width:850px;margin:18px 0}.hero p{font-size:19px;line-height:1.7;color:var(--muted);max-width:720px}.layout{display:grid;grid-template-columns:230px 1fr;gap:55px;padding:65px 0 90px}.toc{position:sticky;top:25px;height:max-content}.toc strong{display:block;margin-bottom:12px}.toc a{display:block;padding:7px 0;color:var(--muted);font-size:14px}.toc a:hover{color:var(--blue)}section{scroll-margin-top:25px;margin-bottom:70px}h2{font-size:44px;margin:10px 0 18px}h3{font-size:27px;margin:35px 0 12px}p,li{color:var(--muted);line-height:1.75}ul,ol{padding-left:22px}.card{background:var(--white);border:1px solid var(--line);border-radius:20px;padding:24px;margin:20px 0}.card.peach{background:#fff1e4;border-color:#f4c8a6}.card.teal{background:#eaf8f7}.flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:25px 0}.flow span{background:var(--white);border:1px solid var(--line);padding:10px 13px;border-radius:999px;font-size:13px;font-weight:700}.flow b{color:var(--coral)}pre{background:#15333b;color:#fdfcdc;padding:20px;border-radius:16px;overflow:auto;line-height:1.6;font-size:13px}.warning{border-left:5px solid var(--coral);background:#fff0e3;padding:18px 20px;border-radius:0 16px 16px 0}.tip{border-left:5px solid var(--teal);background:#eaf8f7;padding:18px 20px;border-radius:0 16px 16px 0}.app-list{display:grid;grid-template-columns:1fr 1fr;gap:12px}.app{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:18px}.app strong{display:block;margin-bottom:5px}.app span{font-size:13px;color:var(--muted)}footer{border-top:1px solid var(--line);padding:25px 0;color:var(--muted);font-size:13px}@media(max-width:800px){.navlinks{display:none}.layout{grid-template-columns:1fr}.toc{position:static}.app-list{grid-template-columns:1fr}}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--cream);color:var(--ink);font-family:"DM Sans",sans-serif}
+a{color:var(--blue);text-decoration:none}a:hover{color:var(--coral)}
+.wrap{max-width:1160px;margin:auto;padding:0 24px}
+nav{height:82px;display:flex;align-items:center;justify-content:space-between}
+.brand{font-weight:700;font-size:18px;letter-spacing:-.04em;color:var(--ink)}.brand span{color:var(--coral)}
+.navlinks{display:flex;gap:22px;color:var(--muted);font-size:14px}.navlinks a{color:var(--muted)}.navlinks a:hover{color:var(--blue)}
+.hero{padding:74px 0 52px;position:relative;overflow:hidden}
+.hero:after{content:"";position:absolute;width:250px;height:168px;background:var(--peach);border-radius:54% 46% 60% 40%;right:-66px;top:34px;transform:rotate(8deg);z-index:-1}
+.kicker{text-transform:uppercase;letter-spacing:.15em;font-size:12px;font-weight:700;color:var(--blue)}
+h1,h2,h3{font-family:Fraunces,serif;letter-spacing:-.045em;line-height:1.05}
+h1{font-size:clamp(46px,7vw,74px);max-width:840px;margin:18px 0}
+.hero p{font-size:19px;line-height:1.7;color:var(--muted);max-width:700px}
+p,li{color:var(--muted);line-height:1.75}ul,ol{padding-left:22px}li{margin-bottom:5px}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.87em;background:#eaf8f7;padding:2px 6px;border-radius:6px;color:#0e5a63;word-break:break-word}
+pre{background:#15333b;color:#fdfcdc;padding:18px;border-radius:15px;overflow:auto;line-height:1.65;font-size:12.5px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;margin:15px 0}
+pre .c{color:#8fb3ae}pre .p{color:#FED9B7}
+.layout{display:grid;grid-template-columns:222px 1fr;gap:52px;padding:8px 0 90px}
+.toc{position:sticky;top:22px;height:max-content;max-height:calc(100vh - 44px);overflow:auto}
+.toc strong{display:block;margin-bottom:11px;font-size:14px;color:var(--ink)}
+.toc a{display:block;padding:5px 0;color:var(--muted);font-size:13.5px;line-height:1.4}
+.toc a:hover{color:var(--blue)}.toc a.on{color:var(--blue);font-weight:700}
+.toc .sub{padding-left:13px;font-size:12.5px}
+.toc hr{border:0;border-top:1px solid var(--line);margin:13px 0}
+section{scroll-margin-top:22px;margin-bottom:62px}
+h2{font-size:38px;margin:8px 0 15px}h3{font-size:24px;margin:36px 0 11px}
+h4{font-family:"DM Sans";font-size:16px;font-weight:700;letter-spacing:-.02em;color:var(--ink);margin:24px 0 7px}
+.lead{font-size:16.5px;color:var(--muted);line-height:1.75;max-width:690px;margin-bottom:22px}
+.card{background:var(--white);border:1px solid var(--line);border-radius:20px;padding:23px;margin:19px 0}
+.card.peach{background:#fff1e4;border-color:#f4c8a6}.card.teal{background:#eaf8f7;border-color:#a9dde0}
+.card strong{color:var(--ink)}
+.warning{border-left:5px solid var(--coral);background:#fff0e3;padding:16px 18px;border-radius:0 15px 15px 0;margin:18px 0;font-size:14.5px}
+.tip{border-left:5px solid var(--teal);background:#eaf8f7;padding:16px 18px;border-radius:0 15px 15px 0;margin:18px 0;font-size:14.5px}
+.warning strong,.tip strong{color:var(--ink)}
+.flow{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin:20px 0}
+.flow span{background:var(--white);border:1px solid var(--line);padding:9px 12px;border-radius:999px;font-size:12.5px;font-weight:700;color:var(--ink)}
+.flow b{color:var(--coral)}
+.tbl{background:var(--white);border:1px solid var(--line);border-radius:17px;overflow:hidden;margin:18px 0}
+.tbl table{width:100%;border-collapse:collapse;font-size:13.5px}
+.tbl th{text-align:left;padding:12px 15px;font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);background:#eaf8f7;font-weight:700}
+.tbl td{padding:11px 15px;border-top:1px solid var(--line);color:var(--muted);vertical-align:top}
+.tbl td:first-child{font-weight:700;color:var(--ink)}
+.tbl td code{font-size:12px}
+.yes{color:#2f7d5e;font-weight:700}.no{color:#b0463c;font-weight:700}.part{color:#a06a2c;font-weight:700}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin:18px 0}
+.mini{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:17px}
+.mini b{display:block;font-size:14.5px;color:var(--ink);margin-bottom:4px;letter-spacing:-.02em}
+.mini span{font-size:13.5px;color:var(--muted);line-height:1.55}
+.mcat{display:flex;align-items:center;gap:10px;font-family:ui-monospace,monospace;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:32px 0 11px}
+.mcat .bar{height:2px;width:22px;border-radius:2px;background:var(--teal)}
+details.m{background:var(--white);border:1px solid var(--line);border-radius:17px;margin-bottom:9px;overflow:hidden}
+details.m[open]{border-color:#a9dde0}
+details.m summary{cursor:pointer;padding:16px 46px 16px 19px;list-style:none;position:relative;display:flex;align-items:baseline;gap:11px;flex-wrap:wrap}
+details.m summary::-webkit-details-marker{display:none}
+details.m summary:after{content:"";position:absolute;right:20px;top:22px;width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);transition:.2s}
+details.m[open] summary:after{transform:rotate(-135deg);top:25px}
+details.m summary b{font-size:16.5px;letter-spacing:-.02em;color:var(--ink)}
+details.m summary .d{font-size:13.5px;color:var(--muted);flex:1;min-width:180px}
+.pill{display:inline-block;font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;text-transform:uppercase;letter-spacing:.06em}
+.pill.easy{background:#d3f0ef;color:#0e5a63}.pill.mod{background:var(--peach);color:#744b32}.pill.adv{background:#ffe0dc;color:#96382f}
+.mbody{padding:0 19px 20px;border-top:1px solid var(--line);padding-top:17px}
+.mbody h5{font-family:"DM Sans";font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);margin:18px 0 6px}
+.mbody h5:first-child{margin-top:0}
+.mbody p,.mbody li{font-size:14px}
+.mbody pre{font-size:12px}
+.spec{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:9px;margin-bottom:6px}
+.spec div{background:#f5fbfa;border:1px solid var(--line);border-radius:11px;padding:9px 11px}
+.spec b{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:2px}
+.spec span{font-size:13px;color:var(--ink);font-weight:500}
+.srcs{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.srcs a{font-size:12px;font-weight:700;border:1px solid var(--line);padding:4px 10px;border-radius:999px;color:var(--muted)}
+.srcs a:hover{border-color:var(--teal);color:var(--blue)}
+.gloss dt{font-weight:700;color:var(--ink);font-size:14.5px;margin-top:14px}
+.gloss dd{margin:3px 0 0;font-size:14px;color:var(--muted);line-height:1.65}
+.btn{display:inline-block;border-radius:999px;padding:12px 20px;font-weight:700;font-size:14.5px;background:var(--blue);color:#fff}
+.btn:hover{background:#00688a;color:#fff}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+.btn.ghost:hover{border-color:var(--teal);color:var(--blue);background:transparent}
+footer{border-top:1px solid var(--line);padding:25px 0;color:var(--muted);font-size:13px}
+@media(max-width:900px){.navlinks{display:none}.layout{grid-template-columns:1fr;gap:0}.toc{position:static;max-height:none;margin-bottom:34px}.two{grid-template-columns:1fr}h2{font-size:30px}}
+@media(max-width:520px){.tbl{overflow-x:auto}.spec{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
-<div class="wrap"><nav><a class="brand" href="modular-media-server-site.html">modular<span>.</span>media</a><div class="navlinks"><a href="modular-media-server-site.html">Home</a><a href="guide.html">Guide</a><a href="platforms.html">Platforms</a><a href="modular-media-server-site.html#apps">Apps</a><a href="modular-media-server-site.html#generator">Generator</a><a href="access.html">Access</a><a href="hardware.html">Hardware</a><a href="faq.html">Help</a><a href="#getting-started">Getting started</a></div></nav></div>
-<section class="hero"><div class="wrap"><div class="kicker">Documentation</div><h1>Understand what you're building.</h1><p>Modular Media Server is meant to help you learn self-hosting while making the repetitive parts easier. These docs explain the pieces, how they fit together, and what to think about before you press deploy.</p></div></section>
-<div class="wrap layout"><aside class="toc"><strong>On this page</strong><a href="#getting-started">Getting started</a><a href="#docker">Docker & Compose</a><a href="#architecture">How the stack fits</a><a href="#storage">Storage</a><a href="#networking">Networking</a><a href="#generator">The generator</a><a href="#modules">Modules</a><a href="#updates">Updates & backups</a><a href="#legal">Legal & safety</a><a href="hardware.html" style="color:var(--blue);font-weight:700">Hardware &amp; hosting →</a></aside>
+<div class="wrap"><nav><a class="brand" href="index.html">modular<span>.</span>media</a>
+<div class="navlinks"><a href="index.html">Home</a><a href="guide.html">Guide</a><a href="platforms.html">Platforms</a><a href="generator.html">Generator</a><a href="access.html">Access</a><a href="hardware.html">Hardware</a><a href="faq.html">Help</a></div></nav></div>
+
+<section class="hero"><div class="wrap"><div class="kicker">Documentation</div>
+<h1>How all of this actually works.</h1>
+<p>The concepts underneath a self-hosted media server, then a reference entry for every module — what it does, what it needs, how it connects to the rest, and what usually goes wrong with it.</p></div></section>
+
+<div class="wrap"><div class="layout">
+<aside class="toc" id="toc">
+<strong>On this page</strong>
+<a href="#getting-started">Getting started</a>
+<a href="#docker">Docker &amp; Compose</a>
+<a href="#architecture">How the stack fits</a>
+<a href="#storage">Storage &amp; folders</a>
+<a href="#permissions">Permissions</a>
+<a href="#networking">Networking</a>
+<a href="#generator">The generator</a>
+<hr>
+<a href="#modules">Module reference</a>
+<a class="sub" href="#m-media">Media serving</a>
+<a class="sub" href="#m-auto">Automation</a>
+<a class="sub" href="#m-dl">Downloads</a>
+<a class="sub" href="#m-photos">Photos &amp; music</a>
+<a class="sub" href="#m-monitor">Monitoring &amp; archives</a>
+<a class="sub" href="#m-conn">Connection</a>
+<a class="sub" href="#m-auth">Authentication</a>
+<a class="sub" href="#m-manage">Management</a>
+<hr>
+<a href="#ports">Port reference</a>
+<a href="#envvars">Environment variables</a>
+<a href="#updates">Updates &amp; backups</a>
+<a href="#glossary">Glossary</a>
+<a href="#legal">Legal &amp; security</a>
+<hr>
+<a href="hardware.html">Hardware &amp; hosting →</a>
+<a href="faq.html">Troubleshooting →</a>
+</aside>
+
 <main>
-<section id="getting-started"><div class="kicker">01 · Start here</div><h2>Getting started</h2><p>You do not need a giant server to begin. A NAS, mini PC, used desktop, laptop, Raspberry Pi or dedicated machine can all be useful depending on what you want to run.</p><div class="card teal"><strong>Suggested order</strong><div class="flow"><span>Choose hardware</span><b>→</b><span>Install Docker</span><b>→</b><span>Install Arcane</span><b>→</b><span>Choose apps</span><b>→</b><span>Configure storage</span><b>→</b><span>Deploy</span></div></div></section>
-<section id="docker"><div class="kicker">02 · The foundation</div><h2>Docker & Compose</h2><p>Docker packages an application and its dependencies into a container. Docker Compose gives you a readable way to describe several containers, their networks, volumes and configuration together.</p><p>The goal here is not to hide Docker from you. The generator should make the first Compose file approachable, then let you inspect and learn from the result.</p><div class="card"><strong>A simple Compose idea</strong><pre>services:
-  jellyfin:
-    image: jellyfin/jellyfin
+
+<section id="getting-started">
+<div class="kicker">01 · Start here</div>
+<h2>Getting started</h2>
+<p class="lead">You do not need a giant server to begin. A NAS, mini PC, used desktop, laptop, Raspberry Pi or dedicated machine can all be useful depending on what you want to run.</p>
+<div class="card"><strong>Suggested order</strong>
+<div class="flow" style="margin-bottom:0"><span>Choose hardware</span><b>→</b><span>Install Docker</span><b>→</b><span>Install Arcane</span><b>→</b><span>Choose apps</span><b>→</b><span>Configure storage</span><b>→</b><span>Deploy</span></div></div>
+<p>Each of those steps has its own page. The <a href="hardware.html">hardware guide</a> covers what to run it on, the <a href="platforms.html">platform guides</a> cover installing Docker on Windows, macOS, Linux and NAS devices, and the <a href="guide.html">setup guide</a> walks through Arcane and the generator.</p>
+<div class="tip"><strong>Start with one thing.</strong> Jellyfin on its own is a complete, useful server. Every module you add is another thing to configure, update and eventually debug — three services you understand beat fifteen you do not.</div>
+</section>
+
+<section id="docker">
+<div class="kicker">02 · The foundation</div>
+<h2>Docker &amp; Compose</h2>
+<p class="lead">Docker packages an application and its dependencies into a container. Docker Compose gives you a readable way to describe several containers, their networks, volumes and configuration together.</p>
+<p>The goal here is not to hide Docker from you. The generator makes the first Compose file approachable, then lets you inspect and learn from the result.</p>
+
+<h3>Anatomy of a service</h3>
+<p>Nearly every entry in your Compose file uses the same handful of keys. Once these make sense, the whole file does.</p>
+<pre>services:
+  jellyfin:                                  <span class="c"># service name — also its hostname</span>
+    image: jellyfin/jellyfin:latest          <span class="c"># what to run</span>
+    container_name: jellyfin                 <span class="c"># fixed name, easier to type</span>
+    ports:
+      - "8096:8096"                          <span class="c"># host:container — only the left side is yours</span>
     volumes:
-      - ${MEDIA_ROOT}:/media
-    restart: unless-stopped</pre></div></section>
-<section id="architecture"><div class="kicker">03 · The bigger picture</div><h2>How the stack fits together</h2><p>A modular server is a collection of small tools with specific jobs. Some are independent. Others work best when connected.</p><div class="card"><strong>Example media flow</strong><div class="flow"><span>Jellyseerr</span><b>→</b><span>Sonarr / Radarr</span><b>→</b><span>Download client</span><b>→</b><span>Library</span><b>→</b><span>Jellyfin</span></div><p style="margin-bottom:0">Bazarr can sit alongside Sonarr and Radarr for subtitles. Gluetun can provide a VPN network boundary for supported download traffic.</p></div><div class="tip"><strong>Dependency rule:</strong> the generator should distinguish between required, recommended and optional relationships. It should add required infrastructure automatically, but explain why it appeared.</div></section>
-<section id="storage"><div class="kicker">04 · Keep it organized</div><h2>Storage & folders</h2><p>Storage is one of the most important decisions in a media server. Keep configuration data separate from the media you care about, and give downloads and libraries a predictable structure.</p><pre>/volume1/
-├── docker/
-│   └── modular-media-server/
-├── media/
-│   ├── movies/
-│   ├── tv/
-│   └── music/
-├── downloads/
-│   ├── torrents/
-│   └── incomplete/
-└── photos/</pre><p>The exact paths are configurable. The important part is consistency. Shared storage layouts can also make hardlinks possible for compatible workloads, avoiding unnecessary duplicate data.</p></section>
-<section id="networking"><div class="kicker">05 · Getting around</div><h2>Networking</h2><p>Keep services on a private network by default. Expose only what you actually need, and use a reverse proxy, VPN or mesh VPN when remote access makes sense.</p><ul><li>Do not expose administration interfaces casually.</li><li>Use strong passwords and generated secrets.</li><li>Keep Docker and application images updated.</li><li>Understand which container is allowed to reach the Internet and why.</li></ul></section>
-<section id="generator"><div class="kicker">06 · Build it</div><h2>How the generator works</h2><p>The generator turns a selection of modules into a configuration plan before it creates files.</p><div class="flow"><span>Pick modules</span><b>→</b><span>Resolve dependencies</span><b>→</b><span>Storage</span><b>→</b><span>Credentials</span><b>→</b><span>Secrets</span><b>→</b><span>Validate</span><b>→</b><span>Generate</span></div><div class="card peach"><strong>Generated package</strong><ul><li><code>docker-compose.yml</code></li><li><code>.env</code></li><li><code>.env.example</code></li><li><code>.gitignore</code></li><li><code>README.md</code></li></ul><p style="margin-bottom:0">The production generator should generate secure random secrets locally, never commit <code>.env</code>, and clearly show which values still need to be supplied by the user.</p></div></section>
-<section id="modules"><div class="kicker">07 · The toolbox</div><h2>Modules</h2><p>Each module page will eventually cover purpose, difficulty, resources, dependencies, storage, networking, configuration, Compose examples and troubleshooting.</p><div class="app-list"><div class="app"><strong>Media</strong><span>Jellyfin · Jellyseerr · Sonarr · Radarr · Bazarr</span></div><div class="app"><strong>Music</strong><span>Lidarr · Kima</span></div><div class="app"><strong>Downloads & networking</strong><span>qBittorrent · Gluetun · Jackett</span></div><div class="app"><strong>Photos</strong><span>Immich</span></div><div class="app"><strong>Monitoring</strong><span>Uptime Kuma</span></div><div class="app"><strong>Archives</strong><span>ArchiveBox · Tube Archivist</span></div><div class="app"><strong>Management</strong><span>Arcane</span></div></div></section>
-<section id="updates"><div class="kicker">08 · Keep it healthy</div><h2>Updates & backups</h2><p>Containers make updates convenient, but convenience should not replace backups. Keep important configuration and media protected before making changes.</p><ul><li>Back up important application configuration.</li><li>Back up irreplaceable photos and personal data separately from the server.</li><li>Review release notes before major upgrades.</li><li>Keep a record of custom environment variables and integrations.</li><li>Test that backups can actually be restored.</li></ul></section>
-<section id="legal"><div class="kicker">09 · Read this</div><h2>Legal & security</h2><div class="warning"><strong>Copyright and media:</strong> Modular Media Server does not provide, distribute, host or endorse unauthorized copies of movies, TV, music, books, photos, software or other copyrighted material. You are responsible for ensuring that anything you download, store, archive, stream or share is legally obtained and that you have the necessary rights or permission.</div><div class="warning" style="margin-top:18px"><strong>Torrents and malware:</strong> Torrent files and downloaded content can come from untrusted sources. They may contain malware, ransomware, trojans, cryptominers or malicious scripts. A VPN does not make downloaded files safe. Treat downloaded files as untrusted, keep your systems updated, avoid blindly executing programs or scripts, use appropriate network controls and maintain backups.</div><p>ArchiveBox and Tube Archivist can preserve content from third-party sites. You are responsible for respecting copyright, privacy, terms of service and applicable laws when using them.</p></section>
-</main></div>
-<footer><div class="wrap">Modular Media Server · <a href="modular-media-server-site.html">Back to the generator</a> · <a href="hardware.html">Hardware &amp; hosting</a></div></footer>
+      - <span class="p">${CONFIG_ROOT}</span>/jellyfin:/config     <span class="c"># host path : container path</span>
+      - <span class="p">${MEDIA_ROOT}</span>:/media:ro            <span class="c"># :ro means read-only</span>
+    environment:
+      - TZ=<span class="p">${TZ}</span>                          <span class="c"># settings passed in from .env</span>
+    restart: unless-stopped                  <span class="c"># comes back after a reboot</span></pre>
+
+<div class="tbl"><table>
+<thead><tr><th>Key</th><th>What it does</th></tr></thead>
+<tbody>
+<tr><td>image</td><td>Which published image to run. The part after <code>:</code> is the tag — <code>latest</code> moves, a version number does not.</td></tr>
+<tr><td>ports</td><td>Publishes a container port on the host. <code>"8097:8096"</code> changes only where <em>you</em> reach it.</td></tr>
+<tr><td>volumes</td><td>Maps a host folder into the container. Without one, data disappears when the container is recreated.</td></tr>
+<tr><td>environment</td><td>Settings handed to the app. Values come from <code>.env</code> so secrets stay out of this file.</td></tr>
+<tr><td>depends_on</td><td>Start ordering. It waits for the container to start, not for the app inside to be ready.</td></tr>
+<tr><td>restart</td><td><code>unless-stopped</code> restarts on failure and after reboot, but respects you stopping it deliberately.</td></tr>
+<tr><td>network_mode</td><td><code>service:gluetun</code> makes this container share another's network entirely. Used for the VPN kill switch.</td></tr>
+</tbody></table></div>
+
+<h3>The commands you will actually use</h3>
+<pre>docker compose up -d          <span class="c"># start everything in the background</span>
+docker compose ps             <span class="c"># what is running, and its health</span>
+docker compose logs -f sonarr <span class="c"># follow one service's logs</span>
+docker compose pull           <span class="c"># fetch newer images</span>
+docker compose up -d          <span class="c"># recreate anything that changed</span>
+docker compose restart sonarr <span class="c"># bounce one service</span>
+docker compose down           <span class="c"># stop and remove containers (volumes survive)</span>
+docker compose exec sonarr sh <span class="c"># open a shell inside a container</span></pre>
+<div class="tip"><strong><code>docker compose down</code> does not delete your data</strong> as long as it lives in a volume or bind mount. It removes containers, which are disposable by design. Adding <code>--volumes</code> is the flag that destroys data — avoid it unless you mean it.</div>
+</section>
+
+<section id="architecture">
+<div class="kicker">03 · The bigger picture</div>
+<h2>How the stack fits together</h2>
+<p class="lead">A modular server is a collection of small tools with specific jobs. Some are independent. Others work best when connected.</p>
+<div class="card"><strong>Example media flow</strong>
+<div class="flow" style="margin-bottom:0"><span>Jellyseerr</span><b>→</b><span>Sonarr / Radarr</span><b>→</b><span>Download client</span><b>→</b><span>Library</span><b>→</b><span>Jellyfin</span></div></div>
+<p>Someone requests a film in Jellyseerr. Radarr searches configured indexers through Jackett, hands a result to qBittorrent, waits for it to finish, then renames and moves it into your library. Jellyfin sees the new file. Bazarr fetches subtitles for it. Nobody had to touch a terminal.</p>
+
+<h3>Three kinds of relationship</h3>
+<div class="tbl"><table>
+<thead><tr><th>Type</th><th>Meaning</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>Required</td><td>Will not work without it. Added automatically, with an explanation.</td><td>qBittorrent needs Gluetun</td></tr>
+<tr><td>Recommended</td><td>Works alone, but most of the value comes from the pairing.</td><td>Bazarr with Sonarr and Radarr</td></tr>
+<tr><td>Optional</td><td>Nice additions that change nothing if absent.</td><td>Kometa alongside Jellyfin</td></tr>
+</tbody></table></div>
+<div class="tip"><strong>Dependency rule.</strong> The generator distinguishes between required, recommended and optional relationships. It adds required infrastructure automatically and marks it in amber so you can see what appeared and why — and removing a module removes anything that depended on it, so you cannot end up with a torrent client and no VPN.</div>
+</section>
+
+<section id="storage">
+<div class="kicker">04 · Keep it organized</div>
+<h2>Storage &amp; folders</h2>
+<p class="lead">Storage is one of the most important decisions in a media server, and the one that is most painful to change later. Keep configuration separate from media, and give downloads and libraries a predictable structure.</p>
+
+<h3>The layout that avoids doubling your disk use</h3>
+<p>Sonarr and Radarr can <strong>hardlink</strong> — giving one file two names on disk for no extra space. That only works when the download and the library sit on the same filesystem <em>and</em> the container sees them through a single mount.</p>
+<div class="two">
+<div class="mini"><b>Works — one shared mount</b><span>The container sees <code>/data</code>, containing both <code>downloads/</code> and <code>media/</code>. Imports are instant and free.</span></div>
+<div class="mini"><b>Breaks — separate mounts</b><span>The container sees <code>/downloads</code> and <code>/tv</code> as unrelated places, so every import copies the file.</span></div>
+</div>
+<pre>/srv/
+├── media-server/
+│   └── config/            <span class="c"># app settings and databases — back this up</span>
+│       ├── jellyfin/
+│       ├── sonarr/
+│       └── qbittorrent/
+└── data/                  <span class="c"># mounted into containers as a single /data</span>
+    ├── downloads/
+    │   ├── complete/
+    │   └── incomplete/
+    └── media/
+        ├── movies/
+        ├── tv/
+        └── music/</pre>
+<div class="warning"><strong>This is expensive to change later.</strong> Restructuring paths after a library is established means re-importing everything. If you are at the beginning, use the shared layout — it is the generator's default for exactly this reason.</div>
+
+<h3>Naming your files</h3>
+<p>Metadata matching relies on filenames. Letting Sonarr and Radarr handle renaming avoids most problems, since they use the format media servers expect.</p>
+<pre>Movies/The Thing (1982)/The Thing (1982).mkv
+TV/Show Name/Season 01/Show Name - S01E01.mkv</pre>
+<p>The year is what separates a remake from the original. <code>film.final.copy.mkv</code> will match something, but rarely what you wanted.</p>
+</section>
+
+<section id="permissions">
+<div class="kicker">05 · The most common problem</div>
+<h2>Permissions &amp; ownership</h2>
+<p class="lead">More setups break on file ownership than on anything else. The idea is simple once seen: a container runs as a numeric user, and that number must be allowed to touch your folders.</p>
+
+<h3>PUID and PGID</h3>
+<p>Linux does not really care about usernames — it cares about numeric user and group IDs. Find yours:</p>
+<pre>id
+<span class="c"># uid=1000(you) gid=1000(you) groups=1000(you),27(sudo)</span></pre>
+<p>Put those numbers in <code>.env</code> as <code>PUID</code> and <code>PGID</code>. The LinuxServer images used for Sonarr, Radarr, Lidarr, Bazarr, Jackett and qBittorrent read them at startup and run the app as that user, so files they create belong to you rather than to root.</p>
+<pre><span class="c"># make the folders match</span>
+sudo chown -R 1000:1000 /srv/data /srv/media-server</pre>
+
+<div class="tbl"><table>
+<thead><tr><th>Symptom</th><th>Usual cause</th></tr></thead>
+<tbody>
+<tr><td>Permission denied in logs</td><td>PUID/PGID do not match the folder's owner</td></tr>
+<tr><td>Files owned by root appear</td><td>A container ignoring PUID, or one that ran before you set it</td></tr>
+<tr><td>Downloads finish but never import</td><td>The *arr app can read the download but cannot write to the library</td></tr>
+<tr><td>Container starts then exits immediately</td><td>It could not create its config directory</td></tr>
+</tbody></table></div>
+
+<h4>Checking what a container thinks it is</h4>
+<pre>docker compose exec sonarr id
+docker compose exec sonarr ls -la /data</pre>
+<p>If the second command shows folders owned by a different number than the first reports, that is your problem in two lines.</p>
+
+<div class="tip"><strong>Docker Desktop behaves differently.</strong> On Windows and macOS, ownership is handled at the virtual machine boundary and your real user ID usually does not apply. Leave PUID and PGID at 1000 there; changing them rarely helps and often confuses matters.</div>
+<div class="warning"><strong>Do not fix this with <code>chmod 777</code>.</strong> It appears to work, and it makes every file on that path writable by anything on the system — including anything that gets in through an exposed service. Set the ownership correctly instead; it takes the same amount of time.</div>
+</section>
+
+<section id="networking">
+<div class="kicker">06 · Getting around</div>
+<h2>Networking</h2>
+<p class="lead">Keep services on a private network by default. Expose only what you actually need, and use a reverse proxy, VPN or mesh VPN when remote access makes sense.</p>
+
+<h3>Containers do not share your idea of localhost</h3>
+<p>This single misunderstanding causes more support questions than everything else combined. Inside a container, <code>localhost</code> means <em>that container</em>. Pointing Sonarr at <code>127.0.0.1:8080</code> makes it look inside itself, find nothing, and report a connection failure.</p>
+<p>Containers on the same Compose network reach each other by <strong>service name</strong>. Sonarr finds Jellyfin at <code>jellyfin:8096</code>, Bazarr finds Radarr at <code>radarr:7878</code>.</p>
+
+<div class="warning"><strong>qBittorrent is the exception that catches everyone.</strong> Because it uses <code>network_mode: service:gluetun</code>, it has no network identity of its own — it lives inside Gluetun's network. Other containers must therefore ask for <code>gluetun</code>, not <code>qbittorrent</code>.</div>
+
+<div class="tbl"><table>
+<thead><tr><th>Connecting to</th><th>Host</th><th>Port</th></tr></thead>
+<tbody>
+<tr><td>qBittorrent behind a VPN</td><td><code>gluetun</code></td><td>8080</td></tr>
+<tr><td>qBittorrent with no VPN</td><td><code>qbittorrent</code></td><td>8080</td></tr>
+<tr><td>Jackett behind a VPN</td><td><code>gluetun</code></td><td>9117</td></tr>
+<tr><td>Sonarr, from Jellyseerr</td><td><code>sonarr</code></td><td>8989</td></tr>
+<tr><td>Jellyfin, from Jellyseerr</td><td><code>jellyfin</code></td><td>8096</td></tr>
+</tbody></table></div>
+<pre><span class="c"># prove a name resolves before blaming anything else</span>
+docker compose exec sonarr ping -c2 gluetun</pre>
+
+<h3>Sensible defaults</h3>
+<ul>
+<li>Do not expose administration interfaces casually.</li>
+<li>Use strong passwords and generated secrets.</li>
+<li>Keep Docker and application images updated.</li>
+<li>Understand which container is allowed to reach the internet and why.</li>
+</ul>
+<p>When you do want access from outside the house, the <a href="access.html">access guide</a> compares Tailscale, Cloudflare Tunnel and a reverse proxy, and explains which services should never be published at all.</p>
+</section>
+
+<section id="generator">
+<div class="kicker">07 · Build it</div>
+<h2>How the generator works</h2>
+<p class="lead">The generator turns a selection of modules into a configuration plan, validates it, then writes the files. It runs entirely in your browser — nothing is uploaded.</p>
+<div class="flow"><span>Pick modules</span><b>→</b><span>Resolve dependencies</span><b>→</b><span>Storage</span><b>→</b><span>Connection</span><b>→</b><span>Credentials</span><b>→</b><span>Secrets</span><b>→</b><span>Validate</span><b>→</b><span>Generate</span></div>
+<div class="card"><strong>Generated package</strong>
+<ul style="margin-bottom:0">
+<li><code>docker-compose.yml</code> — your services</li>
+<li><code>.env</code> — real paths and secrets, never to be committed</li>
+<li><code>.env.example</code> — the same shape with placeholders, safe to share</li>
+<li><code>.gitignore</code> — already excluding <code>.env</code></li>
+<li><code>Caddyfile</code> — reverse proxy routes, when Caddy is selected</li>
+<li><code>README.md</code> — your service addresses and first steps</li>
+</ul></div>
+<p>Secrets come from <code>crypto.getRandomValues</code>, the same source your browser uses for HTTPS. Each service gets its own value; nothing is shared or reused. Anything you leave blank is written as <code>CHANGEME</code> rather than guessed, so a missing value is visible instead of silently wrong.</p>
+<div class="tip"><strong>There is a command-line equivalent.</strong> <a href="install.sh">install.sh</a> does the same job in a terminal, with presets and a <code>--dry-run</code> flag. It emits the same images and configuration as the web generator.</div>
+</section>
+
+<section id="modules">
+<div class="kicker">08 · The toolbox</div>
+<h2>Module reference</h2>
+<p class="lead">Every module, in a consistent format: what it is for, how hard it is, what it needs, how it connects to the rest of the stack, and what usually goes wrong. Open one to see the detail.</p>
+
+<div class="mcat" id="m-media"><span class="bar"></span>Media serving</div>
+
+<details class="m"><summary><b>Jellyfin</b><span class="pill easy">Easy</span><span class="d">Streams your library to any device</span></summary>
+<div class="mbody">
+<div class="spec"><div><b>Port</b><span>8096</span></div><div><b>CPU</b><span>Low, high when transcoding</span></div><div><b>RAM</b><span>Low–Medium</span></div><div><b>Storage</b><span>Your whole library</span></div></div>
+<h5>Purpose</h5><p>A free media server for films, TV, music and photos, with clients for browsers, phones, tablets and TV devices. No subscription and no account with anyone else.</p>
+<h5>How it fits</h5><p>The end of the chain. Everything else in the media path exists to put well-named files where Jellyfin can find them.</p>
+<h5>Dependencies</h5><p>None. Jellyfin is a complete server on its own, and a perfectly good place to start.</p>
+<h5>Storage</h5><p>Config at <code>${CONFIG_ROOT}/jellyfin/config</code>, a separate cache folder, and your media mounted read-only. Read-only is deliberate: Jellyfin has no reason to modify your files.</p>
+<h5>Configuration</h5><p>Add libraries using the <em>container</em> path (<code>/media/movies</code>), not the host path. Set the content type correctly per library — films and TV need separate libraries for metadata to match.</p>
+<h5>Transcoding</h5><p>Direct play costs almost nothing. Transcoding rebuilds the video in real time and is where weak hardware fails. On native Linux with an Intel chip, uncomment the device mapping and enable hardware acceleration under Dashboard → Playback:</p>
+<pre>devices:
+  - /dev/dri:/dev/dri</pre>
+<div class="warning"><strong>Not available on Docker Desktop.</strong> On Windows and macOS the virtual machine cannot reach the GPU, so transcoding is CPU-only — realistically one stream.</div>
+<h5>Troubleshooting</h5>
+<ul>
+<li><b>Empty library</b> — run <code>docker compose exec jellyfin ls /media</code>. Nothing listed means the mount is wrong, not Jellyfin.</li>
+<li><b>Buffering</b> — check the dashboard during playback. If it says Transcoding rather than Direct Play, that is your answer.</li>
+<li><b>Wrong artwork</b> — filenames. Use <code>Name (Year)</code> and let the *arr apps do the renaming.</li>
+</ul>
+<h5>Official sources</h5><div class="srcs"><a href="https://jellyfin.org/" target="_blank" rel="noopener">Website</a><a href="https://github.com/jellyfin/jellyfin" target="_blank" rel="noopener">GitHub</a><a href="https://jellyfin.org/docs/" target="_blank" rel="noopener">Docs</a></div>
+</div></details>
+
+<details class="m"><summary><b>Jellyseerr</b><span class="pill easy">Easy</span><span class="d">Lets your household request things</span></summary>
+<div class="mbody">
+<div class="spec"><div><b>Port</b><span>5055</span></div><div><b>CPU</b><span>Low</span></div><div><b>RAM</b><span>Low</span></div><div><b>Storage</b><span>Small</span></div></div>
+<h5>Purpose</h5><p>A polished request and discovery interface. Family members browse, click request, and the automation handles the rest — instead of messaging you.</p>
+<h5>How it fits</h5><p>Sits in front of Sonarr and Radarr. It signs users in against Jellyfin, so people use the account they already have.</p>
+<h5>Dependencies</h5><p>Recommends Jellyfin for sign-in, plus Sonarr and Radarr to fulfil requests. Without those it can still track requests, but nothing acts on them.</p>
+<h5>Configuration</h5><p>Point it at <code>jellyfin:8096</code>, then add Sonarr at <code>sonarr:8989</code> and Radarr at <code>radarr:7878</code> with their API keys. Set per-user request quotas — five films a week stops an enthusiastic new user filling your disk in an afternoon.</p>
+<h5>Troubleshooting</h5>
+<ul>
+<li><b>Requests approved but nothing downloads</b> — the *arr connection is the problem, not Jellyseerr. Check its Sonarr and Radarr settings and quality profiles.</li>
+<li><b>Users cannot sign in</b> — it authenticates against Jellyfin, so confirm they have a working Jellyfin account first.</li>
+</ul>
+<h5>Official sources</h5><div class="srcs"><a href="https://github.com/CTXP/jellyseerr" target="_blank" rel="noopener">GitHub</a></div>
+</div></details>
+
+<div class="mcat" id="m-auto"><span class="bar"></span>Automation</div>
+
+<details class="m"><summary><b>Sonarr</b><span class="pill mod">Moderate</span><span class="d">Automated TV series management</span></summary>
+<div class="mbody">
+<div class="spec"><div><b>Port</b><span>8989</span></div><div><b>CPU</b><span>Low</span></div><div><b>RAM</b><span>Low</span></div><div><b>Storage</b><span>Config only</span></div></div>
+<h5>Purpose</h5><p>Monitors TV series, searches indexers for missing or new episodes, hands them to a download client, then renames and files the result.</p>
+<h5>How it fits</h5><p>The centre of the TV chain. It talks to an indexer (Jackett), a download client (qBittorrent) and writes into your library where Jellyfin picks it up.</p>
+<h5>Dependencies</h5><p>Needs an indexer and a download client to do anything useful. Recommends Bazarr for subtitles and Jellyseerr for requests.</p>
+<h5>Storage</h5><p>Config at <code>${CONFIG_ROOT}/sonarr</code>. With the shared layout it sees one <code>/data</code> mount, with the library at <code>/data/media/tv</code> and downloads at <code>/data/downloads</code>.</p>
+<h5>Configuration</h5>
+<ol>
+<li><b>Settings → Download Clients</b> — add qBittorrent. Host is <code>gluetun</code> when it is behind the VPN, port 8080.</li>
+<li><b>Settings → Indexers</b> — add Jackett's Torznab feeds with its API key.</li>
+<li><b>Settings → Media Management</b> — set the root folder and enable renaming.</li>
+<li>Find your own API key under <b>Settings → General</b>, for Jellyseerr and Bazarr.</li>
+</ol>
+<h5>Troubleshooting</h5>
+<ul>
+<li><b>Cannot connect to download client</b> — almost always <code>localhost</code> where a container name belongs. See <a href="#networking">Networking</a>.</li>
+<li><b>Downloads complete but never import</b> — Sonarr and qBittorrent disagree about paths. Compare <code>docker compose exec sonarr ls /data/downloads</code> with the same command against qbittorrent.</li>
+<li><b>Imports copy instead of moving</b> — separate mounts breaking hardlinks. See <a href="#storage">Storage</a>.</li>
+</ul>
+<h5>Official sources</h5><div class="srcs"><a href="https://sonarr.tv/" target="_blank" rel="noopener">Website</a><a href="https://github.com/Sonarr/Sonarr" target="_blank" rel="noopener">GitHub</a><a href="https://wiki.servarr.com/sonarr" target="_blank" rel="noopener">Wiki</a></div>
+</div></details>
+
+<details class="m"><summary><b>Radarr</b><span class="pill mod">Moderate</span><span class="d">Automated film management</span></summary>
+<div class="mbody">
+<div class="spec"><div><b>Port</b><span>7878</span></div><div><b>CPU</b><span>Low</span></div><div><b>RAM</b><span>Low</span></div><div><b>Storage</b><span>Config only</span></div></div>
+<h5>Purpose</h5><p>Sonarr's counterpart for films. Same design, same interface, same configuration steps.</p>
+<h5>How it fits</h5><p>Identical position in the chain: indexer in, download client out, library written for Jellyfin.</p>
+<h5>Configuration</h5><p>As Sonarr, with the library at <code>/data/media/movies</code>. Quality profiles matter more here — a 4K remux is enormous and will need transcoding on most hardware, so a 1080p profile is usually the sensible default.</p>
+<h5>Troubleshooting</h5><p>The same three issues as Sonarr, with the same causes. If one is misbehaving, check whether the other is too — it usually points at the shared download client rather than either app.</p>
+<h5>Official sources</h5><div class="srcs"><a href="https://radarr.video/" target="_blank" rel="noopener">Website</a><a href="https://github.com/Radarr/Radarr" target="_blank" rel="noopener">GitHub</a><a href="https://wiki.servarr.com/radarr" target="_blank" rel="noopener">Wiki</a></div>
+</div></details>
+
+<details class="m"><summary><b>Lidarr</b><span class="pill mod">Moderate</span><span class="d">Automated music collection management</span></summary>
+<div class="mbody">
+<div class="spec"><div><b>Port</b><span>8686</span></div><div><b>CPU</b><span>Low</span></div><div><b>RAM</b><span>Low</span></div><div><b>Storage</b><span>Config only</span></div></div>
+<h5>Purpose</h5><p>Monitors artists and albums, fetches missing releases, and organises your music library with metadata from MusicBrainz.</p>
+<h5>How it fits</h5><p>Feeds the music library that Jellyfin and Kima both read. Kima can also drive Lidarr directly, requesting downloads from its own interface.</p>
+<h5>Configuration</h5><p>Library at <code>/data/media/music</code>. Music metadata is messier than film and TV — expect more manual matching, particularly for compilations and classical.</p>
+<h5>Troubleshooting</h5>
+<ul>
+<li><b>Artists will not match</b> — Lidarr relies on MusicBrainz. If an artist is missing or wrong there, it will be wrong here.</li>
+<li><b>Kima cannot reach it</b> — Kima needs the URL and API key from <b>Settings → General</b>, and it sets up a webhook back to itself.</li>
+</ul>
+<h5>Official sources</h5><div class="srcs"><a href="https://lidarr.audio/" target="_blank" rel="noopener">Website</a><a href="https://github.com/Lidarr/Lidarr" target="_blank" rel="noopener">GitHub</a></div>
+</div></details>
+
+<details class="m"><summary><b>Bazarr</b><span class="pill easy">Easy</span><span class="d">Fetches subtitles automatically</span></summary>
+<div class="mbody">
+<div class="spec"><div><b>Port</b><span>6767</span></div><div><b>CPU</b><span>Low</span></div><div><b>RAM</b><span>Low</span></div><div><b>Storage</b><span>Config only</span></div></div>
+<h5>Purpose</h5><p>Watches the libraries Sonarr and Radarr manage and downloads matching subtitles in the languages you choose.</p>
+<h5>Dependencies</h5><p>Recommends Sonarr and Radarr. On its own it has nothing to work with — it does not manage media itself.</p>
+<h5>Configuration</h5><p>Connect to <code>sonarr:8989</code> and <code>radarr:7878</code> with their API keys, pick your languages, then add subtitle providers. Its paths must match what the *arr apps use, or it will look in the wrong place.</p>
+<h5>Troubleshooting</h5>
+<ul>
+<li><b>Finds no subtitles</b> — most providers need a free account, configured under Settings → Providers.</li>
+<li><b>Subtitles download but do not appear</b> — path mismatch with Sonarr or Radarr, or Jellyfin needs a library rescan.</li>
+<li><b>Out of sync</b> — Bazarr can adjust timing, but a subtitle matched to a different release will never line up. Fetch one matching your file's release group.</li>
+</ul>
+<h5>Official sources</h5><div class="srcs"><a href="https://www.bazarr.media/" target="_blank" rel="noopener">Website</a><a href="https://github.com/morpheus65535/bazarr" target="_blank" rel="noopener">GitHub</a></div>
+</div></details>
+
+<div class="mcat" id="m-dl"><span class="bar"></span>Downloads</div>
+
+<details class="m"><summary><b>Gluetun</b><span class="pill mod">Moderate</span><span class="d">VPN container with a kill switch</span></summary>
+<div class="mbody">
+<div class="spec"><div><b>Port</b><span>Publishes for others</span></div><div><b>CPU</b><span>Low</span></div><div><b>RAM</b><span>Low</span></div><div><b>Storage</b><span>Tiny</span></div></div>
+<h5>Purpose</h5><p>A VPN client in a container. Other containers can route all their traffic through it, and if the VPN drops they lose their network entirely rather than falling back to your real connection.</p>
+<h5>How it fits</h5><p>A network boundary rather than an application. qBittorrent and Jackett share its network stack, which is why <em>Gluetun</em> publishes their ports and why other containers address them as <code>gluetun</code>.</p>
+<h5>Configuration</h5>
+<pre>VPN_SERVICE_PROVIDER=mullvad     <span class="c"># lowercase, Gluetun's own spelling</span>
+VPN_TYPE=wireguard
+WIREGUARD_PRIVATE_KEY=...        <span class="c"># the private key, not the public one</span>
+WIREGUARD_ADDRESSES=10.64.0.2/32
+SERVER_COUNTRIES=                <span class="c"># blank = provider default</span></pre>
+<h5>Verifying it</h5>
+<pre>docker compose exec gluetun wget -qO- https://ipinfo.io/ip
+curl -s https://ipinfo.io/ip     <span class="c"># must be different</span></pre>
+<h5>Troubleshooting</h5>
+<ul>
+<li><b>Unhealthy or restarting</b> — read the logs, they are unusually clear. Provider name spelling and wrong key type are the top two causes.</li>
+<li><b>No servers found</b> — a country with none available. Leave <code>SERVER_COUNTRIES</code> blank to test.</li>
+<li><b>Missing TUN device</b> — the container needs <code>/dev/net/tun</code> and <code>NET_ADMIN</code>. Both are generated; check they were not removed.</li>
+</ul>
+<div class="warning"><strong>A VPN routes traffic. It does not make files safe</strong>, verify what you download, or make unlawful activity lawful.</div>
+<h5>Official sources</h5><div class="srcs"><a href="https://github.com/qdm12/gluetun" target="_blank" rel="noopener">GitHub</a><a href="https://github.com/qdm12/gluetun-wiki" target="_blank" rel="noopener">Wiki</a></div>
+</div></details>
+
+<details class="m"><summary><b>qBittorrent</b><span class="pill mod">Moderate</span><span class="d">Download client, locked to the VPN</span></summary>
+<div class="mbody">
+<div class="spec"><div><b>Port</b><span>8080 via Gluetun</span></div><div><b>CPU</b><span>Low</span></div><div><b>RAM</b><span>Low–Medium</span></div><div><b>Storage</b><span>Working space</span></div></div>
+<h5>Purpose</h5><p>A BitTorrent client with a web interface, driven by the *arr apps rather than used directly most of the time.</p>
+<h5>Dependencies</h5><p><b>Requires Gluetun.</b> The generator will not produce a qBittorrent service without it, and removing Gluetun removes qBittorrent too.</p>
+<h5>How it fits</h5><p>Uses <code>network_mode: service:gluetun</code>, so it has no network of its own. This is what makes the kill switch real: no VPN, no connection.</p>
+<h5>First login</h5><p>Recent versions generate a temporary password on first start rather than shipping a fixed default:</p>
+<pre>docker compose logs qbittorrent | grep -i password</pre>
+<p>Sign in as <code>admin</code>, then change it under <b>Tools → Options → Web UI</b>.</p>
+<h5>Configuration</h5><p>Set the save path to <code>/data/downloads</code> with the shared layout, and keep incomplete downloads in a subfolder so the *arr apps do not try to import half a file.</p>
+<h5>Troubleshooting</h5>
+<ul>
+<li><b>Web interface unreachable</b> — check Gluetun first. If it is unhealthy, qBittorrent is unreachable by design.</li>
+<li><b>Stalled at zero</b> — often no forwarded port, which limits you to peers who accept incoming connections. Some providers support it through Gluetun, many do not.</li>
+<li><b>Paused after a disk-full event</b> — free space, then resume manually.</li>
+</ul>
+<div class="warning"><strong>Downloaded files can be malicious.</strong> Filenames, extensions and comments guarantee nothing. Only obtain content you are legally entitled to, and treat everything as untrusted until verified.</div>
+<h5>Official sources</h5><div class="srcs"><a href="https://www.qbittorrent.org/" target="_blank" rel="noopener">Website</a><a href="https://github.com/qbittorrent/qBittorrent" target="_blank" rel="noopener">GitHub</a></div>
+</div></details>
+
+<details class="m"><summary><b>Jackett</b><span class="pill mod">Moderate</span><span class="d">Translates indexers for the *arr apps</span></summary>
+<div class="mbody">
+<div class="spec"><div><b>Port</b><span>9117</span></div><div><b>CPU</b><span>Low</span></div><div><b>RAM</b><span>Low</span></div><div><b>Storage</b><span>Config only</span></div></div>
+<h5>Purpose</h5><p>Converts many different tracker search APIs into one standard format (Torznab) that Sonarr, Radarr and Lidarr understand.</p>
+<h5>How it fits</h5><p>Sits between the *arr apps and whatever indexers you configure. Routed through Gluetun when a VPN is present.</p>
+<h5>Configuration</h5><p>Add indexers in Jackett, copy each Torznab feed URL and Jackett's API key, then paste them into the *arr apps under Settings → Indexers. When behind the VPN, the *arr apps reach it at <code>gluetun:9117</code>.</p>
+<h5>Troubleshooting</h5>
+<ul>
+<li><b>Indexer test fails</b> — many require an account, and some use protection that Jackett cannot pass automatically.</li>
+<li><b>Works in Jackett but not in Sonarr</b> — usually the host name. Use the container name, not <code>localhost</code>.</li>
+</ul>
+<div class="warning"><strong>You remain responsible for which indexers you use</strong> and whether accessing them is lawful where you are.</div>
+<h5>Official sources</h5><div class="srcs"><a href="https://github.com/Jackett/Jackett" target="_blank" rel="noopener">GitHub</a></div>
+</div></details>
+
+<div class="mcat" id="m-photos"><span class="bar"></span>Photos &amp; music</div>
+
+<details class="m"><summary><b>Immich</b><span class="pill adv">Advanced</span><span class="d">Self-hosted photo and video library</span></summary>
+<div class="mbody">
+<div class="spec"><div><b>Port</b><span>2283</span></div><div><b>CPU</b><span>Medium</span></div><div><b>RAM</b><span>4 GB+</span></div><div><b>Storage</b><span>Large, growing</span></div></div>
+<h5>Purpose</h5><p>A replacement for cloud photo services: phone backup, timeline, albums, search, face recognition and sharing, all on your hardware.</p>
+<h5>How it fits</h5><p>Independent of the media chain. It brings its own Postgres database, Redis cache and machine-learning service — four containers from one module.</p>
+<h5>Storage</h5><p>Photos at <code>${PHOTOS_ROOT}</code>, database under <code>${CONFIG_ROOT}/immich/postgres</code>. Both matter: the files are your photos, the database is every album, face and piece of metadata.</p>
+<h5>Configuration</h5><p>Create your account on first visit, install the mobile app and point it at your server, then enable background backup. Supports OIDC single sign-on — see the <a href="access.html#immich-oidc">access guide</a>.</p>
+<h5>Troubleshooting</h5>
+<ul>
+<li><b>Slow first import</b> — normal. Thumbnails and face recognition for a large library take hours.</li>
+<li><b>Will not connect to the database</b> — most often a changed password. The existing database still expects the old one.</li>
+<li><b>Machine learning failing</b> — usually memory. It is the heaviest part of the stack.</li>
+</ul>
+<div class="warning"><strong>Back up the database, not just the photos.</strong> The files alone are not your library — losing Postgres means keeping every image but losing all albums, faces and organisation.</div>
+<h5>Official sources</h5><div class="srcs"><a href="https://immich.app/" target="_blank" rel="noopener">Website</a><a href="https://github.com/immich-app/immich" target="_blank" rel="noopener">GitHub</a><a href="https://immich.app/docs" target="_blank" rel="noopener">Docs</a></div>
+</div></details>
+
+<details class="m"><summary><b>Kima</b><span class="pill mod">Moderate</span><span class="d">Music streaming from your own library</span></summary>
+<div class="mbody">
+<div class="spec"><div><b>Port</b><span>3030</span></div><div><b>CPU</b><span>Medium</span></div><div><b>RAM</b><span>Medium</span></div><div><b>Storage</b><span>Your music</span></div></div>
+<h5>Purpose</h5><p>A streaming-service experience over your own collection: playlists, discovery, podcasts, audiobooks via Audiobookshelf, and audio analysis for mood and similarity.</p>
+<h5>How it fits</h5><p>Reads the same music library Lidarr manages, and can drive Lidarr to request new material. Implements the OpenSubsonic API, so native clients such as Symfonium, Amperfy and DSub work against it.</p>
+<h5>Storage</h5><p>Music mounted at <code>/music</code>, everything else in a named volume <code>kima_data</code>. The image runs its own Postgres and Redis internally, so there are no extra services to add — the upstream docs recommend a named volume rather than a bind mount for <code>/data</code>.</p>
+<h5>Configuration</h5><p><code>SETTINGS_ENCRYPTION_KEY</code> is required and the container will not start without it; the generator produces one. <code>extra_hosts</code> is included so Lidarr's webhook can reach it on Linux.</p>
+<div class="warning"><strong>Kima's built-in downloader is not behind the VPN.</strong> It includes Soulseek support, and unlike qBittorrent it runs on the normal network because it also serves your library. If you enter Soulseek credentials, that peer-to-peer traffic uses your ordinary connection. Leaving the integration unconfigured avoids this entirely; everything else still works.</div>
+<h5>Troubleshooting</h5>
+<ul>
+<li><b>Will not start</b> — check <code>SETTINGS_ENCRYPTION_KEY</code> is set.</li>
+<li><b>Permission errors on <code>/data</code></b> — the docs recommend a named volume; bind mounts need the postgres and redis subdirectories created and owned correctly.</li>
+<li><b>Analysis is slow</b> — audio analysis is CPU-heavy. GPU acceleration is optional and documented upstream.</li>
+</ul>
+<h5>Official sources</h5><div class="srcs"><a href="https://github.com/Chevron7Locked/kima-hub" target="_blank" rel="noopener">GitHub</a><a href="https://hub.docker.com/r/chevron7locked/kima" target="_blank" rel="noopener">Docker Hub</a></div>
+</div></details>
+
+<div class="mcat" id="m-monitor"><span class="bar"></span>Monitoring &amp; archives</div>
+
+<details class="m"><summary><b>Uptime Kuma</b><span class="pill easy">Easy</span><span class="d">Monitoring and status pages</span></summary>
+<div class="mbody">
+<div class="spec"><div><b>Port</b><span>3001</span></div><div><b>CPU</b><span>Very low</span></div><div><b>RAM</b><span>Very low</span></div><div><b>Storage</b><span>Tiny</span></div></div>
+<h5>Purpose</h5><p>Watches your services and tells you when one stops responding, via Telegram, Discord, email and many others. Can publish a status page.</p>
+<h5>Configuration</h5><p>Add an HTTP monitor per service using container names — <code>http://jellyfin:8096</code> — so it tests the internal path rather than your router.</p>
+<div class="tip"><strong>Monitoring that lives on the machine it monitors cannot tell you the machine is down.</strong> This is the strongest argument for a cheap VPS: run Uptime Kuma there, pointed back at home.</div>
+<h5>Troubleshooting</h5><p>Monitors failing while services work usually means the wrong hostname. Notifications need testing once when you add them — most people discover a broken alert channel at the worst moment.</p>
+<h5>Official sources</h5><div class="srcs"><a href="https://uptime.kuma.pet/" target="_blank" rel="noopener">Website</a><a href="https://github.com/louislam/uptime-kuma" target="_blank" rel="noopener">GitHub</a></div>
+</div></details>
+
+<details class="m"><summary><b>ArchiveBox</b><span class="pill mod">Moderate</span><span class="d">Saves web pages before they vanish</span></summary>
+<div class="mbody">
+<div class="spec"><div><b>Port</b><span>8000</span></div><div><b>CPU</b><span>Medium</span></div><div><b>RAM</b><span>Medium</span></div><div><b>Storage</b><span>Grows steadily</span></div></div>
+<h5>Purpose</h5><p>Archives URLs, bookmarks and RSS feeds as local copies in several formats at once — HTML, PDF, screenshot, WARC and extracted text.</p>
+<h5>Configuration</h5><p>The generated service keeps public access off (<code>PUBLIC_INDEX</code>, <code>PUBLIC_SNAPSHOTS</code> and <code>PUBLIC_ADD_VIEW</code> all False) and sets an admin password. Turn those on only deliberately.</p>
+<h5>Troubleshooting</h5><p>Some sites block archiving or need authentication. Chrome-based captures are slower on ARM. Storage grows faster than expected — each snapshot keeps several formats.</p>
+<div class="warning"><strong>Archiving does not override copyright.</strong> Keeping a personal copy is a different thing from redistributing it.</div>
+<h5>Official sources</h5><div class="srcs"><a href="https://archivebox.io/" target="_blank" rel="noopener">Website</a><a href="https://github.com/ArchiveBox/ArchiveBox" target="_blank" rel="noopener">GitHub</a><a href="https://docs.archivebox.io/" target="_blank" rel="noopener">Docs</a></div>
+</div></details>
+
+<details class="m"><summary><b>Tube Archivist</b><span class="pill adv">Advanced</span><span class="d">Archives YouTube channels</span></summary>
+<div class="mbody">
+<div class="spec"><div><b>Port</b><span>8001</span></div><div><b>CPU</b><span>Medium</span></div><div><b>RAM</b><span>Medium–High</span></div><div><b>Storage</b><span>Large</span></div></div>
+<h5>Purpose</h5><p>Subscribes to channels, downloads on a schedule using yt-dlp, and gives you a searchable interface over the archive.</p>
+<h5>How it fits</h5><p>Independent, but brings Elasticsearch and Redis with it — three containers from one module, and the heaviest module here after Immich.</p>
+<h5>Troubleshooting</h5>
+<ul>
+<li><b>Elasticsearch will not start</b> — usually memory limits, or <code>vm.max_map_count</code> being too low on the host.</li>
+<li><b>Fails on ARM</b> — the Elasticsearch image has limited ARM support. This is the one module likely to disappoint on a Raspberry Pi or Apple Silicon.</li>
+<li><b>Downloads failing</b> — yt-dlp needs regular updating as YouTube changes.</li>
+</ul>
+<div class="warning"><strong>You are responsible for complying with YouTube's terms</strong> and applicable copyright law.</div>
+<h5>Official sources</h5><div class="srcs"><a href="https://www.tubearchivist.com/" target="_blank" rel="noopener">Website</a><a href="https://github.com/tubearchivist/tubearchivist" target="_blank" rel="noopener">GitHub</a><a href="https://docs.tubearchivist.com/" target="_blank" rel="noopener">Docs</a></div>
+</div></details>
+
+<div class="mcat" id="m-conn"><span class="bar"></span>Connection</div>
+
+<details class="m"><summary><b>Caddy</b><span class="pill mod">Moderate</span><span class="d">Reverse proxy with automatic HTTPS</span></summary>
+<div class="mbody">
+<div class="spec"><div><b>Port</b><span>80, 443</span></div><div><b>CPU</b><span>Very low</span></div><div><b>RAM</b><span>Low</span></div><div><b>Storage</b><span>Certificates</span></div></div>
+<h5>Purpose</h5><p>Sits in front of your services, terminates HTTPS, and routes requests by hostname. Obtains and renews certificates without being asked.</p>
+<h5>How it fits</h5><p>The only container that should face the internet. Everything else stays on the internal network and is reached through it.</p>
+<h5>Requirements</h5><p>A domain whose DNS already points at your machine, and ports 80 and 443 forwarded — those two only. Port 80 is needed for certificate issuance, not for serving your site.</p>
+<h5>Configuration</h5>
+<pre>jellyfin.example.com {
+    reverse_proxy jellyfin:8096
+}</pre>
+<p>Targets use container names because Caddy shares the Docker network. The generator writes a Caddyfile containing only the services that are safe to publish.</p>
+<div class="warning"><strong>Some services are deliberately excluded.</strong> Arcane, qBittorrent, Sonarr, Radarr, Lidarr, Bazarr and Jackett are never proxied — they hold the Docker socket, can write files anywhere, or authenticate weakly. Reach those over Tailscale or your LAN.</div>
+<h5>Troubleshooting</h5>
+<ul>
+<li><b>Certificate errors</b> — DNS not resolving yet, or port 80 not reaching the server. Both show clearly in the logs.</li>
+<li><b>Rate limited</b> — repeated failures hit issuer limits. Use the staging endpoint while testing.</li>
+<li><b>502 errors</b> — the target container name or port is wrong, or that container is down.</li>
+</ul>
+<h5>Backups</h5><p>Keep the <code>/data</code> volume. It holds your certificates, and losing it means re-issuing them.</p>
+<h5>Official sources</h5><div class="srcs"><a href="https://caddyserver.com/" target="_blank" rel="noopener">Website</a><a href="https://caddyserver.com/docs/" target="_blank" rel="noopener">Docs</a></div>
+</div></details>
+
+<details class="m"><summary><b>Tailscale</b><span class="pill easy">Easy</span><span class="d">Private mesh network, nothing published</span></summary>
+<div class="mbody">
+<div class="spec"><div><b>Port</b><span>None published</span></div><div><b>CPU</b><span>Very low</span></div><div><b>RAM</b><span>Very low</span></div><div><b>Storage</b><span>Tiny</span></div></div>
+<h5>Purpose</h5><p>Builds a private network between your own devices. Your phone behaves as though it is at home, with nothing exposed to the internet at all.</p>
+<h5>How it fits</h5><p>An alternative to publishing services, and the recommended way to reach the administrative tools that should never be public. You can run both: Caddy for what the household uses, Tailscale for everything else.</p>
+<div class="tip"><strong>Installing Tailscale on the host is usually simpler</strong> than running this container, and covers every service on the machine at once. The container exists for cases where you cannot install on the host.</div>
+<h5>Configuration</h5><p>Needs an auth key from the Tailscale admin console under Settings → Keys. Requires <code>NET_ADMIN</code>, <code>SYS_MODULE</code> and <code>/dev/net/tun</code>.</p>
+<h5>Troubleshooting</h5><p>If it never appears in your device list, the auth key is missing, expired, or already used. Keys can be set as reusable and given an expiry when you create them.</p>
+<h5>Official sources</h5><div class="srcs"><a href="https://tailscale.com/" target="_blank" rel="noopener">Website</a><a href="https://tailscale.com/kb/1282/docker" target="_blank" rel="noopener">Docker guide</a></div>
+</div></details>
+
+<div class="mcat" id="m-auth"><span class="bar"></span>Authentication</div>
+
+<details class="m"><summary><b>Pocket ID</b><span class="pill adv">Advanced</span><span class="d">Passkey single sign-on</span></summary>
+<div class="mbody">
+<div class="spec"><div><b>Port</b><span>1411, proxy only</span></div><div><b>CPU</b><span>Very low</span></div><div><b>RAM</b><span>Low</span></div><div><b>Storage</b><span>Tiny</span></div></div>
+<h5>Purpose</h5><p>A small OpenID Connect identity provider built entirely around passkeys. One login for apps that support OIDC, with no passwords stored anywhere.</p>
+<h5>Dependencies</h5><p><b>Requires Caddy</b> or another reverse proxy. Passkeys only work over HTTPS on a real domain — this is a browser rule, not a setting. It publishes no host port and is reachable only through the proxy.</p>
+<h5>What it can actually cover</h5>
+<div class="tbl"><table>
+<thead><tr><th>App</th><th>OIDC</th><th>Reality</th></tr></thead>
+<tbody>
+<tr><td>Immich</td><td><span class="yes">Native</span></td><td>Works properly, mobile app included</td></tr>
+<tr><td>Arcane</td><td><span class="yes">Native</span></td><td>Supported directly</td></tr>
+<tr><td>Jellyfin</td><td><span class="part">Plugin</span></td><td>Community plugin, <b>web browser only</b></td></tr>
+<tr><td>Everything else</td><td><span class="no">None</span></td><td>Their own logins</td></tr>
+</tbody></table></div>
+<div class="warning"><strong>The Jellyfin SSO plugin does not work in native apps.</strong> Swiftfin, Android TV, Roku and Kodi cannot use it, so anyone watching on a TV still needs a normal Jellyfin password. Native OIDC is proposed upstream but not released.</div>
+<h5>Configuration</h5><p><code>APP_URL</code> must exactly match the address you visit — passkeys bind to that origin. <code>TRUST_PROXY=true</code> makes it honour Caddy's forwarded headers. Recovery if you lose access:</p>
+<pre>docker compose exec pocket-id \
+  /app/pocket-id one-time-access-token admin</pre>
+<div class="warning"><strong>Register two passkeys on separate devices.</strong> One passkey on one phone means losing that phone locks you out of every connected app at once. This is the single most important step.</div>
+<h5>Official sources</h5><div class="srcs"><a href="https://pocket-id.org/" target="_blank" rel="noopener">Website</a><a href="https://github.com/pocket-id/pocket-id" target="_blank" rel="noopener">GitHub</a><a href="https://docs.pocket-id.org/" target="_blank" rel="noopener">Docs</a></div>
+</div></details>
+
+<div class="mcat" id="m-manage"><span class="bar"></span>Management</div>
+
+<details class="m"><summary><b>Arcane</b><span class="pill easy">Easy</span><span class="d">Docker management in a browser</span></summary>
+<div class="mbody">
+<div class="spec"><div><b>Port</b><span>3552</span></div><div><b>CPU</b><span>Very low</span></div><div><b>RAM</b><span>Low</span></div><div><b>Storage</b><span>Small</span></div></div>
+<h5>Purpose</h5><p>A web interface for Docker: start, stop, update and inspect containers, manage Compose projects, and read logs without the command line.</p>
+<h5>How it fits</h5><p>How you operate everything else. Deploy your generated stack as a project, then use it for day-to-day management and updates.</p>
+<h5>Configuration</h5><p>Needs two generated secrets, <code>ENCRYPTION_KEY</code> and <code>JWT_SECRET</code>, plus <code>APP_URL</code> matching where you reach it. Mounts the Docker socket, and your stack directory as its projects folder.</p>
+<div class="warning"><strong>Arcane holds the Docker socket, which is equivalent to root on the host.</strong> Anyone who reaches its interface can control the whole machine. Keep it on your LAN or behind Tailscale, never proxy it publicly, and never forward port 3552.</div>
+<h5>Troubleshooting</h5>
+<ul>
+<li><b>Cannot see containers</b> — the socket mount is missing or unreadable.</li>
+<li><b>Login problems after a restart</b> — <code>JWT_SECRET</code> changed. It must stay the same between restarts.</li>
+</ul>
+<h5>Official sources</h5><div class="srcs"><a href="https://getarcane.app/" target="_blank" rel="noopener">Website</a><a href="https://github.com/getarcaneapp/arcane" target="_blank" rel="noopener">GitHub</a></div>
+</div></details>
+</section>
+
+<section id="ports">
+<div class="kicker">09 · Reference</div>
+<h2>Port reference</h2>
+<p class="lead">Default host ports for every module. Change only the left side of a mapping if something conflicts — the right side is fixed inside the container.</p>
+<div class="tbl"><table>
+<thead><tr><th>Service</th><th>Port</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>Caddy</td><td>80, 443</td><td>The only ports to forward on your router</td></tr>
+<tr><td>Jellyfin</td><td>8096</td><td></td></tr>
+<tr><td>Jellyseerr</td><td>5055</td><td></td></tr>
+<tr><td>Sonarr</td><td>8989</td><td></td></tr>
+<tr><td>Radarr</td><td>7878</td><td></td></tr>
+<tr><td>Lidarr</td><td>8686</td><td></td></tr>
+<tr><td>Bazarr</td><td>6767</td><td></td></tr>
+<tr><td>qBittorrent</td><td>8080</td><td>Published by Gluetun, not itself</td></tr>
+<tr><td>Jackett</td><td>9117</td><td>Published by Gluetun when a VPN is present</td></tr>
+<tr><td>BitTorrent traffic</td><td>6881</td><td>TCP and UDP, via Gluetun</td></tr>
+<tr><td>Immich</td><td>2283</td><td></td></tr>
+<tr><td>Kima</td><td>3030</td><td></td></tr>
+<tr><td>Uptime Kuma</td><td>3001</td><td></td></tr>
+<tr><td>ArchiveBox</td><td>8000</td><td></td></tr>
+<tr><td>Tube Archivist</td><td>8001</td><td>Maps to 8000 inside the container</td></tr>
+<tr><td>Arcane</td><td>3552</td><td>Never expose publicly</td></tr>
+<tr><td>Pocket ID</td><td>1411</td><td>Not published — reached through Caddy</td></tr>
+</tbody></table></div>
+<div class="tip"><strong>On a Synology NAS, DSM reserves many ports.</strong> If a container will not start because a port is in use, shift the host side — <code>"8097:8096"</code> — which breaks nothing.</div>
+</section>
+
+<section id="envvars">
+<h2>Environment variables</h2>
+<p class="lead">Everything the generated stack reads from <code>.env</code>. Secrets are generated for you; the rest you set once.</p>
+<div class="tbl"><table>
+<thead><tr><th>Variable</th><th>Purpose</th></tr></thead>
+<tbody>
+<tr><td>CONFIG_ROOT</td><td>Where application settings and databases live. The thing most worth backing up.</td></tr>
+<tr><td>DATA_ROOT</td><td>Shared parent for downloads and media, in the recommended layout.</td></tr>
+<tr><td>MEDIA_ROOT</td><td>Media library, in the split layout.</td></tr>
+<tr><td>DOWNLOADS_ROOT</td><td>Download working space, in the split layout.</td></tr>
+<tr><td>PHOTOS_ROOT</td><td>Immich's upload folder.</td></tr>
+<tr><td>PUID / PGID</td><td>User and group IDs that should own created files.</td></tr>
+<tr><td>TZ</td><td>Timezone, as an IANA name such as <code>Europe/London</code>.</td></tr>
+<tr><td>BASE_DOMAIN</td><td>Your domain, when Caddy is in use.</td></tr>
+<tr><td>VPN_SERVICE_PROVIDER</td><td>Gluetun's own lowercase spelling of your provider.</td></tr>
+<tr><td>VPN_TYPE</td><td><code>wireguard</code> or <code>openvpn</code>.</td></tr>
+<tr><td>WIREGUARD_PRIVATE_KEY</td><td>The private key. Not the public one.</td></tr>
+<tr><td>WIREGUARD_ADDRESSES</td><td>Supplied with your key, e.g. <code>10.64.0.2/32</code>.</td></tr>
+<tr><td>VPN_SERVER_COUNTRIES</td><td>Optional. Blank uses the provider default.</td></tr>
+<tr><td>TS_AUTHKEY</td><td>Tailscale auth key from the admin console.</td></tr>
+<tr><td>ARCANE_APP_URL</td><td>Where you reach Arcane. Must match the address you actually use.</td></tr>
+<tr><td>ARCANE_ENCRYPTION_KEY</td><td>Generated. Encrypts stored values.</td></tr>
+<tr><td>ARCANE_JWT_SECRET</td><td>Generated. Must stay stable across restarts.</td></tr>
+<tr><td>POCKETID_URL</td><td>Must match the address you visit exactly.</td></tr>
+<tr><td>POCKETID_ENCRYPTION_KEY</td><td>Generated.</td></tr>
+<tr><td>IMMICH_DB_PASSWORD</td><td>Generated. Do not change after first run.</td></tr>
+<tr><td>KIMA_SESSION_SECRET</td><td>Generated.</td></tr>
+<tr><td>KIMA_ENCRYPTION_KEY</td><td>Generated. Required — Kima will not start without it.</td></tr>
+<tr><td>TA_PASSWORD / TA_ES_PASSWORD</td><td>Generated, for Tube Archivist and its Elasticsearch.</td></tr>
+<tr><td>ARCHIVEBOX_PASSWORD</td><td>Generated admin password.</td></tr>
+</tbody></table></div>
+<div class="warning"><strong><code>.env</code> holds real secrets in plain text.</strong> It is written with restrictive permissions and listed in <code>.gitignore</code>. Never commit it, and redact it before pasting logs or configuration anywhere public.</div>
+</section>
+
+<section id="updates">
+<div class="kicker">10 · Keep it healthy</div>
+<h2>Updates &amp; backups</h2>
+<p class="lead">A server you never maintain becomes a server you cannot trust. Neither of these takes long once you have a rhythm.</p>
+
+<h3>Updating</h3>
+<pre>docker compose pull      <span class="c"># fetch newer images</span>
+docker compose up -d     <span class="c"># recreate anything that changed</span>
+docker image prune       <span class="c"># clear out the replaced ones</span></pre>
+<p>In Arcane it is pull, then redeploy. Monthly is a reasonable rhythm; anything reachable from outside your network deserves more urgency.</p>
+<div class="tip"><strong>Read release notes before major version jumps</strong>, particularly for Immich, which occasionally requires migration steps. Automatic updaters like Watchtower are tempting, but an update that breaks something at 4am while you are asleep is worse than one you are present for.</div>
+
+<h3>What to back up</h3>
+<div class="tbl"><table>
+<thead><tr><th>Priority</th><th>What</th><th>Why</th></tr></thead>
+<tbody>
+<tr><td>Essential</td><td><code>CONFIG_ROOT</code>, <code>.env</code>, <code>docker-compose.yml</code></td><td>Every setting and secret. Small, and painful to rebuild.</td></tr>
+<tr><td>Essential</td><td>Immich photos <em>and</em> its database</td><td>Genuinely irreplaceable. The database holds all organisation.</td></tr>
+<tr><td>Worthwhile</td><td>Caddy's <code>/data</code> volume</td><td>Your certificates. Avoids re-issuing and rate limits.</td></tr>
+<tr><td>Optional</td><td>Media library</td><td>Large, and usually re-acquirable.</td></tr>
+</tbody></table></div>
+<pre><span class="c"># stop first so databases are copied in a consistent state</span>
+docker compose stop
+tar czf backup-$(date +%F).tar.gz /srv/media-server
+docker compose start</pre>
+<div class="warning"><strong>A backup you have never restored is not a backup.</strong> Test it once, deliberately, while nothing is wrong.</div>
+</section>
+
+<section id="glossary">
+<h2>Glossary</h2>
+<dl class="gloss">
+<dt>Bind mount</dt><dd>A host folder mapped into a container, so you can see the files yourself. Used for config and media here.</dd>
+<dt>Named volume</dt><dd>Storage Docker manages for you, not visible as an ordinary folder. Used where an application expects to own its own data, as Kima does.</dd>
+<dt>Hardlink</dt><dd>A second name for the same file on disk, costing no extra space. What lets imports be instant instead of copying.</dd>
+<dt>Kill switch</dt><dd>Here, the effect of <code>network_mode: service:gluetun</code> — if the VPN drops, the container loses its network rather than falling back to your real connection.</dd>
+<dt>Torznab</dt><dd>The standard search format Jackett exposes so the *arr apps can talk to many different indexers the same way.</dd>
+<dt>Direct play</dt><dd>The client can handle the file as-is, so the server just sends it. Costs almost no CPU.</dd>
+<dt>Transcoding</dt><dd>Rebuilding video in real time for a client that cannot play the original. Expensive, and where weak hardware fails.</dd>
+<dt>Reverse proxy</dt><dd>A server that receives requests and forwards them to the right internal service, handling HTTPS on the way.</dd>
+<dt>OIDC</dt><dd>OpenID Connect. The standard that lets one login work across several applications.</dd>
+<dt>Passkey</dt><dd>A key pair held by your device and unlocked biometrically. No password exists to leak or reuse.</dd>
+<dt>PUID / PGID</dt><dd>The numeric user and group a container runs as. Must match the owner of your folders.</dd>
+<dt>CGNAT</dt><dd>When your provider does not give you a real public address, making port forwarding impossible. Tailscale sidesteps it.</dd>
+</dl>
+</section>
+
+<section id="legal">
+<div class="kicker">11 · Please read</div>
+<h2>Legal &amp; security</h2>
+<p class="lead">This project is a guide and a configuration generator. It does not provide, host, index or endorse copyrighted material.</p>
+<div class="card peach"><strong>Your responsibility</strong>
+<p style="margin:10px 0 0">You are responsible for ensuring everything you download, store, stream or share is legally obtained and that you hold the necessary rights. These applications all have legitimate uses — managing media you own, public-domain and Creative Commons material, your own recordings, and openly distributed software. Copyright law differs between countries, and nothing here is legal advice.</p></div>
+<div class="warning"><strong>Downloaded files can be malicious.</strong> Filenames, extensions, trackers and comments guarantee nothing. A VPN changes how your traffic is routed — it does not inspect files, verify sources, or make anything safe. Treat everything you download as untrusted until you have checked it.</div>
+<h3>Security basics</h3>
+<ul>
+<li>Never commit <code>.env</code>, and redact secrets before pasting logs anywhere public.</li>
+<li>Keep administrative interfaces off the public internet — Arcane above all.</li>
+<li>Forward ports 80 and 443 only, never application ports.</li>
+<li>Set a password on every service that offers one, including on a home network.</li>
+<li>Keep Docker and your images updated.</li>
+<li>Back up config and anything irreplaceable, and test the restore.</li>
+</ul>
+<h3>Project ownership</h3>
+<p>Every application here is a separate open-source project owned by its own developers and licensed on its own terms. This project claims no ownership of any of them, and links to each project's official sources in the module reference above. Consult those before deploying.</p>
+<p style="margin-top:24px"><a class="btn ghost" href="generator.html">Build a stack</a> &nbsp; <a class="btn ghost" href="faq.html">Troubleshooting</a> &nbsp; <a class="btn ghost" href="access.html">Access &amp; accounts</a></p>
+</section>
+
+</main>
+</div></div>
+
+<footer><div class="wrap">Modular Media Server · <a href="index.html">Home</a> · <a href="guide.html">Guide</a> · <a href="generator.html">Generator</a> · <a href="hardware.html">Hardware</a> · <a href="faq.html">Help</a> · Start small. Add what you need. Understand what you're running.</div></footer>
+
+<script>
+(function(){
+  var links = [].slice.call(document.querySelectorAll('.toc a[href^="#"]'));
+  var targets = links.map(function(a){ return document.getElementById(a.getAttribute('href').slice(1)); });
+  function sync(){
+    var y = window.scrollY + 96, best = -1;
+    targets.forEach(function(t,i){ if(t && t.offsetTop <= y) best = i; });
+    links.forEach(function(a,i){ a.classList.toggle('on', i === best); });
+  }
+  var tick = false;
+  window.addEventListener('scroll', function(){
+    if(tick) return; tick = true;
+    requestAnimationFrame(function(){ sync(); tick = false; });
+  });
+  sync();
+  if(location.hash){
+    var el = document.querySelector(location.hash);
+    if(el && el.tagName === 'DETAILS') el.open = true;
+  }
+})();
+</script>
 </body></html>
