@@ -8,7 +8,7 @@
 # for a self-hosted media stack. Does the same job as the website generator,
 # without the website.
 #
-#   curl -fsSL https://<your-pages-url>/install.sh -o install.sh
+#   curl -fsSL https://parkertools.github.io/Modular-Media-Server/install.sh -o install.sh
 #   less install.sh          # read it before you run it. always.
 #   bash install.sh
 #
@@ -73,7 +73,7 @@ SELECTED=()
 ALL_MODULES=(
   arcane jellyfin jellyseerr sonarr radarr lidarr bazarr
   gluetun qbittorrent jackett immich kima uptime-kuma
-  archivebox tubearchivist caddy pocket-id
+  archivebox tubearchivist caddy tailscale pocket-id
 )
 
 module_label() {
@@ -94,6 +94,7 @@ module_label() {
     archivebox)    echo "ArchiveBox — web archiving" ;;
     tubearchivist) echo "Tube Archivist — YouTube archiving" ;;
     caddy)         echo "Caddy — reverse proxy with automatic HTTPS" ;;
+    tailscale)     echo "Tailscale — private mesh network (host install is simpler)" ;;
     pocket-id)     echo "Pocket ID — passkey single sign-on (needs Caddy + domain)" ;;
     *)             echo "$1" ;;
   esac
@@ -869,8 +870,8 @@ YAML
 emit_kima() {
   cat <<'YAML'
 
-  # All-in-one image: the container runs its own Postgres and Redis
-  # internally, so there are no separate database services to add.
+  # All-in-one container: it runs its own Postgres and Redis internally,
+  # so there are no separate database services to add.
   kima:
     image: chevron7locked/kima:latest
     container_name: kima
@@ -999,6 +1000,31 @@ emit_caddy() {
 YAML
 }
 
+emit_tailscale() {
+  cat <<'YAML'
+
+  # Private mesh network — nothing is published publicly.
+  # Installing Tailscale on the host is usually simpler and covers every
+  # service at once; use this when you cannot install on the host.
+  tailscale:
+    image: tailscale/tailscale:latest
+    container_name: tailscale
+    hostname: media-server
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    volumes:
+      - ${CONFIG_ROOT}/tailscale:/var/lib/tailscale
+    environment:
+      - TS_AUTHKEY=${TS_AUTHKEY}
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=false
+    restart: unless-stopped
+YAML
+}
+
 emit_pocket_id() {
   cat <<'YAML'
 
@@ -1085,6 +1111,7 @@ build_compose() {
   selected archivebox    && emit_archivebox
   selected tubearchivist && emit_tubearchivist
   selected caddy         && emit_caddy
+  selected tailscale     && emit_tailscale
   selected pocket-id     && emit_pocket_id
   # Kima's docs recommend a named volume for /data rather than a bind mount.
   selected kima && printf '\nvolumes:\n  kima_data:\n'
@@ -1165,6 +1192,15 @@ BASE_DOMAIN=$BASE_DOMAIN
 EOF
   fi
 
+  if selected tailscale; then
+    cat <<EOF
+
+# ── Tailscale ────────────────────────────────────────────────────────────
+# Generate in the Tailscale admin console under Settings → Keys.
+TS_AUTHKEY=CHANGEME
+EOF
+  fi
+
   if selected pocket-id; then
     cat <<EOF
 POCKETID_URL=https://id.$BASE_DOMAIN
@@ -1227,6 +1263,7 @@ service_url() {
     tubearchivist) echo "http://localhost:8001" ;;
     caddy) echo "https://${BASE_DOMAIN:-your-domain}" ;;
     pocket-id) echo "https://id.${BASE_DOMAIN:-your-domain}" ;;
+    tailscale) echo "(no web interface)" ;;
     *) echo "" ;;
   esac
 }
