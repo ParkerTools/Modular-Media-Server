@@ -166,7 +166,7 @@ details.qa,details.m,.shell,.genout{box-shadow:0 1px 2px rgba(21,51,59,.04),0 6p
 </head>
 <body>
 <div class="wrap"><nav><a class="brand" href="index.html">modular<span>.</span>media</a>
-<div class="navlinks"><a href="index.html">Home</a><a href="guide.html">Guide</a><a href="platforms.html">Platforms</a><a href="generator.html">Generator</a><a href="access.html">Access</a><a href="hardware.html">Hardware</a><a href="faq.html">Help</a></div><button class="navbtn" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button></nav></div>
+<div class="navlinks"><a href="index.html">Home</a><a href="guide.html">Guide</a><a href="platforms.html">Platforms</a><a href="generator.html">Generator</a><a href="setup.html">App setup</a><a href="access.html">Access</a><a href="hardware.html">Hardware</a><a href="faq.html">Help</a></div><button class="navbtn" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button></nav></div>
 
 <section class="hero"><div class="wrap"><div class="kicker">Documentation</div>
 <h1>How all of this actually works.</h1>
@@ -687,7 +687,7 @@ curl -s https://ipinfo.io/ip     <span class="c"># must be different</span></pre
 <tr><td>Jellyfin</td><td><span class="part">Plugin</span></td><td>Community plugin, <b>web browser only</b></td></tr>
 <tr><td>Everything else</td><td><span class="no">None</span></td><td>Their own logins</td></tr>
 </tbody></table></div>
-<div class="warning"><strong>The Jellyfin SSO plugin does not work in native apps.</strong> Swiftfin, Android TV, Roku and Kodi cannot use it, so anyone watching on a TV still needs a normal Jellyfin password. Native OIDC is proposed upstream but not released.</div>
+<div class="warning"><strong>The Jellyfin SSO plugin authenticates via the web UI or Quick Connect only.</strong> Swiftfin, Android TV, Roku and Kodi cannot use the redirect flow, so anyone watching on a TV still needs a normal Jellyfin password. The original plugin was archived in May 2026; a maintained fork continues it. Native OIDC is proposed upstream for a future major release. <a href="setup.html#pid-jellyfin">Setup steps →</a></div>
 <h5>Configuration</h5><p><code>APP_URL</code> must exactly match the address you visit — passkeys bind to that origin. <code>TRUST_PROXY=true</code> makes it honour Caddy's forwarded headers. Recovery if you lose access:</p>
 <pre>docker compose exec pocket-id \
   /app/pocket-id one-time-access-token admin</pre>
