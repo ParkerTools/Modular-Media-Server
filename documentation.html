@@ -11,20 +11,22 @@
 <meta property="og:description" content="How the pieces fit together: Docker, Compose, storage, permissions, networking and a full reference for every module in your stack.">
 <meta property="og:url" content="https://parkertools.github.io/Modular-Media-Server/documentation.html">
 <meta name="twitter:card" content="summary">
-<meta name="theme-color" content="#0081A7">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230081A7'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23FDFCDC'/%3E%3Ccircle cx='16' cy='16' r='2.5' fill='%23F07167'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#006C87">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23006C87'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23FDFCDC'/%3E%3Ccircle cx='16' cy='16' r='2.5' fill='%23F07167'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Fraunces:opsz,wght@9..144,700&display=swap">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap');
-:root{--blue:#0081A7;--teal:#00AFB9;--cream:#FDFCDC;--peach:#FED9B7;--coral:#F07167;--ink:#15333b;--muted:#587078;--white:#fffef7;--line:#cfe3e4}
+:root{--blue:#006C87;--teal:#00AFB9;--cream:#FDFCDC;--peach:#FED9B7;--coral:#F07167;--ink:#15333b;--muted:#4a626b;--white:#fffef7;--line:#cfe3e4}
 *{box-sizing:border-box}html{scroll-behavior:smooth}
 body{margin:0;background:var(--cream);color:var(--ink);font-family:"DM Sans",sans-serif}
-a{color:var(--blue);text-decoration:none}a:hover{color:var(--coral)}
+a{color:var(--blue);text-decoration:none}a:hover{color:var(--coral);text-decoration:underline}
 .wrap{max-width:1160px;margin:auto;padding:0 24px}
 nav{height:82px;display:flex;align-items:center;justify-content:space-between}
 .brand{font-weight:700;font-size:18px;letter-spacing:-.04em;color:var(--ink)}.brand span{color:var(--coral)}
 .navlinks{display:flex;gap:22px;color:var(--muted);font-size:14px}.navlinks a{color:var(--muted)}.navlinks a:hover{color:var(--blue)}
 .hero{padding:74px 0 52px;position:relative;overflow:hidden}
-.hero:after{content:"";position:absolute;width:250px;height:168px;background:var(--peach);border-radius:54% 46% 60% 40%;right:-66px;top:34px;transform:rotate(8deg);z-index:-1}
+.hero:after{content:"";position:absolute;width:250px;height:168px;background:#8fd3d8;border-radius:54% 46% 60% 40%;right:-66px;top:34px;transform:rotate(8deg);z-index:-1}
 .kicker{text-transform:uppercase;letter-spacing:.15em;font-size:12px;font-weight:700;color:var(--blue)}
 h1,h2,h3{font-family:Fraunces,serif;letter-spacing:-.045em;line-height:1.05}
 h1{font-size:clamp(46px,7vw,74px);max-width:840px;margin:18px 0}
@@ -95,13 +97,76 @@ details.m summary .d{font-size:13.5px;color:var(--muted);flex:1;min-width:180px}
 .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
 .btn.ghost:hover{border-color:var(--teal);color:var(--blue);background:transparent}
 footer{border-top:1px solid var(--line);padding:25px 0;color:var(--muted);font-size:13px}
-@media(max-width:900px){.navlinks{display:none}.layout{grid-template-columns:1fr;gap:0}.toc{position:static;max-height:none;margin-bottom:34px}.two{grid-template-columns:1fr}h2{font-size:30px}}
+@media(max-width:900px){.layout{grid-template-columns:1fr;gap:0}.toc{position:static;max-height:none;margin-bottom:34px}.two{grid-template-columns:1fr}h2{font-size:30px}}
 @media(max-width:520px){.tbl{overflow-x:auto}.spec{grid-template-columns:1fr 1fr}}
+
+.navbtn{display:none;background:none;border:1px solid var(--line);border-radius:10px;padding:8px 11px;cursor:pointer;font:inherit;color:var(--ink);line-height:1}
+.navbtn span{display:block;width:17px;height:2px;background:var(--ink);border-radius:2px;margin:3px 0;transition:.2s}
+.navopen .navbtn span:nth-child(1){transform:translateY(5px) rotate(45deg)}
+.navopen .navbtn span:nth-child(2){opacity:0}
+.navopen .navbtn span:nth-child(3){transform:translateY(-5px) rotate(-45deg)}
+@media(max-width:900px){
+.navbtn{display:block}
+nav{position:relative}
+.navlinks{display:none;position:absolute;top:66px;right:0;left:0;background:var(--white);border:1px solid var(--line);border-radius:16px;flex-direction:column;gap:0;padding:8px;z-index:60;box-shadow:0 10px 30px rgba(21,51,59,.09)}
+.navopen .navlinks{display:flex}
+.navlinks a{padding:11px 13px;border-radius:10px;font-size:15px}
+.navlinks a:hover{background:#eaf8f7;text-decoration:none}
+}
+
+/* ── colour system ─────────────────────────────────────────────── */
+/* Tinted section shells break up long cream pages with rhythm. */
+.tinted{background:#eaf8f7;border:1px solid #cbe8e7;border-radius:26px;padding:38px 34px;margin-bottom:62px}
+.tinted-peach{background:#fff6ee;border:1px solid #f6d5b8;border-radius:26px;padding:38px 34px;margin-bottom:62px}
+.tinted h2,.tinted-peach h2{margin-top:0}
+
+/* Cards cycle through tints instead of all-white. */
+.cyc>.card:nth-of-type(3n+2){background:#eaf8f7;border-color:#bfe3e2}
+.cyc>.card:nth-of-type(3n){background:#fff6ee;border-color:#f4d3b6}
+
+/* Second hero blob adds depth behind the first. */
+.hero:before{content:"";position:absolute;width:210px;height:210px;border-radius:52% 48% 44% 56%;
+  background:var(--hero2,rgba(0,175,185,.20));right:130px;top:-40px;z-index:-2}
+@media(max-width:900px){.hero:before{display:none}
+.tinted,.tinted-peach{padding:28px 20px;border-radius:20px}}
+
+/* ── page texture ──────────────────────────────────────────────────
+   Tunable: --grain (speckle strength) and --bloom (colour wash).
+   Everything sits BEHIND content — cards and panels have their own
+   opaque backgrounds, so text contrast is never softened by it.     */
+:root{--grain:.06;--bloom:1}
+body{
+  background-color:var(--cream);
+  background-image:
+    /* chromatic speckle — fine paper/film tooth */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23g)' opacity='0.5'/%3E%3C/svg%3E"),
+    /* soft colour blooms drifting in from the edges */
+    radial-gradient(ellipse 900px 620px at 8% 2%,rgba(0,175,185,calc(.10*var(--bloom))),transparent 62%),
+    radial-gradient(ellipse 760px 540px at 95% 14%,rgba(254,217,183,calc(.26*var(--bloom))),transparent 64%),
+    radial-gradient(ellipse 820px 600px at 78% 62%,rgba(240,113,103,calc(.08*var(--bloom))),transparent 62%),
+    radial-gradient(ellipse 900px 640px at 15% 88%,rgba(0,108,135,calc(.07*var(--bloom))),transparent 62%);
+  background-repeat:repeat,no-repeat,no-repeat,no-repeat,no-repeat;
+  background-size:220px 220px,auto,auto,auto,auto;
+  background-attachment:fixed,fixed,fixed,fixed,fixed;
+}
+/* The grain layer is drawn at low opacity via its own alpha; this keeps
+   it from muddying the blooms underneath. */
+body{background-blend-mode:soft-light,normal,normal,normal,normal}
+
+/* Cards lift off the textured page rather than melting into it. */
+.card,.mini,.tbl,.util,.mod,.side,.opt,.pick,.price,.prov,.aidcard,.stp pre,
+details.qa,details.m,.shell,.genout{box-shadow:0 1px 2px rgba(21,51,59,.04),0 6px 18px rgba(21,51,59,.045)}
+
+@media(max-width:900px){
+  /* fixed attachment is costly to repaint on mobile scroll */
+  body{background-attachment:scroll,scroll,scroll,scroll,scroll;--bloom:.7}
+}
+@media print{body{background-image:none}}
 </style>
 </head>
 <body>
 <div class="wrap"><nav><a class="brand" href="index.html">modular<span>.</span>media</a>
-<div class="navlinks"><a href="index.html">Home</a><a href="guide.html">Guide</a><a href="platforms.html">Platforms</a><a href="generator.html">Generator</a><a href="access.html">Access</a><a href="hardware.html">Hardware</a><a href="faq.html">Help</a></div></nav></div>
+<div class="navlinks"><a href="index.html">Home</a><a href="guide.html">Guide</a><a href="platforms.html">Platforms</a><a href="generator.html">Generator</a><a href="access.html">Access</a><a href="hardware.html">Hardware</a><a href="faq.html">Help</a></div><button class="navbtn" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button></nav></div>
 
 <section class="hero"><div class="wrap"><div class="kicker">Documentation</div>
 <h1>How all of this actually works.</h1>
@@ -140,7 +205,7 @@ footer{border-top:1px solid var(--line);padding:25px 0;color:var(--muted);font-s
 
 <main>
 
-<section id="getting-started">
+<section class="cyc" id="getting-started">
 <div class="kicker">01 · Start here</div>
 <h2>Getting started</h2>
 <p class="lead">You do not need a giant server to begin. A NAS, mini PC, used desktop, laptop, Raspberry Pi or dedicated machine can all be useful depending on what you want to run.</p>
@@ -195,7 +260,7 @@ docker compose exec sonarr sh <span class="c"># open a shell inside a container<
 <div class="tip"><strong><code>docker compose down</code> does not delete your data</strong> as long as it lives in a volume or bind mount. It removes containers, which are disposable by design. Adding <code>--volumes</code> is the flag that destroys data — avoid it unless you mean it.</div>
 </section>
 
-<section id="architecture">
+<section id="architecture" class="tinted">
 <div class="kicker">03 · The bigger picture</div>
 <h2>How the stack fits together</h2>
 <p class="lead">A modular server is a collection of small tools with specific jobs. Some are independent. Others work best when connected.</p>
@@ -248,7 +313,7 @@ TV/Show Name/Season 01/Show Name - S01E01.mkv</pre>
 <p>The year is what separates a remake from the original. <code>film.final.copy.mkv</code> will match something, but rarely what you wanted.</p>
 </section>
 
-<section id="permissions">
+<section id="permissions" class="tinted">
 <div class="kicker">05 · The most common problem</div>
 <h2>Permissions &amp; ownership</h2>
 <p class="lead">More setups break on file ownership than on anything else. The idea is simple once seen: a container runs as a numeric user, and that number must be allowed to touch your folders.</p>
@@ -738,7 +803,7 @@ docker compose start</pre>
 <div class="warning"><strong>A backup you have never restored is not a backup.</strong> Test it once, deliberately, while nothing is wrong.</div>
 </section>
 
-<section id="glossary">
+<section id="glossary" class="tinted-peach">
 <h2>Glossary</h2>
 <dl class="gloss">
 <dt>Bind mount</dt><dd>A host folder mapped into a container, so you can see the files yourself. Used for config and media here.</dd>
@@ -756,7 +821,7 @@ docker compose start</pre>
 </dl>
 </section>
 
-<section id="legal">
+<section id="legal" class="tinted-peach">
 <div class="kicker">11 · Please read</div>
 <h2>Legal &amp; security</h2>
 <p class="lead">This project is a guide and a configuration generator. It does not provide, host, index or endorse copyrighted material.</p>
@@ -801,6 +866,25 @@ docker compose start</pre>
     var el = document.querySelector(location.hash);
     if(el && el.tagName === 'DETAILS') el.open = true;
   }
+})();
+</script>
+<script>
+(function(){
+  var b=document.querySelector('.navbtn'), n=document.querySelector('nav');
+  if(!b||!n) return;
+  b.addEventListener('click',function(){
+    var open=n.classList.toggle('navopen');
+    b.setAttribute('aria-expanded',open?'true':'false');
+  });
+  n.addEventListener('click',function(e){
+    if(e.target.tagName==='A') n.classList.remove('navopen');
+  });
+  document.addEventListener('click',function(e){
+    if(!n.contains(e.target)) n.classList.remove('navopen');
+  });
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape') n.classList.remove('navopen');
+  });
 })();
 </script>
 </body></html>
