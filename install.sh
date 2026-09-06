@@ -901,6 +901,9 @@ emit_uptime_kuma() {
       - "3001:3001"
     volumes:
       - ${CONFIG_ROOT}/uptime-kuma:/app/data
+    # Uncomment for "Docker Container" monitors. Read-only, but socket
+    # access is still powerful — HTTP monitors need none of this.
+    #  - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
       - TZ=${TZ}
     restart: unless-stopped
