@@ -11,15 +11,17 @@
 <meta property="og:description" content="Two ways in: manage everything from Arcane in a browser, or generate your Compose files and deploy them yourself.">
 <meta property="og:url" content="https://parkertools.github.io/Modular-Media-Server/guide.html">
 <meta name="twitter:card" content="summary">
-<meta name="theme-color" content="#0081A7">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230081A7'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23FDFCDC'/%3E%3Ccircle cx='16' cy='16' r='2.5' fill='%23F07167'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#006C87">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23006C87'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23FDFCDC'/%3E%3Ccircle cx='16' cy='16' r='2.5' fill='%23F07167'/%3E%3C/svg%3E">
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Fraunces:opsz,wght@9..144,700&display=swap">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap');
-:root{--blue:#0081A7;--teal:#00AFB9;--cream:#FDFCDC;--peach:#FED9B7;--coral:#F07167;--ink:#15333b;--muted:#587078;--white:#fffef7;--line:#cfe3e4}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--cream);color:var(--ink);font-family:"DM Sans",sans-serif}a{color:var(--blue);text-decoration:none}a:hover{color:var(--coral)}.wrap{max-width:1160px;margin:auto;padding:0 24px}
+:root{--blue:#006C87;--teal:#00AFB9;--cream:#FDFCDC;--peach:#FED9B7;--coral:#F07167;--ink:#15333b;--muted:#4a626b;--white:#fffef7;--line:#cfe3e4}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--cream);color:var(--ink);font-family:"DM Sans",sans-serif}a{color:var(--blue);text-decoration:none}a:hover{color:var(--coral);text-decoration:underline}.wrap{max-width:1160px;margin:auto;padding:0 24px}
 nav{height:82px;display:flex;align-items:center;justify-content:space-between}.brand{font-weight:700;font-size:18px;letter-spacing:-.04em;color:var(--ink)}.brand span{color:var(--coral)}.navlinks{display:flex;gap:25px;color:var(--muted);font-size:14px}.navlinks a{color:var(--muted)}.navlinks a:hover{color:var(--blue)}
-.hero{padding:80px 0 70px;position:relative;overflow:hidden}.hero:after{content:"";position:absolute;width:260px;height:175px;background:var(--peach);border-radius:54% 46% 60% 40%;right:-70px;top:35px;transform:rotate(9deg);z-index:-1}
+.hero{padding:80px 0 70px;position:relative;overflow:hidden}.hero:after{content:"";position:absolute;width:260px;height:175px;background:var(--teal);border-radius:54% 46% 60% 40%;right:-70px;top:35px;transform:rotate(9deg);z-index:-1}
 .kicker{text-transform:uppercase;letter-spacing:.15em;font-size:12px;font-weight:700;color:var(--blue)}
 h1,h2,h3{font-family:Fraunces,serif;letter-spacing:-.045em;line-height:1.05}h1{font-size:clamp(50px,7vw,80px);max-width:850px;margin:18px 0}.hero p{font-size:19px;line-height:1.7;color:var(--muted);max-width:700px}
 p,li{color:var(--muted);line-height:1.75}ul,ol{padding-left:22px}code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.88em;background:#eaf8f7;padding:2px 6px;border-radius:6px;color:#0e5a63}
@@ -62,12 +64,80 @@ pre{background:#15333b;color:#fdfcdc;padding:20px;border-radius:16px;overflow:au
 .tbl{background:var(--white);border:1px solid var(--line);border-radius:20px;overflow:hidden;margin:25px 0}.tbl table{width:100%;border-collapse:collapse;font-size:14px}.tbl th{text-align:left;padding:14px 18px;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);background:#eaf8f7;font-weight:700}.tbl td{padding:13px 18px;border-top:1px solid var(--line);color:var(--muted)}.tbl td:first-child{font-weight:700;color:var(--ink)}
 .flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:25px 0}.flow span{background:var(--white);border:1px solid var(--line);padding:10px 13px;border-radius:999px;font-size:13px;font-weight:700;color:var(--ink)}.flow b{color:var(--coral)}
 footer{border-top:1px solid var(--line);padding:25px 0;color:var(--muted);font-size:13px}
-@media(max-width:850px){.navlinks{display:none}.fork,.tour,.opts{grid-template-columns:1fr}h2.big{font-size:36px}.road h2{font-size:29px}}
+@media(max-width:850px){.fork,.tour,.opts{grid-template-columns:1fr}h2.big{font-size:36px}.road h2{font-size:29px}}
 @media(max-width:520px){.stp{padding-left:48px}.tbl{overflow-x:auto}}
+
+.navbtn{display:none;background:none;border:1px solid var(--line);border-radius:10px;padding:8px 11px;cursor:pointer;font:inherit;color:var(--ink);line-height:1}
+.navbtn span{display:block;width:17px;height:2px;background:var(--ink);border-radius:2px;margin:3px 0;transition:.2s}
+.navopen .navbtn span:nth-child(1){transform:translateY(5px) rotate(45deg)}
+.navopen .navbtn span:nth-child(2){opacity:0}
+.navopen .navbtn span:nth-child(3){transform:translateY(-5px) rotate(-45deg)}
+@media(max-width:900px){
+.navbtn{display:block}
+nav{position:relative}
+.navlinks{display:none;position:absolute;top:66px;right:0;left:0;background:var(--white);border:1px solid var(--line);border-radius:16px;flex-direction:column;gap:0;padding:8px;z-index:60;box-shadow:0 10px 30px rgba(21,51,59,.09)}
+.navopen .navlinks{display:flex}
+.navlinks a{padding:11px 13px;border-radius:10px;font-size:15px}
+.navlinks a:hover{background:#eaf8f7;text-decoration:none}
+}
+
+/* ── colour system ─────────────────────────────────────────────── */
+/* Tinted section shells break up long cream pages with rhythm. */
+.tinted{background:#eaf8f7;border:1px solid #cbe8e7;border-radius:26px;padding:38px 34px;margin-bottom:62px}
+.tinted-peach{background:#fff6ee;border:1px solid #f6d5b8;border-radius:26px;padding:38px 34px;margin-bottom:62px}
+.tinted h2,.tinted-peach h2{margin-top:0}
+
+/* Cards cycle through tints instead of all-white. */
+.cyc>.card:nth-of-type(3n+2){background:#eaf8f7;border-color:#bfe3e2}
+.cyc>.card:nth-of-type(3n){background:#fff6ee;border-color:#f4d3b6}
+
+/* Second hero blob adds depth behind the first. */
+.hero:before{content:"";position:absolute;width:210px;height:210px;border-radius:52% 48% 44% 56%;
+  background:var(--hero2,rgba(0,175,185,.20));right:130px;top:-40px;z-index:-2}
+@media(max-width:900px){.hero:before{display:none}
+.tinted,.tinted-peach{padding:28px 20px;border-radius:20px}}
+
+/* A section that becomes a panel drops its own rule line and vertical padding. */
+.section.tinted,.section.tinted-peach{border-top:0;padding:40px 34px;margin:46px 0 56px}
+@media(max-width:900px){.section.tinted,.section.tinted-peach{padding:28px 20px}}
+
+
+/* ── page texture ──────────────────────────────────────────────────
+   Tunable: --grain (speckle strength) and --bloom (colour wash).
+   Everything sits BEHIND content — cards and panels have their own
+   opaque backgrounds, so text contrast is never softened by it.     */
+:root{--grain:.06;--bloom:1}
+body{
+  background-color:var(--cream);
+  background-image:
+    /* chromatic speckle — fine paper/film tooth */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23g)' opacity='0.5'/%3E%3C/svg%3E"),
+    /* soft colour blooms drifting in from the edges */
+    radial-gradient(ellipse 900px 620px at 8% 2%,rgba(0,175,185,calc(.10*var(--bloom))),transparent 62%),
+    radial-gradient(ellipse 760px 540px at 95% 14%,rgba(254,217,183,calc(.26*var(--bloom))),transparent 64%),
+    radial-gradient(ellipse 820px 600px at 78% 62%,rgba(240,113,103,calc(.08*var(--bloom))),transparent 62%),
+    radial-gradient(ellipse 900px 640px at 15% 88%,rgba(0,108,135,calc(.07*var(--bloom))),transparent 62%);
+  background-repeat:repeat,no-repeat,no-repeat,no-repeat,no-repeat;
+  background-size:220px 220px,auto,auto,auto,auto;
+  background-attachment:fixed,fixed,fixed,fixed,fixed;
+}
+/* The grain layer is drawn at low opacity via its own alpha; this keeps
+   it from muddying the blooms underneath. */
+body{background-blend-mode:soft-light,normal,normal,normal,normal}
+
+/* Cards lift off the textured page rather than melting into it. */
+.card,.mini,.tbl,.util,.mod,.side,.opt,.pick,.price,.prov,.aidcard,.stp pre,
+details.qa,details.m,.shell,.genout{box-shadow:0 1px 2px rgba(21,51,59,.04),0 6px 18px rgba(21,51,59,.045)}
+
+@media(max-width:900px){
+  /* fixed attachment is costly to repaint on mobile scroll */
+  body{background-attachment:scroll,scroll,scroll,scroll,scroll;--bloom:.7}
+}
+@media print{body{background-image:none}}
 </style>
 </head>
 <body>
-<div class="wrap"><nav><a class="brand" href="index.html">modular<span>.</span>media</a><div class="navlinks"><a href="index.html">Home</a><a href="platforms.html">Platforms</a><a href="access.html">Access</a><a href="generator.html">Generator</a><a href="documentation.html">Documentation</a><a href="hardware.html">Hardware</a><a href="faq.html">Help</a><a href="index.html#generator">Generator</a></div></nav></div>
+<div class="wrap"><nav><a class="brand" href="index.html">modular<span>.</span>media</a><div class="navlinks"><a href="index.html">Home</a><a href="platforms.html">Platforms</a><a href="access.html">Access</a><a href="generator.html">Generator</a><a href="documentation.html">Documentation</a><a href="hardware.html">Hardware</a><a href="faq.html">Help</a><a href="index.html#generator">Generator</a></div><button class="navbtn" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button></nav></div>
 
 <section class="hero"><div class="wrap"><div class="kicker">Setup guide</div><h1>Two ways in. Pick the one that sounds like you.</h1><p>There's no single correct route. If the terminal makes you nervous, take the first path and never open one. If you already have Docker running and just want the files, take the second and be done in a couple of minutes.</p><p style="margin-top:14px;font-size:16px">Running Windows or a Mac? Both work — start with the <a href="platforms.html">platform guide</a> to get Docker in place, then come back here.</p></div></section>
 
@@ -104,7 +174,7 @@ footer{border-top:1px solid var(--line);padding:25px 0;color:var(--muted);font-s
 </div>
 
 <!-- ══════════════ PATH ONE ══════════════ -->
-<section class="section" id="arcane-path"><div class="wrap">
+<section class="section tinted-peach" id="arcane-path"><div class="wrap">
 <div class="kicker">Path one · No command line after this</div>
 <h2 class="big">Setting up with Arcane</h2>
 <p class="lead">Docker doesn't come with a screen. Arcane gives it one — a web page where your containers are things you can see and click, rather than commands you have to remember. You'll need the terminal for the first two steps, then you're done with it.</p>
@@ -216,7 +286,7 @@ volumes:
 </div></section>
 
 <!-- ══════════════ PATH TWO ══════════════ -->
-<section class="section" id="script"><div class="wrap">
+<section class="section tinted" id="script"><div class="wrap">
 <div class="kicker">Path two · You know what you're doing</div>
 <h2 class="big">The generator, or one script</h2>
 <p class="lead">If Docker is already running, you don't need any of the above. Two options, same output — a Compose file, an environment file, and a README, ready to bring up however you normally do.</p>
@@ -302,4 +372,23 @@ bash install.sh</pre>
 </div></section>
 
 <footer><div class="wrap">Modular Media Server · <a href="index.html">Home</a> · <a href="documentation.html">Documentation</a> · <a href="hardware.html">Hardware</a> · <a href="faq.html">Help</a> · Start small. Add what you need. Understand what you're running.</div></footer>
+<script>
+(function(){
+  var b=document.querySelector('.navbtn'), n=document.querySelector('nav');
+  if(!b||!n) return;
+  b.addEventListener('click',function(){
+    var open=n.classList.toggle('navopen');
+    b.setAttribute('aria-expanded',open?'true':'false');
+  });
+  n.addEventListener('click',function(e){
+    if(e.target.tagName==='A') n.classList.remove('navopen');
+  });
+  document.addEventListener('click',function(e){
+    if(!n.contains(e.target)) n.classList.remove('navopen');
+  });
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape') n.classList.remove('navopen');
+  });
+})();
+</script>
 </body></html>
