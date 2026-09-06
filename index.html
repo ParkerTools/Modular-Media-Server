@@ -12,40 +12,175 @@
 <meta property="og:description" content="Build the server you actually want. A friendly guide and Compose generator for self-hosting your own media stack with Docker.">
 <meta property="og:url" content="https://parkertools.github.io/Modular-Media-Server/">
 <meta name="twitter:card" content="summary">
-<meta name="theme-color" content="#0081A7">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230081A7'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23FDFCDC'/%3E%3Ccircle cx='16' cy='16' r='2.5' fill='%23F07167'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#006C87">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23006C87'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23FDFCDC'/%3E%3Ccircle cx='16' cy='16' r='2.5' fill='%23F07167'/%3E%3C/svg%3E">
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Fraunces:opsz,wght@9..144,700&display=swap">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap');
-:root{--blue:#0081A7;--teal:#00AFB9;--cream:#FDFCDC;--peach:#FED9B7;--coral:#F07167;--ink:#15333b;--muted:#587078;--white:#fffef7;--line:#cfe3e4}
+:root{--blue:#006C87;--teal:#00AFB9;--cream:#FDFCDC;--peach:#FED9B7;--coral:#F07167;--ink:#15333b;--muted:#4a626b;--white:#fffef7;--line:#cfe3e4}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--cream);color:var(--ink);font-family:"DM Sans",sans-serif}a{text-decoration:none;color:inherit}.wrap{max-width:1160px;margin:auto;padding:0 24px}
 nav{height:82px;display:flex;align-items:center;justify-content:space-between}.brand{font-weight:700;font-size:18px;letter-spacing:-.04em}.brand span{color:var(--coral)}.navlinks{display:flex;gap:25px;color:var(--muted);font-size:14px}.navlinks a:hover{color:var(--blue)}
 .hero{padding:90px 0 105px;position:relative;overflow:hidden}.hero:after{content:"";position:absolute;width:280px;height:180px;background:var(--peach);border-radius:54% 46% 60% 40%;right:-70px;top:30px;transform:rotate(8deg);z-index:-1}.kicker{text-transform:uppercase;letter-spacing:.15em;font-size:12px;font-weight:700;color:var(--blue)}
 h1,h2,h3{font-family:Fraunces,serif;letter-spacing:-.045em;line-height:1.03}h1{font-size:clamp(55px,8vw,94px);max-width:850px;margin:18px 0 25px}.hero p,.lead{color:var(--muted);line-height:1.7}.hero p{font-size:20px;max-width:650px}
-.buttons{display:flex;gap:12px;margin-top:30px;flex-wrap:wrap}.btn,.gen-btn{border-radius:999px;padding:13px 19px;font-weight:700}.btn{background:var(--blue);color:white}.btn.alt{background:transparent;border:1px solid var(--line);color:var(--ink)}.btn.alt:hover{border-color:var(--teal);color:var(--blue)}
+.buttons{display:flex;gap:12px;margin-top:30px;flex-wrap:wrap}.btn{display:inline-block;border-radius:999px;padding:13px 22px;font-weight:700;font-size:15px;background:var(--blue);color:#fff;text-decoration:none;transition:.15s}
+.btn:hover{background:#005b73;color:#fff;text-decoration:none}
+.btn.alt{background:transparent;border:1px solid var(--line);color:var(--ink)}
+.btn.alt:hover{border-color:var(--teal);color:var(--blue);background:transparent}
+/* On the blue band the normal button colours disappear, so invert them. */
+.generator .btn{background:var(--cream);color:#0b3540}
+.generator .btn:hover{background:#fff;color:#0b3540}
+.generator .btn.alt{background:transparent;border:1px solid rgba(253,252,220,.55);color:var(--cream)}
+.generator .btn.alt:hover{border-color:var(--cream);background:rgba(253,252,220,.12);color:var(--cream)}
+.buttons{display:flex;gap:12px;flex-wrap:wrap}.btn.alt{background:transparent;border:1px solid var(--line);color:var(--ink)}.btn.alt:hover{border-color:var(--teal);color:var(--blue)}
 .section{padding:80px 0;border-top:1px solid var(--line)}h2{font-size:52px;margin:10px 0 18px}.lead{font-size:17px;max-width:680px}
 .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:35px}.card{background:var(--white);border:1px solid var(--line);padding:25px;border-radius:20px}.num{font:31px Fraunces;color:var(--coral)}.card h3{font:700 18px "DM Sans";letter-spacing:-.02em;margin:15px 0 8px}.card p{font-size:14px;color:var(--muted);line-height:1.65;margin:0}
-.apps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:35px}.app{background:var(--white);border:1px solid var(--line);padding:23px;border-radius:20px;display:flex;flex-direction:column;min-height:190px}.app:nth-child(3n+2){background:#eaf8f7}.app:nth-child(3n){background:#fff1e4}.app-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.app h3{font:700 20px "DM Sans";letter-spacing:-.03em;margin:0}.tag{font-size:10px;text-transform:uppercase;letter-spacing:.1em;font-weight:700;padding:6px 8px;border-radius:999px;background:var(--peach);color:#744b32;white-space:nowrap}.app p{font-size:14px;color:var(--muted);line-height:1.6;margin:14px 0 18px}.source{margin-top:auto;display:flex;gap:8px;flex-wrap:wrap}.source a{font-size:12px;font-weight:700;color:var(--blue);border-bottom:1px solid #9bcbd2}.source a:hover{color:var(--coral)}
-.generator{background:var(--blue);color:var(--cream);padding:85px 0}.generator .lead{color:#d8f1f2}.generator h2{color:var(--cream)}.shell{margin-top:35px;background:var(--white);color:var(--ink);border-radius:25px;padding:20px;box-shadow:0 20px 60px rgba(0,61,75,.12)}.ghead{display:flex;justify-content:space-between;font-weight:700;padding:6px;border-bottom:1px solid var(--line)}.progress{height:7px;background:#dce8e8;border-radius:20px;margin:18px 0 25px;overflow:hidden}.bar{height:100%;width:14%;background:var(--coral);transition:.45s}
-.body{display:grid;grid-template-columns:185px 1fr;min-height:390px}.side{border-right:1px solid var(--line);padding:8px}.step{padding:10px;border-radius:10px;color:var(--muted);font-size:13px}.step.active{background:#dff6f5;color:var(--blue);font-weight:700}.main{padding:10px 25px;animation:in .3s ease}@keyframes in{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}.main h3{font-size:34px;margin:4px 0 8px}.main p{font-size:14px;color:var(--muted)}
-.options{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:25px 0}.option{border:1px solid var(--line);background:white;border-radius:14px;padding:15px;text-align:left;transition:.2s}.option:hover{transform:translateY(-2px);border-color:#91cdd1}.option.selected{background:#e6f7f6;border-color:var(--teal)}.option b{display:block}.option span{font-size:12px;color:var(--muted)}
-.actions{display:flex;justify-content:space-between;margin-top:25px}.gen-btn{border:0;background:var(--coral);color:white}.gen-btn.back{background:transparent;color:var(--ink);border:1px solid var(--line)}.note{background:#fff0e3;border-left:4px solid var(--coral);padding:13px 15px;color:var(--muted);font-size:13px;line-height:1.55}
+.apps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:35px}.app{background:var(--white);border:1px solid var(--line);padding:23px;border-radius:20px;display:flex;flex-direction:column;min-height:190px}.app:nth-child(3n+2){background:#eaf8f7}.app:nth-child(3n){background:#fff1e4}.app-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.app h3{font:700 20px "DM Sans";letter-spacing:-.03em;margin:0}.tag{font-size:10px;text-transform:uppercase;letter-spacing:.1em;font-weight:700;padding:6px 8px;border-radius:999px;background:var(--peach);color:#744b32;white-space:nowrap}.app p{font-size:14px;color:var(--muted);line-height:1.6;margin:14px 0 18px}.source{margin-top:auto;display:flex;gap:8px;flex-wrap:wrap}.source a{font-size:12px;font-weight:700;color:var(--blue);border-bottom:1px solid #9bcbd2}.source a:hover{color:var(--coral);text-decoration:underline}
+.generator{background:var(--blue);color:var(--cream);padding:85px 0}.generator .lead{color:#d8f1f2}.generator h2{color:var(--cream)}.ghead{display:flex;justify-content:space-between;font-weight:700;padding:6px;border-bottom:1px solid var(--line)}.bar{height:100%;width:14%;background:var(--coral);transition:.45s}
+.body{display:grid;grid-template-columns:185px 1fr;min-height:390px}.side{border-right:1px solid var(--line);padding:8px}.main{padding:10px 25px;animation:in .3s ease}@keyframes in{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}.main h3{font-size:34px;margin:4px 0 8px}.main p{font-size:14px;color:var(--muted)}
+.option:hover{transform:translateY(-2px);border-color:#91cdd1}.option b{display:block}.option span{font-size:12px;color:var(--muted)}
+.note{background:#fff0e3;border-left:4px solid var(--coral);padding:13px 15px;color:var(--muted);font-size:13px;line-height:1.55}
 .about{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}.blob{background:var(--peach);border-radius:50% 45% 52% 43%;min-height:280px;display:grid;place-items:center;text-align:center;padding:35px;transform:rotate(-3deg)}.blob p{font:30px/1.25 Fraunces;max-width:350px;color:#653f32}.legal{font-size:12px;color:var(--muted);line-height:1.7;margin-top:45px}footer{border-top:1px solid var(--line);padding:25px 0;color:var(--muted);font-size:13px}
-@media(max-width:850px){.navlinks{display:none}.grid4{grid-template-columns:1fr 1fr}.apps{grid-template-columns:1fr 1fr}.about{grid-template-columns:1fr}.body{grid-template-columns:1fr}.side{border-right:0;border-bottom:1px solid var(--line);display:flex;overflow:auto}.step{white-space:nowrap}.options{grid-template-columns:1fr 1fr}}
-@media(max-width:520px){.grid4,.apps,.options{grid-template-columns:1fr}h2{font-size:42px}.hero{padding-top:55px}}
+@media(max-width:850px){.grid4{grid-template-columns:1fr 1fr}.apps{grid-template-columns:1fr 1fr}.about{grid-template-columns:1fr}.body{grid-template-columns:1fr}.side{border-right:0;border-bottom:1px solid var(--line);display:flex;overflow:auto}}
+@media(max-width:520px){.grid4,.apps,h2{font-size:42px}.hero{padding-top:55px}}
+
+.navbtn{display:none;background:none;border:1px solid var(--line);border-radius:10px;padding:8px 11px;cursor:pointer;font:inherit;color:var(--ink);line-height:1}
+.navbtn span{display:block;width:17px;height:2px;background:var(--ink);border-radius:2px;margin:3px 0;transition:.2s}
+.navopen .navbtn span:nth-child(1){transform:translateY(5px) rotate(45deg)}
+.navopen .navbtn span:nth-child(2){opacity:0}
+.navopen .navbtn span:nth-child(3){transform:translateY(-5px) rotate(-45deg)}
+@media(max-width:900px){
+.navbtn{display:block}
+nav{position:relative}
+.navlinks{display:none;position:absolute;top:66px;right:0;left:0;background:var(--white);border:1px solid var(--line);border-radius:16px;flex-direction:column;gap:0;padding:8px;z-index:60;box-shadow:0 10px 30px rgba(21,51,59,.09)}
+.navopen .navlinks{display:flex}
+.navlinks a{padding:11px 13px;border-radius:10px;font-size:15px}
+.navlinks a:hover{background:#eaf8f7;text-decoration:none}
+}
+
+/* ── colour system ─────────────────────────────────────────────── */
+/* Tinted section shells break up long cream pages with rhythm. */
+.tinted{background:#eaf8f7;border:1px solid #cbe8e7;border-radius:26px;padding:38px 34px;margin-bottom:62px}
+.tinted-peach{background:#fff6ee;border:1px solid #f6d5b8;border-radius:26px;padding:38px 34px;margin-bottom:62px}
+.tinted h2,.tinted-peach h2{margin-top:0}
+
+/* Cards cycle through tints instead of all-white. */
+.cyc>.card:nth-of-type(3n+2){background:#eaf8f7;border-color:#bfe3e2}
+.cyc>.card:nth-of-type(3n){background:#fff6ee;border-color:#f4d3b6}
+
+/* Second hero blob adds depth behind the first. */
+.hero:before{content:"";position:absolute;width:210px;height:210px;border-radius:52% 48% 44% 56%;
+  background:var(--hero2,rgba(0,175,185,.20));right:130px;top:-40px;z-index:-2}
+@media(max-width:900px){.hero:before{display:none}
+.tinted,.tinted-peach{padding:28px 20px;border-radius:20px}}
+
+/* A section that becomes a panel drops its own rule line and vertical padding. */
+.section.tinted,.section.tinted-peach{border-top:0;padding:40px 34px;margin:46px 0 56px}
+@media(max-width:900px){.section.tinted,.section.tinted-peach{padding:28px 20px}}
+
+.genfacts{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:34px 0 30px}
+.genfacts div{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.20);border-radius:18px;padding:20px}
+.genfacts b{display:block;font-family:Fraunces,serif;font-size:38px;line-height:1;color:var(--cream);margin-bottom:8px}
+.genfacts span{font-size:13.5px;color:#cfeaf0;line-height:1.55}
+.genout{background:#0d2830;border-radius:20px;overflow:hidden;border:1px solid rgba(255,255,255,.14)}
+.genout-bar{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:rgba(255,255,255,.06);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;color:#9fd3dc}
+.genout-tag{color:var(--peach)}
+.genout pre{margin:0;padding:20px;background:none;color:#e8f4f2;font-size:12.5px;line-height:1.7;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.genout pre .cmt{color:#7fa8a4}
+@media(max-width:800px){.genfacts{grid-template-columns:1fr}}
+
+/* ── page texture ──────────────────────────────────────────────────
+   Tunable: --grain (speckle strength) and --bloom (colour wash).
+   Everything sits BEHIND content — cards and panels have their own
+   opaque backgrounds, so text contrast is never softened by it.     */
+:root{--grain:.06;--bloom:1}
+body{
+  background-color:var(--cream);
+  background-image:
+    /* chromatic speckle — fine paper/film tooth */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23g)' opacity='0.5'/%3E%3C/svg%3E"),
+    /* soft colour blooms drifting in from the edges */
+    radial-gradient(ellipse 900px 620px at 8% 2%,rgba(0,175,185,calc(.10*var(--bloom))),transparent 62%),
+    radial-gradient(ellipse 760px 540px at 95% 14%,rgba(254,217,183,calc(.26*var(--bloom))),transparent 64%),
+    radial-gradient(ellipse 820px 600px at 78% 62%,rgba(240,113,103,calc(.08*var(--bloom))),transparent 62%),
+    radial-gradient(ellipse 900px 640px at 15% 88%,rgba(0,108,135,calc(.07*var(--bloom))),transparent 62%);
+  background-repeat:repeat,no-repeat,no-repeat,no-repeat,no-repeat;
+  background-size:220px 220px,auto,auto,auto,auto;
+  background-attachment:fixed,fixed,fixed,fixed,fixed;
+}
+/* The grain layer is drawn at low opacity via its own alpha; this keeps
+   it from muddying the blooms underneath. */
+body{background-blend-mode:soft-light,normal,normal,normal,normal}
+
+/* Cards lift off the textured page rather than melting into it. */
+.card,.mini,.tbl,.util,.mod,.side,.opt,.pick,.price,.prov,.aidcard,.stp pre,
+details.qa,details.m,.shell,.genout{box-shadow:0 1px 2px rgba(21,51,59,.04),0 6px 18px rgba(21,51,59,.045)}
+
+@media(max-width:900px){
+  /* fixed attachment is costly to repaint on mobile scroll */
+  body{background-attachment:scroll,scroll,scroll,scroll,scroll;--bloom:.7}
+}
+@media print{body{background-image:none}}
+
+/* ── front page quickstart ─────────────────────────────────────── */
+.quickstart{padding:78px 0;border-top:1px solid var(--line)}
+.quickstart h2{font-family:Fraunces,serif;font-size:clamp(32px,4.4vw,46px);letter-spacing:-.045em;margin:14px 0;max-width:760px;line-height:1.05}
+.qs-need{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:15px 18px;margin:24px 0 34px;font-size:14.5px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.qs-need b{color:var(--ink)}
+.qs{counter-reset:q;list-style:none;padding:0;margin:0}
+.qs-step{counter-increment:q;position:relative;padding:0 0 34px 62px;border-left:2px solid var(--line);margin-left:19px}
+.qs-step:last-of-type{border-left-color:transparent;padding-bottom:8px}
+.qs-step:before{content:counter(q);position:absolute;left:-20px;top:-6px;width:39px;height:39px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;font-weight:700;font-size:15px}
+.qs-step h3{font-family:Fraunces,serif;font-size:23px;letter-spacing:-.035em;margin:0 0 9px;color:var(--ink)}
+.qs-step p{font-size:15px;margin:0 0 12px}
+.qs-step ul{margin:0 0 12px;padding-left:20px}
+.qs-step li{font-size:14.5px;margin-bottom:4px}
+.qs-step pre{background:#15333b;color:#fdfcdc;padding:16px 18px;border-radius:14px;font-size:12.5px;line-height:1.7;overflow:auto;margin:0 0 13px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.qs-step pre .cm{color:#8fb3ae}
+.qs-step pre .hl{color:var(--peach)}
+.qs-warn{border-left:4px solid var(--coral);background:#fff0e3;padding:13px 16px;border-radius:0 13px 13px 0;font-size:14px;line-height:1.65;margin:0 0 13px}
+.qs-note{border-left:4px solid var(--teal);background:#e4f5f4;padding:13px 16px;border-radius:0 13px 13px 0;font-size:14px;line-height:1.65;margin:0 0 13px}
+.qs-warn b,.qs-note b{color:var(--ink)}
+.qs-done{background:var(--white);border:1px solid var(--line);border-radius:24px;padding:30px;margin-top:14px}
+.qs-done h3{font-family:Fraunces,serif;font-size:27px;letter-spacing:-.04em;margin:0 0 8px;color:var(--ink)}
+.qs-done>p{font-size:15.5px;margin:0 0 20px}
+.qs-next{display:grid;gap:11px}
+.qs-next a{display:block;background:#eaf8f7;border:1px solid #bfe3e2;border-radius:15px;padding:15px 17px;text-decoration:none;transition:.14s}
+.qs-next a:hover{border-color:var(--teal);transform:translateY(-1px);text-decoration:none}
+.qs-next b{display:block;font-size:15px;color:var(--blue);margin-bottom:3px}
+.qs-next span{font-size:13.5px;color:var(--muted);line-height:1.5}
+@media(min-width:860px){.qs-next{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:560px){.qs-step{padding-left:48px}}
+
+/* collapsed steps keep the section scannable */
+.qs-step details{margin:0}
+.qs-step summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:12px;padding:2px 0 6px}
+.qs-step summary::-webkit-details-marker{display:none}
+.qs-title{font-family:Fraunces,serif;font-size:23px;letter-spacing:-.035em;color:var(--ink);line-height:1.15}
+.qs-step summary:hover .qs-title{color:var(--blue)}
+.qs-toggle{margin-left:auto;flex-shrink:0;width:9px;height:9px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);transition:.2s;margin-right:4px}
+.qs-step details[open] .qs-toggle{transform:rotate(-135deg)}
+.qs-body{padding-top:8px}
+.qs-step details[open]:before{content:""}
+.qs-meta{display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin:0 0 22px;font-size:13.5px;color:var(--muted)}
+.qs-meta b{color:var(--ink)}
+.qs-expand{font-family:inherit;font-size:13px;font-weight:700;background:none;border:1px solid var(--line);border-radius:999px;padding:7px 14px;color:var(--muted);cursor:pointer}
+.qs-expand:hover{border-color:var(--teal);color:var(--blue)}
+.qs-signpost{margin-top:20px;font-size:15px;background:var(--white);border:1px solid var(--line);border-radius:14px;padding:14px 17px;display:inline-block}
 </style>
 </head>
 <body>
-<div class="wrap"><nav><div class="brand">modular<span>.</span>media</div><div class="navlinks"><a href="guide.html">Guide</a><a href="platforms.html">Platforms</a><a href="#how">How it works</a><a href="#apps">Apps</a><a href="generator.html">Generator</a><a href="access.html">Access</a><a href="documentation.html">Documentation</a><a href="hardware.html">Hardware</a><a href="faq.html">Help</a><a href="#safety">Safety</a></div></nav></div>
+<div class="wrap"><nav><div class="brand">modular<span>.</span>media</div><div class="navlinks"><a href="#quickstart">Quickstart</a><a href="guide.html">Guide</a><a href="platforms.html">Platforms</a><a href="#how">How it works</a><a href="#apps">Apps</a><a href="generator.html">Generator</a><a href="access.html">Access</a><a href="documentation.html">Documentation</a><a href="hardware.html">Hardware</a><a href="faq.html">Help</a><a href="#safety">Safety</a></div><button class="navbtn" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button></nav></div>
 
-<section class="hero"><div class="wrap"><div class="kicker">A calmer way to self-host</div><h1>Build the server you actually want.</h1><p>Modular Media Server is a friendly guide and Compose generator for putting together your own little corner of the internet. Start with one thing. Add another when you need it.</p><div class="buttons"><a class="btn" href="generator.html">Build a stack</a><a class="btn alt" href="guide.html">Set it up</a><a class="btn alt" href="documentation.html">Read the docs</a></div></div></section>
+<section class="hero"><div class="wrap"><div class="kicker">A calmer way to self-host</div><h1>Build the server you actually want.</h1><p>Modular Media Server is a friendly guide and Compose generator for putting together your own little corner of the internet. Start with one thing. Add another when you need it.</p><div class="buttons"><a class="btn" href="generator.html">Build a stack</a><a class="btn alt" href="#quickstart">Follow the quickstart</a></div></div></section>
 
 <section class="section" id="how"><div class="wrap"><div class="kicker">No giant mystery box</div><h2>Take it one piece at a time.</h2><p class="lead">Pick the services you want and the generator handles the boring connections between them, while still showing you what is happening.</p><div class="grid4">
 <div class="card"><div class="num">01</div><h3>Pick your pieces</h3><p>Choose media, photos, monitoring, downloads, archives and more.</p></div>
 <div class="card"><div class="num">02</div><h3>We'll sort the plumbing</h3><p>Required dependencies are added automatically and explained.</p></div>
 <div class="card"><div class="num">03</div><h3>Tell us where things live</h3><p>Set your storage roots once instead of wrestling with volume mappings.</p></div>
 <div class="card"><div class="num">04</div><h3>Take the files home</h3><p>Get Compose, environment files, secrets and a README ready to review.</p></div>
-</div></div></section>
+</div><p class="qs-signpost">New to this? There is a <a href="#quickstart">step-by-step walkthrough</a> further down that gets you from an empty machine to a working server.</p></div></section>
 
 <section class="section" id="apps"><div class="wrap"><div class="kicker">The toolbox</div><h2>Meet the apps.</h2><p class="lead">These are the projects Modular Media Server is designed to help you understand and combine. Each one has its own project, documentation and license; the links below point back to the original sources.</p><div class="apps">
 <div class="app"><div class="app-top"><h3>Arcane</h3><span class="tag">Management</span></div><p>A friendly Docker management platform for viewing, managing and working with Compose projects.</p><div class="source"><a href="https://getarcane.app/" target="_blank" rel="noopener">Website</a><a href="https://github.com/getarcaneapp/arcane" target="_blank" rel="noopener">Source</a></div></div>
@@ -65,28 +200,216 @@ h1,h2,h3{font-family:Fraunces,serif;letter-spacing:-.045em;line-height:1.03}h1{f
 <div class="app"><div class="app-top"><h3>Tube Archivist</h3><span class="tag">Archives</span></div><p>A self-hosted YouTube media server for downloading, organizing and watching your personal video archive.</p><div class="source"><a href="https://www.tubearchivist.com/" target="_blank" rel="noopener">Website</a><a href="https://github.com/tubearchivist/tubearchivist" target="_blank" rel="noopener">Source</a><a href="https://docs.tubearchivist.com/" target="_blank" rel="noopener">Docs</a></div></div>
 </div></div></section>
 
-<section class="generator" id="generator"><div class="wrap"><div class="kicker" style="color:var(--peach)">The useful bit</div><h2>Let's build something.</h2><p class="lead">A guided setup instead of a wall of YAML. Try the preview below, or go straight to the full generator.</p><div class="buttons" style="margin-top:6px"><a class="btn alt" href="generator.html">Open the full generator</a></div>
-<div class="shell"><div class="ghead"><span>Modular Media Server / Builder</span><span id="pct">14%</span></div><div class="progress"><div class="bar" id="bar"></div></div><div class="body"><div class="side" id="steps"></div><div class="main" id="main"></div></div></div></div></section>
+<section class="generator" id="generator"><div class="wrap">
+<div class="kicker" style="color:var(--peach)">The useful bit</div>
+<h2>Let's build something.</h2>
+<p class="lead">Pick the services you want. Dependencies get resolved for you, secrets are generated in your browser, and you leave with a complete set of files ready to deploy.</p>
+<div class="buttons" style="margin-top:20px"><a class="btn" href="generator.html">Open the generator</a><a class="btn alt" href="guide.html">Read the setup guide first</a></div>
 
+<div class="genfacts">
+<div><b>18</b><span>modules across media, downloads, photos, monitoring, connection and authentication</span></div>
+<div><b>6</b><span>files written — Compose, .env, .env.example, .gitignore, Caddyfile, README</span></div>
+<div><b>0</b><span>data sent anywhere; everything runs locally in your browser</span></div>
+</div>
+
+<div class="genout">
+<div class="genout-bar"><span>docker-compose.yml</span><span class="genout-tag">generated for you</span></div>
+<pre>services:
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    ports:
+      - "8096:8096"
+    volumes:
+      - ${CONFIG_ROOT}/jellyfin/config:/config
+      - ${DATA_ROOT}/media:/media:ro
+
+  <span class="cmt"># qBittorrent is tied to Gluetun's network.</span>
+  <span class="cmt"># If the VPN drops, it loses its connection too.</span>
+  qbittorrent:
+    network_mode: "service:gluetun"</pre>
+</div>
+</div></section>
+
+<section class="quickstart" id="quickstart"><div class="wrap">
+<div class="kicker">Start here</div>
+<h2>Your first server, in about half an hour.</h2>
+<p class="lead">Three services, end to end: Arcane to manage everything, Jellyfin to watch things, and Uptime Kuma to tell you on Discord when something breaks. Nothing here assumes you have done this before.</p>
+
+<div class="qs-need">
+<b>You need:</b> a machine that stays on — a mini PC, an old laptop, a NAS or a VPS — with Docker installed.
+<a href="platforms.html">Docker setup for Windows, macOS, Linux or NAS →</a>
+</div>
+
+<div class="qs-meta"><span><b>7 steps</b> · about 30 minutes</span><button class="qs-expand" id="qsx">Expand all</button></div>
+<ol class="qs">
+
+<li class="qs-step"><details open><summary><span class="qs-title">Install Arcane</span><span class="qs-toggle"></span></summary><div class="qs-body">
+<p>Arcane is the web interface you will use for everything after this. It needs two secrets of its own — run this twice and keep both lines:</p>
+<pre>openssl rand -base64 32</pre>
+<p>Make a folder for your stacks, and one inside it for Arcane:</p>
+<pre>sudo mkdir -p /opt/stacks/arcane
+cd /opt/stacks/arcane
+nano docker-compose.yml</pre>
+<p>Paste this in, replacing both secrets:</p>
+<pre>services:
+  arcane:
+    image: ghcr.io/getarcaneapp/arcane:latest
+    container_name: arcane
+    ports:
+      - "3552:3552"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - arcane-data:/app/data
+      <span class="cm"># same path on both sides — this matters</span>
+      - /opt/stacks:/opt/stacks
+    environment:
+      - APP_URL=http://localhost:3552
+      - PUID=1000
+      - PGID=1000
+      - ENCRYPTION_KEY=<span class="hl">your-first-secret</span>
+      - JWT_SECRET=<span class="hl">your-second-secret</span>
+    restart: unless-stopped
+
+volumes:
+  arcane-data:</pre>
+<pre>docker compose up -d</pre>
+<p>Open <code>http://your-server-ip:3552</code> and create your admin account. <b>That is the last command you have to type.</b></p>
+<div class="qs-warn">Arcane can control your whole machine through the Docker socket. Keep it on your home network — never forward port 3552 to the internet.</div>
+</div></details></li>
+
+<li class="qs-step"><details><summary><span class="qs-title">Point Arcane at your stacks folder</span><span class="qs-toggle"></span></summary><div class="qs-body">
+<p>In Arcane, open <b>Settings</b> and set the projects directory to <code>/opt/stacks</code> — the same path you mounted above.</p>
+<p>Any folder in there containing a <code>docker-compose.yml</code> now appears under <b>Projects</b>. Arcane itself will already be listed, because you put it there.</p>
+<div class="qs-note">Matching paths inside and outside the container is the detail people get wrong. <code>/opt/stacks:/opt/stacks</code> works; <code>/opt/stacks:/app/data/projects</code> quietly breaks relative paths.</div>
+</div></details></li>
+
+<li class="qs-step"><details><summary><span class="qs-title">Create a project for Jellyfin</span><span class="qs-toggle"></span></summary><div class="qs-body">
+<p>In Arcane, go to <b>Projects → New Project</b>, call it <code>jellyfin</code>, and paste this as the Compose file:</p>
+<pre>services:
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    user: "1000:1000"
+    ports:
+      - "8096:8096"
+    volumes:
+      - /opt/stacks/jellyfin/config:/config
+      - /opt/stacks/jellyfin/cache:/cache
+      - <span class="hl">/srv/media</span>:/media:ro
+    environment:
+      - TZ=<span class="hl">Europe/London</span>
+    restart: unless-stopped</pre>
+<p>Change <code>/srv/media</code> to wherever your films and shows live, and set your timezone. Press <b>Deploy</b>. The first run downloads a few hundred megabytes.</p>
+<div class="qs-note"><code>:ro</code> means read-only. Jellyfin has no reason to modify your files, so it is not allowed to.</div>
+</div></details></li>
+
+<li class="qs-step"><details><summary><span class="qs-title">Set up a Jellyfin library</span><span class="qs-toggle"></span></summary><div class="qs-body">
+<p>Open <code>http://your-server-ip:8096</code>. Create your user account, then when it asks for a media library:</p>
+<ul>
+<li>Content type: <b>Movies</b> — make a second library later for Shows, since separate types matter for metadata</li>
+<li>Display name: <b>Films</b></li>
+<li>Folder: <code>/media/movies</code> — the path <em>inside</em> the container, not the host path</li>
+</ul>
+<p>Finish the wizard, then run <b>Scan All Libraries</b> from the dashboard.</p>
+<div class="qs-warn">If the library comes up empty, the mount is wrong rather than Jellyfin. Check what it can actually see: in Arcane open the Jellyfin container, use the console, and run <code>ls /media</code>. Nothing listed means the volume path in step 3 does not match your real folder.</div>
+<p>Naming decides whether artwork matches. <code>The Thing (1982).mkv</code> works; <code>film.final.copy.mkv</code> rarely does.</p>
+</div></details></li>
+
+<li class="qs-step"><details><summary><span class="qs-title">Add Uptime Kuma</span><span class="qs-toggle"></span></summary><div class="qs-body">
+<p>Another Arcane project, this one called <code>uptime-kuma</code>:</p>
+<pre>services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:1
+    container_name: uptime-kuma
+    ports:
+      - "3001:3001"
+    volumes:
+      - /opt/stacks/uptime-kuma/data:/app/data
+      <span class="cm"># lets Kuma watch containers, not just web pages</span>
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - TZ=<span class="hl">Europe/London</span>
+    restart: unless-stopped</pre>
+<p>Deploy it, then open <code>http://your-server-ip:3001</code> and create an account.</p>
+<div class="qs-note">The socket mount is read-only and only needed for container monitors. If you would rather not grant it, leave that line out and use the HTTP monitor in the next step — it answers the more useful question anyway.</div>
+</div></details></li>
+
+<li class="qs-step"><details><summary><span class="qs-title">Watch the Jellyfin container</span><span class="qs-toggle"></span></summary><div class="qs-body">
+<p>First tell Kuma about Docker. Go to <b>Profile → Settings → Docker Hosts → Add Docker Host</b>:</p>
+<ul>
+<li>Friendly name: <b>Local</b></li>
+<li>Connection type: <b>Socket</b></li>
+<li>Path: <code>/var/run/docker.sock</code></li>
+</ul>
+<p>Save, then <b>Add New Monitor</b>:</p>
+<ul>
+<li>Monitor type: <b>Docker Container</b></li>
+<li>Friendly name: <b>Jellyfin container</b></li>
+<li>Container name: <code>jellyfin</code></li>
+<li>Docker host: the one you just created</li>
+</ul>
+<div class="qs-note"><b>Add an HTTP monitor as well.</b> A container can be running while the app inside it is wedged. Choose type <b>HTTP(s)</b> and URL <code>http://jellyfin:8096</code> — using the container name, because inside Docker <code>localhost</code> means Kuma itself. Between the two you learn both that it exists and that it works.</div>
+</div></details></li>
+
+<li class="qs-step"><details><summary><span class="qs-title">Get told on Discord</span><span class="qs-toggle"></span></summary><div class="qs-body">
+<p>In Discord, open the channel you want alerts in, then <b>Edit Channel → Integrations → Webhooks → New Webhook</b>. Name it, then <b>Copy Webhook URL</b>.</p>
+<p>Back in Uptime Kuma, edit your monitor and choose <b>Setup Notification</b>:</p>
+<ul>
+<li>Notification type: <b>Discord</b></li>
+<li>Friendly name: <b>Discord</b></li>
+<li>Discord webhook URL: paste it</li>
+<li>Tick <b>Default enabled</b> so new monitors use it automatically</li>
+</ul>
+<p>Press <b>Test</b> — a message should land in the channel within a second or two. If it does not, the webhook URL is wrong; nothing else in the chain produces that result.</p>
+<div class="qs-warn">A webhook URL is a password. Anyone who has it can post to your channel, so keep it out of screenshots and out of git.</div>
+</div></details></li>
+
+</ol>
+
+<div class="qs-done">
+<h3>That is a working server.</h3>
+<p>Jellyfin is serving your library, Arcane manages it without a terminal, and you find out on Discord if it stops. Everything after this is optional.</p>
+<div class="qs-next">
+<a href="generator.html"><b>Add more services →</b><span>Sonarr, Radarr, Immich and the rest, with dependencies resolved for you</span></a>
+<a href="access.html"><b>Reach it from outside →</b><span>Tailscale, a reverse proxy, or passkey single sign-on</span></a>
+<a href="faq.html"><b>Something broken? →</b><span>The four commands that diagnose most problems</span></a>
+</div>
+</div>
+</div></section>
 <section class="section" id="safety"><div class="wrap"><div class="about"><div><div class="kicker">A small but important thing</div><h2>Self-hosting comes with responsibility.</h2><p class="lead">This project helps you run software. It does not give you permission to download, archive, copy or distribute media you do not have the right to use.</p><div class="note"><strong>Torrents are also a security concern.</strong><br>Files can come from untrusted sources and may contain malware, ransomware, trojans, cryptominers or malicious scripts. A VPN can protect network privacy; it cannot make a malicious file safe.</div></div><div class="blob"><p>Own your server.<br>Know what's running on it.</p></div></div><div class="legal"><strong>Copyright:</strong> Only obtain, store, archive and share content you are legally permitted to use. This project does not provide or endorse piracy. <strong>Security:</strong> Keep your host, Docker engine, images and applications updated; do not blindly execute downloaded programs or scripts; use sensible firewall and network controls; and keep backups. This is general information, not legal or security advice.</div></div></section>
 <footer><div class="wrap">Modular Media Server · <a href="documentation.html">Documentation</a> · <a href="hardware.html">Hardware</a> · <a href="platforms.html">Platforms</a> · Start small. Add what you need. Understand what you're running.</div></footer>
 
+
 <script>
-const items=["Jellyfin","Jellyseerr","Sonarr","Radarr","Lidarr","qBittorrent","Immich","Uptime Kuma","ArchiveBox","Tube Archivist"];
-const stages=["Choose modules","Dependencies","Storage","Credentials","Secrets","Check everything","Your files"];
-let n=0,selected=new Set();
-const main=document.getElementById("main"),bar=document.getElementById("bar"),pct=document.getElementById("pct"),steps=document.getElementById("steps");
-function render(){steps.innerHTML=stages.map((s,i)=>`<div class="step ${i===n?'active':''}">${i<n?'✓ ':''}${s}</div>`).join("");let p=Math.round(((n+1)/stages.length)*100);bar.style.width=p+"%";pct.textContent=p+"%";if(n===0)choose();else if(n===1)deps();else if(n===2)storage();else if(n===3)creds();else if(n===4)secrets();else if(n===5)validate();else finish()}
-function actions(back=true,label="Continue"){return `<div class="actions">${back?'<button class="gen-btn back" onclick="go(-1)">Back</button>':'<span></span>'}<button class="gen-btn" onclick="go(1)">${label}</button></div>`}
-function choose(){main.innerHTML=`<h3>What sounds useful?</h3><p>Pick a few things. You can change your mind later.</p><div class="options">${items.map((x,i)=>`<button class="option ${selected.has(i)?'selected':''}" onclick="toggle(${i})"><b>${x}</b><span>${i===0?'Media server':i===5?'Download client':'Module'}</span></button>`).join("")}</div>${actions(false)}`}
-function toggle(i){selected.has(i)?selected.delete(i):selected.add(i);render()}
-function deps(){let vpn=[...selected].some(i=>items[i]==="qBittorrent");main.innerHTML=`<h3>A little plumbing.</h3><p>We checked your choices and found the things they need.</p><div class="note"><strong>✓ Dependencies checked</strong><br>${vpn?"qBittorrent needs a VPN container, so Gluetun will be included.":"No additional required infrastructure was detected for this selection."}</div>${actions()}`}
-function storage(){main.innerHTML=`<h3>Where should everything live?</h3><p>Set the roots once. The generated files will reuse them.</p><div class="options"><div class="option"><b>Config</b><span>/volume1/docker/modular-media-server</span></div><div class="option"><b>Media</b><span>/volume1/media</span></div><div class="option"><b>Downloads</b><span>/volume1/downloads</span></div></div>${actions()}`}
-function creds(){main.innerHTML=`<h3>Any keys to bring along?</h3><p>API keys and provider credentials will live in <code>.env</code>.</p><div class="note"><strong>Nothing is sent anywhere in this prototype.</strong><br>A production version should make credential handling explicit and secure.</div>${actions()}`}
-function secrets(){main.innerHTML=`<h3>Making the secret sauce.</h3><p>Internal passwords and encryption secrets can be generated locally with secure browser randomness.</p><div class="options"><div class="option selected"><b>32-character secrets</b><span>Generated in your browser.</span></div><div class="option"><b>.env protection</b><span>The package ignores .env.</span></div></div>${actions()}`}
-function validate(){main.innerHTML=`<h3>One last look.</h3><p>Everything important gets a quick check before we hand over the files.</p><div class="note"><strong>✓ Modules selected<br>✓ Dependencies resolved<br>✓ Storage paths configured<br>✓ Secrets ready</strong></div>${actions(true,"Generate my files")}`}
-function finish(){main.innerHTML=`<h3>There we go.</h3><p>That is the shape of it. The full generator resolves dependencies, generates your secrets and writes every file — including a Caddyfile if you add a reverse proxy.</p><div class="note"><strong>docker-compose.yml</strong><br>.env<br>.env.example<br>.gitignore<br>Caddyfile<br>README.md</div><div class="actions"><button class="gen-btn back" onclick="n=0;selected.clear();render()">Start over</button><a class="gen-btn" href="generator.html" style="text-decoration:none;display:inline-block">Open the full generator</a></div>`}
-function go(d){n=Math.max(0,Math.min(6,n+d));render()}render();
+(function(){
+  var b=document.querySelector('.navbtn'), n=document.querySelector('nav');
+  if(!b||!n) return;
+  b.addEventListener('click',function(){
+    var open=n.classList.toggle('navopen');
+    b.setAttribute('aria-expanded',open?'true':'false');
+  });
+  n.addEventListener('click',function(e){
+    if(e.target.tagName==='A') n.classList.remove('navopen');
+  });
+  document.addEventListener('click',function(e){
+    if(!n.contains(e.target)) n.classList.remove('navopen');
+  });
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape') n.classList.remove('navopen');
+  });
+})();
+</script>
+<script>
+(function(){
+  var b=document.getElementById('qsx');
+  if(!b) return;
+  b.addEventListener('click',function(){
+    var d=document.querySelectorAll('.qs-step details'),
+        opening=b.textContent.indexOf('Expand')===0;
+    d.forEach(function(x){ x.open=opening; });
+    b.textContent = opening ? 'Collapse all' : 'Expand all';
+  });
+})();
 </script>
 </body>
 </html>
