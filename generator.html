@@ -222,6 +222,18 @@ details.qa,details.m,.shell,.genout{box-shadow:0 1px 2px rgba(21,51,59,.04),0 6p
 .secretbtn:hover{border-color:var(--teal);color:var(--blue)}
 .secretfield{display:flex;gap:8px;align-items:center}
 .secretfield input{flex:1;min-width:0}
+
+.dcard-lead{background:#eaf8f7;border:1px solid #a9dde0;border-radius:22px;padding:26px 28px;margin:6px 0 16px;position:relative}
+.dbadge{display:inline-block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;
+  background:var(--blue);color:#fff;padding:5px 12px;border-radius:999px;margin-bottom:12px}
+.dcard-lead h4{font-family:Fraunces,serif;font-size:26px;letter-spacing:-.035em;margin:0 0 4px;color:var(--ink)}
+.dcard-lead .dwho{font-size:13px;font-weight:700;color:var(--coral);margin:0 0 14px;text-transform:none;letter-spacing:0}
+.dcard-lead p{font-size:15px;margin:0 0 13px}
+.dsteps{counter-reset:d;list-style:none;padding:0;margin:0 0 15px}
+.dsteps li{counter-increment:d;position:relative;padding:0 0 10px 34px;font-size:14.5px;line-height:1.65}
+.dsteps li:before{content:counter(d);position:absolute;left:0;top:1px;width:22px;height:22px;border-radius:50%;
+  background:var(--white);border:1px solid #a9dde0;color:var(--blue);font-size:11.5px;font-weight:700;
+  display:grid;place-items:center}
 </style>
 </head>
 <body>
@@ -313,14 +325,31 @@ details.qa,details.m,.shell,.genout{box-shadow:0 1px 2px rgba(21,51,59,.04),0 6p
 <div id="postnotes"></div>
 
 <h3 style="font-family:Fraunces,serif;font-size:26px;letter-spacing:-.04em;margin:38px 0 12px">Where do these files go?</h3>
-<p class="pd" style="margin-bottom:18px">Downloading them is half the job. Below are the three ways to get them running, easiest first.</p>
+<p class="pd" style="margin-bottom:18px">Downloading them is half the job. Here is where they actually go — start with the first if you would rather not open a terminal.</p>
+
+<div class="dcard dcard-lead">
+<div class="dbadge">No terminal needed</div>
+<h4>Paste it straight into Arcane</h4>
+<p class="dwho">The easiest route, and the one to use if the command line makes you uneasy</p>
+<p>Arcane can create the whole project for you from the browser. You never touch a folder, a text editor or a terminal — you copy from this page and paste into Arcane.</p>
+<ol class="dsteps">
+<li>In Arcane, open <b>Projects</b> and choose <b>New Project</b>.</li>
+<li>Name it — <code>media</code> is fine.</li>
+<li>Come back here, open the <b>docker-compose.yml</b> tab above and press <b>Copy</b>. Paste it into Arcane's Compose editor.</li>
+<li>Open the <b>.env</b> tab, press <b>Copy</b>, and paste that into the project's environment field. This is where your secrets go, so Arcane holds them rather than a file you have to manage.</li>
+<li>Press <b>Deploy</b>.</li>
+</ol>
+<p>Arcane pulls the images and starts everything. The first run takes a few minutes. After that you start, stop, update and read logs from the same page.</p>
+<div class="dnote"><b>Copy gives you the real values.</b> The dots on screen are only there so secrets do not end up in a screenshot — what lands on your clipboard is the genuine file.</div>
+<div class="dwarn"><b>One thing still needs a terminal, once.</b> Installing Docker and starting Arcane itself. The <a href="index.html#quickstart">quickstart</a> walks through it with commands you can copy and paste. After Arcane is running, everything above is clicking.</div>
+</div>
 
 <div class="deploy">
 
 <div class="dcard">
 <div class="dnum">1</div>
 <h4>Arcane, via a project folder</h4>
-<p class="dwho">Simplest if you already run Arcane</p>
+<p class="dwho">If you prefer files on disk</p>
 <p>Arcane shows any folder in its projects directory as a project. Make a folder, put the files in it, and it appears in the UI ready to deploy.</p>
 <pre>cd /opt/stacks          <span class="cm"># your Arcane projects dir</span>
 mkdir media
@@ -1035,7 +1064,7 @@ function go(i){
   if(step===3) renderCred();
   if(step===4){ if(!Object.keys(state.secrets).length) genSecrets(); renderSecrets(); }
   if(step===5) renderReview();
-  if(step===6){ if(!Object.keys(state.secrets).length) genSecrets(); buildFiles(); }
+  if(step===6){ if(!Object.keys(state.secrets).length) genSecrets(); state.showSecrets = false; buildFiles(); }
   renderSteps();
   window.scrollTo({top:0,behavior:"smooth"});
 }
@@ -1454,7 +1483,7 @@ function renderSecrets(){
   c.appendChild(ul); b.appendChild(c);
 
   var btn = el("button","btn ghost","Generate new values");
-  btn.onclick = function(){ genSecrets(); renderSecrets(); };
+  btn.onclick = function(){ genSecrets(); state.showSecrets = false; renderSecrets(); };
   b.appendChild(btn);
 
   var t = el("div","tip");
@@ -1553,7 +1582,11 @@ $("dlall").onclick = function(){
   files.forEach(function(f,i){ setTimeout(function(){ download(f.name, f.body); }, i*350); });
 };
 $("revealbtn").onclick = function(){ state.showSecrets = !state.showSecrets; showFile(); };
-$("regen").onclick = function(){ genSecrets(); buildFiles(); };
+$("regen").onclick = function(){
+  genSecrets();
+  state.showSecrets = false;   // new values start hidden again
+  buildFiles();
+};
 $("next").onclick = function(){ if(step < STEPS.length-1) go(step+1); };
 $("back").onclick = function(){ go(step-1); };
 
