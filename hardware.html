@@ -11,13 +11,15 @@
 <meta property="og:description" content="What to run your media server on, what it costs, and when a VPS makes sense — with an honest cost comparison.">
 <meta property="og:url" content="https://parkertools.github.io/Modular-Media-Server/hardware.html">
 <meta name="twitter:card" content="summary">
-<meta name="theme-color" content="#0081A7">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230081A7'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23FDFCDC'/%3E%3Ccircle cx='16' cy='16' r='2.5' fill='%23F07167'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#006C87">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23006C87'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23FDFCDC'/%3E%3Ccircle cx='16' cy='16' r='2.5' fill='%23F07167'/%3E%3C/svg%3E">
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Fraunces:opsz,wght@9..144,700&display=swap">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap');
-:root{--blue:#0081A7;--teal:#00AFB9;--cream:#FDFCDC;--peach:#FED9B7;--coral:#F07167;--ink:#15333b;--muted:#587078;--white:#fffef7;--line:#cfe3e4}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--cream);color:var(--ink);font-family:"DM Sans",sans-serif}a{color:var(--blue);text-decoration:none}a:hover{color:var(--coral)}.wrap{max-width:1160px;margin:auto;padding:0 24px}
+:root{--blue:#006C87;--teal:#00AFB9;--cream:#FDFCDC;--peach:#FED9B7;--coral:#F07167;--ink:#15333b;--muted:#4a626b;--white:#fffef7;--line:#cfe3e4}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--cream);color:var(--ink);font-family:"DM Sans",sans-serif}a{color:var(--blue);text-decoration:none}a:hover{color:var(--coral);text-decoration:underline}.wrap{max-width:1160px;margin:auto;padding:0 24px}
 nav{height:82px;display:flex;align-items:center;justify-content:space-between}.brand{font-weight:700;font-size:18px;letter-spacing:-.04em;color:var(--ink)}.brand span{color:var(--coral)}.navlinks{display:flex;gap:25px;color:var(--muted);font-size:14px}.navlinks a{color:var(--muted)}.navlinks a:hover{color:var(--blue)}
 .hero{padding:80px 0 70px;border-bottom:1px solid var(--line);position:relative;overflow:hidden}.hero:after{content:"";position:absolute;width:250px;height:170px;background:var(--peach);border-radius:54% 46% 60% 40%;right:-60px;top:40px;transform:rotate(-6deg);z-index:-1}
 .kicker{text-transform:uppercase;letter-spacing:.15em;font-size:12px;font-weight:700;color:var(--blue)}
@@ -33,16 +35,82 @@ pre{background:#15333b;color:#fdfcdc;padding:20px;border-radius:16px;overflow:au
 .picks{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:25px}.pick{background:var(--white);border:1px solid var(--line);border-radius:20px;padding:23px}.pick:nth-child(4n+2){background:#eaf8f7}.pick:nth-child(4n+3){background:#fff1e4}.pick h3{font:700 19px "DM Sans";letter-spacing:-.03em;margin:0 0 4px}.pick .who{font-size:12px;font-weight:700;color:var(--coral);margin-bottom:10px}.pick p{font-size:14px;margin:0 0 12px}.pick ul{margin:0;padding-left:18px}.pick li{font-size:13px;line-height:1.6}
 .prices{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:25px}.price{background:var(--white);border:1px solid var(--line);border-radius:20px;padding:23px;display:flex;flex-direction:column}.price .tier{font:700 17px "DM Sans";letter-spacing:-.03em}.price .eg{font-size:12px;color:var(--muted);margin-top:3px}.price .big{font:700 34px Fraunces;color:var(--blue);letter-spacing:-.05em;margin:16px 0 2px}.price .lbl{font-size:12px;color:var(--muted)}.price .mo{font-size:14px;font-weight:700;color:var(--coral);margin-top:8px}.price .sep{height:1px;background:var(--line);margin:16px 0}.price p{font-size:13px;margin:0 0 14px;flex:1}
 .provs{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:22px}.prov{background:var(--white);border:1px solid var(--line);border-radius:20px;padding:22px}.prov h3{font:700 19px "DM Sans";letter-spacing:-.03em;margin:0 0 8px}.prov p{font-size:14px;margin:0 0 14px}.prov .links{display:flex;gap:10px;flex-wrap:wrap}.prov .links a{font-size:12px;font-weight:700;border-bottom:1px solid #9bcbd2}
-.utils{margin-top:22px}.ugroup{margin-bottom:26px}.ugroup>strong{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--blue);margin-bottom:12px}.ulist{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.util{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:14px 16px}.util b{display:block;font-size:14px;letter-spacing:-.02em;color:var(--ink)}.util span{font-size:12.5px;color:var(--muted);line-height:1.5}
+.utils{margin-top:22px}.ugroup{margin-bottom:26px}.ugroup>strong{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--blue);margin-bottom:12px}.ulist{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.util{display:block;background:var(--white);border:1px solid var(--line);border-radius:14px;padding:14px 16px;transition:.14s;text-decoration:none}
+.util:hover{border-color:var(--teal);transform:translateY(-1px);text-decoration:none}
+.util b:after{content:" ↗";font-size:10px;color:var(--muted);font-weight:400;vertical-align:1px}
+.util:hover b:after{color:var(--teal)}.util b{display:block;font-size:14px;letter-spacing:-.02em;color:var(--ink)}.util span{font-size:12.5px;color:var(--muted);line-height:1.5}
 .blob{background:var(--peach);border-radius:50% 45% 52% 43%;min-height:230px;display:grid;place-items:center;text-align:center;padding:35px;transform:rotate(-3deg)}.blob p{font:27px/1.25 Fraunces;max-width:330px;color:#653f32}
 .closing{display:grid;grid-template-columns:1fr 1fr;gap:55px;align-items:center;margin-top:20px}
 footer{border-top:1px solid var(--line);padding:25px 0;color:var(--muted);font-size:13px}
-@media(max-width:850px){.navlinks{display:none}.layout{grid-template-columns:1fr;gap:0}.toc{position:static;margin-bottom:35px}.picks,.provs,.closing{grid-template-columns:1fr}.prices,.ulist{grid-template-columns:1fr 1fr}}
+@media(max-width:850px){.layout{grid-template-columns:1fr;gap:0}.toc{position:static;margin-bottom:35px}.picks,.provs,.closing{grid-template-columns:1fr}.prices,.ulist{grid-template-columns:1fr 1fr}}
 @media(max-width:520px){.prices,.ulist{grid-template-columns:1fr}h2{font-size:36px}.tbl{overflow-x:auto}}
+
+.navbtn{display:none;background:none;border:1px solid var(--line);border-radius:10px;padding:8px 11px;cursor:pointer;font:inherit;color:var(--ink);line-height:1}
+.navbtn span{display:block;width:17px;height:2px;background:var(--ink);border-radius:2px;margin:3px 0;transition:.2s}
+.navopen .navbtn span:nth-child(1){transform:translateY(5px) rotate(45deg)}
+.navopen .navbtn span:nth-child(2){opacity:0}
+.navopen .navbtn span:nth-child(3){transform:translateY(-5px) rotate(-45deg)}
+@media(max-width:900px){
+.navbtn{display:block}
+nav{position:relative}
+.navlinks{display:none;position:absolute;top:66px;right:0;left:0;background:var(--white);border:1px solid var(--line);border-radius:16px;flex-direction:column;gap:0;padding:8px;z-index:60;box-shadow:0 10px 30px rgba(21,51,59,.09)}
+.navopen .navlinks{display:flex}
+.navlinks a{padding:11px 13px;border-radius:10px;font-size:15px}
+.navlinks a:hover{background:#eaf8f7;text-decoration:none}
+}
+
+/* ── colour system ─────────────────────────────────────────────── */
+/* Tinted section shells break up long cream pages with rhythm. */
+.tinted{background:#eaf8f7;border:1px solid #cbe8e7;border-radius:26px;padding:38px 34px;margin-bottom:62px}
+.tinted-peach{background:#fff6ee;border:1px solid #f6d5b8;border-radius:26px;padding:38px 34px;margin-bottom:62px}
+.tinted h2,.tinted-peach h2{margin-top:0}
+
+/* Cards cycle through tints instead of all-white. */
+.cyc>.card:nth-of-type(3n+2){background:#eaf8f7;border-color:#bfe3e2}
+.cyc>.card:nth-of-type(3n){background:#fff6ee;border-color:#f4d3b6}
+
+/* Second hero blob adds depth behind the first. */
+.hero:before{content:"";position:absolute;width:210px;height:210px;border-radius:52% 48% 44% 56%;
+  background:var(--hero2,rgba(0,175,185,.20));right:130px;top:-40px;z-index:-2}
+@media(max-width:900px){.hero:before{display:none}
+.tinted,.tinted-peach{padding:28px 20px;border-radius:20px}}
+
+/* ── page texture ──────────────────────────────────────────────────
+   Tunable: --grain (speckle strength) and --bloom (colour wash).
+   Everything sits BEHIND content — cards and panels have their own
+   opaque backgrounds, so text contrast is never softened by it.     */
+:root{--grain:.06;--bloom:1}
+body{
+  background-color:var(--cream);
+  background-image:
+    /* chromatic speckle — fine paper/film tooth */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23g)' opacity='0.5'/%3E%3C/svg%3E"),
+    /* soft colour blooms drifting in from the edges */
+    radial-gradient(ellipse 900px 620px at 8% 2%,rgba(0,175,185,calc(.10*var(--bloom))),transparent 62%),
+    radial-gradient(ellipse 760px 540px at 95% 14%,rgba(254,217,183,calc(.26*var(--bloom))),transparent 64%),
+    radial-gradient(ellipse 820px 600px at 78% 62%,rgba(240,113,103,calc(.08*var(--bloom))),transparent 62%),
+    radial-gradient(ellipse 900px 640px at 15% 88%,rgba(0,108,135,calc(.07*var(--bloom))),transparent 62%);
+  background-repeat:repeat,no-repeat,no-repeat,no-repeat,no-repeat;
+  background-size:220px 220px,auto,auto,auto,auto;
+  background-attachment:fixed,fixed,fixed,fixed,fixed;
+}
+/* The grain layer is drawn at low opacity via its own alpha; this keeps
+   it from muddying the blooms underneath. */
+body{background-blend-mode:soft-light,normal,normal,normal,normal}
+
+/* Cards lift off the textured page rather than melting into it. */
+.card,.mini,.tbl,.util,.mod,.side,.opt,.pick,.price,.prov,.aidcard,.stp pre,
+details.qa,details.m,.shell,.genout{box-shadow:0 1px 2px rgba(21,51,59,.04),0 6px 18px rgba(21,51,59,.045)}
+
+@media(max-width:900px){
+  /* fixed attachment is costly to repaint on mobile scroll */
+  body{background-attachment:scroll,scroll,scroll,scroll,scroll;--bloom:.7}
+}
+@media print{body{background-image:none}}
 </style>
 </head>
 <body>
-<div class="wrap"><nav><a class="brand" href="index.html">modular<span>.</span>media</a><div class="navlinks"><a href="index.html">Home</a><a href="guide.html">Guide</a><a href="platforms.html">Platforms</a><a href="index.html#apps">Apps</a><a href="index.html#generator">Generator</a><a href="access.html">Access</a><a href="generator.html">Generator</a><a href="documentation.html">Documentation</a><a href="hardware.html">Hardware</a><a href="faq.html">Help</a></div></nav></div>
+<div class="wrap"><nav><a class="brand" href="index.html">modular<span>.</span>media</a><div class="navlinks"><a href="index.html">Home</a><a href="guide.html">Guide</a><a href="platforms.html">Platforms</a><a href="index.html#apps">Apps</a><a href="index.html#generator">Generator</a><a href="access.html">Access</a><a href="generator.html">Generator</a><a href="documentation.html">Documentation</a><a href="hardware.html">Hardware</a><a href="faq.html">Help</a></div><button class="navbtn" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button></nav></div>
 
 <section class="hero"><div class="wrap"><div class="kicker">Hardware &amp; hosting</div><h1>What should you actually run this on?</h1><p>Almost anything that runs Docker can run some of this. The honest answer depends on how many people watch at once, how much you want to keep, and whether you'd rather pay once or pay monthly. Here's how to decide without overbuying.</p></div></section>
 
@@ -108,7 +176,7 @@ footer{border-top:1px solid var(--line);padding:25px 0;color:var(--muted);font-s
 <div class="tip"><strong>Buy for the library, not the CPU.</strong> Most people's first upgrade isn't a faster processor — it's more drive space. Whatever you pick, think about how you'll add storage to it in a year.</div>
 </section>
 
-<section id="selfhosting"><div class="kicker">04 · Running it at home</div><h2>Self-hosting realities</h2>
+<section class="cyc" id="selfhosting" class="tinted"><div class="kicker">04 · Running it at home</div><h2>Self-hosting realities</h2>
 <p>The server itself is usually the easy part. The things that catch people out are the boring realities of a home internet connection.</p>
 <div class="card"><strong>Worth checking before you commit</strong>
 <ul style="margin-bottom:0">
@@ -131,7 +199,7 @@ footer{border-top:1px solid var(--line);padding:25px 0;color:var(--muted);font-s
 <p>The common pattern is a hybrid: bulk storage and media at home where drives are cheap, with a small VPS handling monitoring and the public-facing side of things. You get reliable remote access without paying monthly for terabytes.</p>
 </section>
 
-<section id="pricing"><div class="kicker">06 · What it costs</div><h2>Cost comparison</h2>
+<section id="pricing" class="tinted"><div class="kicker">06 · What it costs</div><h2>Cost comparison</h2>
 <p>Owned hardware costs more on day one and almost nothing after that. Rented hardware is the reverse. Over a couple of years the gap is usually wider than people expect.</p>
 <div class="prices">
 
@@ -174,56 +242,56 @@ footer{border-top:1px solid var(--line);padding:25px 0;color:var(--muted);font-s
 </div>
 </section>
 
-<section id="utilities"><div class="kicker">08 · Worth knowing about</div><h2>Other tools you might want</h2>
+<section id="utilities" class="tinted-peach"><div class="kicker">08 · Worth knowing about</div><h2>Other tools you might want</h2>
 <p>None of these are part of the core modules, and you don't need any of them to start. They're the things people tend to add once the server has been running a while and they've found the rough edges.</p>
 <div class="utils">
 
 <div class="ugroup"><strong>Getting to your server</strong><div class="ulist">
-<div class="util"><b>Tailscale</b><span>Mesh VPN that works around CGNAT with almost no setup</span></div>
-<div class="util"><b>Cloudflare Tunnel</b><span>Reach your services without opening any ports</span></div>
-<div class="util"><b>Nginx Proxy Manager</b><span>Reverse proxy and certificates with a friendly interface</span></div>
-<div class="util"><b>Caddy</b><span>Reverse proxy that handles HTTPS automatically</span></div>
-<div class="util"><b>WireGuard</b><span>Roll your own VPN back into your network</span></div>
+<a class="util" href="https://tailscale.com/" target="_blank" rel="noopener"><b>Tailscale</b><span>Mesh VPN that works around CGNAT with almost no setup</span></a>
+<a class="util" href="https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/" target="_blank" rel="noopener"><b>Cloudflare Tunnel</b><span>Reach your services without opening any ports</span></a>
+<a class="util" href="https://nginxproxymanager.com/" target="_blank" rel="noopener"><b>Nginx Proxy Manager</b><span>Reverse proxy and certificates with a friendly interface</span></a>
+<a class="util" href="https://caddyserver.com/" target="_blank" rel="noopener"><b>Caddy</b><span>Reverse proxy that handles HTTPS automatically</span></a>
+<a class="util" href="https://www.wireguard.com/" target="_blank" rel="noopener"><b>WireGuard</b><span>Roll your own VPN back into your network</span></a>
 </div></div>
 
 <div class="ugroup"><strong>Managing containers</strong><div class="ulist">
-<div class="util"><b>Arcane</b><span>The Docker manager this project is built around</span></div>
-<div class="util"><b>Portainer</b><span>The long-established alternative</span></div>
-<div class="util"><b>Dozzle</b><span>Live container logs in the browser</span></div>
-<div class="util"><b>Watchtower</b><span>Automatic image updates — use thoughtfully</span></div>
+<a class="util" href="https://github.com/getarcaneapp/arcane" target="_blank" rel="noopener"><b>Arcane</b><span>The Docker manager this project is built around</span></a>
+<a class="util" href="https://www.portainer.io/" target="_blank" rel="noopener"><b>Portainer</b><span>The long-established alternative</span></a>
+<a class="util" href="https://dozzle.dev/" target="_blank" rel="noopener"><b>Dozzle</b><span>Live container logs in the browser</span></a>
+<a class="util" href="https://containrrr.dev/watchtower/" target="_blank" rel="noopener"><b>Watchtower</b><span>Automatic image updates — use thoughtfully</span></a>
 </div></div>
 
 <div class="ugroup"><strong>Keeping an eye on things</strong><div class="ulist">
-<div class="util"><b>Glances</b><span>Quick overview of system resources</span></div>
-<div class="util"><b>Netdata</b><span>Detailed real-time metrics</span></div>
-<div class="util"><b>Scrutiny</b><span>Drive health monitoring, so failures aren't a surprise</span></div>
+<a class="util" href="https://nicolargo.github.io/glances/" target="_blank" rel="noopener"><b>Glances</b><span>Quick overview of system resources</span></a>
+<a class="util" href="https://www.netdata.cloud/" target="_blank" rel="noopener"><b>Netdata</b><span>Detailed real-time metrics</span></a>
+<a class="util" href="https://github.com/AnalogJ/scrutiny" target="_blank" rel="noopener"><b>Scrutiny</b><span>Drive health monitoring, so failures aren't a surprise</span></a>
 </div></div>
 
 <div class="ugroup"><strong>Backups</strong><div class="ulist">
-<div class="util"><b>Restic</b><span>Encrypted, deduplicated, straightforward</span></div>
-<div class="util"><b>Borg</b><span>Efficient deduplicating backups</span></div>
-<div class="util"><b>Rclone</b><span>Sync to almost any cloud storage</span></div>
-<div class="util"><b>Duplicati</b><span>Backups with a web interface</span></div>
+<a class="util" href="https://restic.net/" target="_blank" rel="noopener"><b>Restic</b><span>Encrypted, deduplicated, straightforward</span></a>
+<a class="util" href="https://www.borgbackup.org/" target="_blank" rel="noopener"><b>Borg</b><span>Efficient deduplicating backups</span></a>
+<a class="util" href="https://rclone.org/" target="_blank" rel="noopener"><b>Rclone</b><span>Sync to almost any cloud storage</span></a>
+<a class="util" href="https://duplicati.com/" target="_blank" rel="noopener"><b>Duplicati</b><span>Backups with a web interface</span></a>
 </div></div>
 
 <div class="ugroup"><strong>Locking things down</strong><div class="ulist">
-<div class="util"><b>Authelia</b><span>Single sign-on and two-factor in front of your apps</span></div>
-<div class="util"><b>Authentik</b><span>Fuller identity provider if you outgrow Authelia</span></div>
-<div class="util"><b>CrowdSec</b><span>Community-driven intrusion prevention</span></div>
-<div class="util"><b>Fail2ban</b><span>Blocks repeated failed login attempts</span></div>
+<a class="util" href="https://www.authelia.com/" target="_blank" rel="noopener"><b>Authelia</b><span>Single sign-on and two-factor in front of your apps</span></a>
+<a class="util" href="https://goauthentik.io/" target="_blank" rel="noopener"><b>Authentik</b><span>Fuller identity provider if you outgrow Authelia</span></a>
+<a class="util" href="https://www.crowdsec.net/" target="_blank" rel="noopener"><b>CrowdSec</b><span>Community-driven intrusion prevention</span></a>
+<a class="util" href="https://github.com/fail2ban/fail2ban" target="_blank" rel="noopener"><b>Fail2ban</b><span>Blocks repeated failed login attempts</span></a>
 </div></div>
 
 <div class="ugroup"><strong>More media</strong><div class="ulist">
-<div class="util"><b>Kometa</b><span>Better artwork and collections in Jellyfin</span></div>
-<div class="util"><b>Tdarr</b><span>Bulk transcoding so playback doesn't have to</span></div>
-<div class="util"><b>Audiobookshelf</b><span>Audiobooks and podcasts</span></div>
-<div class="util"><b>Kavita</b><span>Books, comics and manga</span></div>
+<a class="util" href="https://kometa.wiki/" target="_blank" rel="noopener"><b>Kometa</b><span>Better artwork and collections in Jellyfin</span></a>
+<a class="util" href="https://tdarr.io/" target="_blank" rel="noopener"><b>Tdarr</b><span>Bulk transcoding so playback doesn't have to</span></a>
+<a class="util" href="https://www.audiobookshelf.org/" target="_blank" rel="noopener"><b>Audiobookshelf</b><span>Audiobooks and podcasts</span></a>
+<a class="util" href="https://www.kavitareader.com/" target="_blank" rel="noopener"><b>Kavita</b><span>Books, comics and manga</span></a>
 </div></div>
 
 <div class="ugroup"><strong>Files</strong><div class="ulist">
-<div class="util"><b>Syncthing</b><span>Keep folders in sync between machines</span></div>
-<div class="util"><b>File Browser</b><span>Simple web access to your files</span></div>
-<div class="util"><b>Nextcloud</b><span>Fuller cloud replacement if you want one</span></div>
+<a class="util" href="https://syncthing.net/" target="_blank" rel="noopener"><b>Syncthing</b><span>Keep folders in sync between machines</span></a>
+<a class="util" href="https://filebrowser.org/" target="_blank" rel="noopener"><b>File Browser</b><span>Simple web access to your files</span></a>
+<a class="util" href="https://nextcloud.com/" target="_blank" rel="noopener"><b>Nextcloud</b><span>Fuller cloud replacement if you want one</span></a>
 </div></div>
 
 </div></section>
@@ -242,4 +310,23 @@ footer{border-top:1px solid var(--line);padding:25px 0;color:var(--muted);font-s
 
 </main></div>
 <footer><div class="wrap">Modular Media Server · <a href="documentation.html">Documentation</a> · <a href="platforms.html">Platforms</a> · <a href="index.html#generator">Build a stack</a> · Start small. Add what you need. Understand what you're running.</div></footer>
+<script>
+(function(){
+  var b=document.querySelector('.navbtn'), n=document.querySelector('nav');
+  if(!b||!n) return;
+  b.addEventListener('click',function(){
+    var open=n.classList.toggle('navopen');
+    b.setAttribute('aria-expanded',open?'true':'false');
+  });
+  n.addEventListener('click',function(e){
+    if(e.target.tagName==='A') n.classList.remove('navopen');
+  });
+  document.addEventListener('click',function(e){
+    if(!n.contains(e.target)) n.classList.remove('navopen');
+  });
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape') n.classList.remove('navopen');
+  });
+})();
+</script>
 </body></html>
