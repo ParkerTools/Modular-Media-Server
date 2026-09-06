@@ -127,7 +127,7 @@ details.qa,details.m,.shell,.genout{box-shadow:0 1px 2px rgba(21,51,59,.04),0 6p
 </style>
 </head>
 <body>
-<div class="wrap"><nav><a class="brand" href="index.html">modular<span>.</span>media</a><div class="navlinks"><a href="index.html">Home</a><a href="guide.html">Guide</a><a href="platforms.html">Platforms</a><a href="access.html">Access</a><a href="generator.html">Generator</a><a href="documentation.html">Documentation</a><a href="faq.html">Help</a></div><button class="navbtn" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button></nav></div>
+<div class="wrap"><nav><a class="brand" href="index.html">modular<span>.</span>media</a><div class="navlinks"><a href="index.html">Home</a><a href="guide.html">Guide</a><a href="platforms.html">Platforms</a><a href="setup.html">App setup</a><a href="access.html">Access</a><a href="generator.html">Generator</a><a href="documentation.html">Documentation</a><a href="faq.html">Help</a></div><button class="navbtn" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button></nav></div>
 
 <section class="hero"><div class="wrap"><div class="kicker">Access &amp; accounts</div><h1>Letting other people in, safely.</h1><p>Three related jobs: reaching your server from outside the house, giving everyone one login instead of nine, and deciding who can actually do what. They have to be done in that order, because single sign-on needs a real HTTPS address before it will work at all.</p></div></section>
 
@@ -430,7 +430,7 @@ app.immich:///oauth-callback   <span class="c"># for the mobile app</span></pre>
 
 <h3 id="jellyfin-oidc">Jellyfin — read this before starting</h3>
 <p>Jellyfin has no native OpenID Connect support. There's a community SSO plugin that works well, but it carries a limitation that matters enormously for a media server.</p>
-<div class="warning"><strong>The plugin only works in a web browser.</strong> Native clients — Swiftfin, Jellyfin for Android and Android TV, Roku, Kodi — cannot use SSO login at all. They need a normal Jellyfin username and password. If your family watches on a TV app, which is the usual case, every one of them still needs a Jellyfin account regardless of what you set up here.</div>
+<div class="warning"><strong>The plugin authenticates through the web interface or Quick Connect only.</strong> Native clients — Swiftfin, Jellyfin for Android and Android TV, Roku, Kodi — cannot use the SSO redirect flow directly. In practice, if your family watches on a TV app, every one of them still needs a normal Jellyfin account regardless of what you set up here.</div>
 <p>Native OIDC has been proposed upstream and is being worked on, but it isn't in a released version at the time of writing, and the discussion points at a future major release. Until then, this is the situation.</p>
 <p>Given that, decide honestly whether it's worth it:</p>
 <div class="two">
@@ -438,7 +438,7 @@ app.immich:///oauth-callback   <span class="c"># for the mobile app</span></pre>
 <div class="mini"><b>Skip it if</b><span>Everyone watches on TV apps. You'll maintain SSO that nobody's device can use, alongside the passwords they'll actually use.</span></div>
 </div>
 <h4>If you're proceeding</h4>
-<p>Install the SSO plugin by adding its repository under <b>Dashboard → Plugins → Repositories</b>, then install from the catalogue and restart Jellyfin.</p>
+<p>The original plugin was archived in May 2026. Use the maintained fork, which keeps the same plugin ID (so it upgrades in place) and adds a proper admin UI. Add its repository under <b>Administration → Plugins → Repositories</b>, install <b>SSO Authentication</b> from the catalogue, and restart Jellyfin.</p><pre>https://raw.githubusercontent.com/K0lin/jellyfin-plugin-sso/manifest-release/manifest.json</pre><div class="warning"><strong>Other forks exist, and at least one is explicitly pre-alpha.</strong> A plugin repository can install code on your server, so check what you are adding.</div>
 <p>In Pocket ID, create a client whose callback URL follows the plugin's pattern — the provider name at the end is whatever you choose to call it, and must match on both sides:</p>
 <pre>https://jellyfin.example.com/sso/OID/redirect/<span class="p">pocketid</span></pre>
 <p>Configure the plugin with your issuer URL, client ID and secret, enable it, tick folder access, and <strong>restart Jellyfin</strong> — configuration changes don't take effect until you do.</p>
