@@ -4,6 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Modular Media Server</title>
+<meta name="description" content="Build the server you actually want. A friendly guide and Compose generator for self-hosting your own media stack with Docker.">
+<link rel="canonical" href="https://parkertools.github.io/Modular-Media-Server/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Modular Media Server">
+<meta property="og:title" content="Modular Media Server">
+<meta property="og:description" content="Build the server you actually want. A friendly guide and Compose generator for self-hosting your own media stack with Docker.">
+<meta property="og:url" content="https://parkertools.github.io/Modular-Media-Server/">
+<meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#0081A7">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230081A7'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23FDFCDC'/%3E%3Ccircle cx='16' cy='16' r='2.5' fill='%23F07167'/%3E%3C/svg%3E">
+
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap');
 :root{--blue:#0081A7;--teal:#00AFB9;--cream:#FDFCDC;--peach:#FED9B7;--coral:#F07167;--ink:#15333b;--muted:#587078;--white:#fffef7;--line:#cfe3e4}
@@ -25,9 +36,9 @@ h1,h2,h3{font-family:Fraunces,serif;letter-spacing:-.045em;line-height:1.03}h1{f
 </style>
 </head>
 <body>
-<div class="wrap"><nav><div class="brand">modular<span>.</span>media</div><div class="navlinks"><a href="guide.html">Guide</a><a href="platforms.html">Platforms</a><a href="#how">How it works</a><a href="#apps">Apps</a><a href="#generator">Generator</a><a href="access.html">Access</a><a href="documentation.html">Documentation</a><a href="hardware.html">Hardware</a><a href="faq.html">Help</a><a href="#safety">Safety</a></div></nav></div>
+<div class="wrap"><nav><div class="brand">modular<span>.</span>media</div><div class="navlinks"><a href="guide.html">Guide</a><a href="platforms.html">Platforms</a><a href="#how">How it works</a><a href="#apps">Apps</a><a href="generator.html">Generator</a><a href="access.html">Access</a><a href="documentation.html">Documentation</a><a href="hardware.html">Hardware</a><a href="faq.html">Help</a><a href="#safety">Safety</a></div></nav></div>
 
-<section class="hero"><div class="wrap"><div class="kicker">A calmer way to self-host</div><h1>Build the server you actually want.</h1><p>Modular Media Server is a friendly guide and Compose generator for putting together your own little corner of the internet. Start with one thing. Add another when you need it.</p><div class="buttons"><a class="btn" href="#generator">Build a stack</a><a class="btn alt" href="guide.html">Set it up</a><a class="btn alt" href="documentation.html">Read the docs</a></div></div></section>
+<section class="hero"><div class="wrap"><div class="kicker">A calmer way to self-host</div><h1>Build the server you actually want.</h1><p>Modular Media Server is a friendly guide and Compose generator for putting together your own little corner of the internet. Start with one thing. Add another when you need it.</p><div class="buttons"><a class="btn" href="generator.html">Build a stack</a><a class="btn alt" href="guide.html">Set it up</a><a class="btn alt" href="documentation.html">Read the docs</a></div></div></section>
 
 <section class="section" id="how"><div class="wrap"><div class="kicker">No giant mystery box</div><h2>Take it one piece at a time.</h2><p class="lead">Pick the services you want and the generator handles the boring connections between them, while still showing you what is happening.</p><div class="grid4">
 <div class="card"><div class="num">01</div><h3>Pick your pieces</h3><p>Choose media, photos, monitoring, downloads, archives and more.</p></div>
@@ -54,7 +65,7 @@ h1,h2,h3{font-family:Fraunces,serif;letter-spacing:-.045em;line-height:1.03}h1{f
 <div class="app"><div class="app-top"><h3>Tube Archivist</h3><span class="tag">Archives</span></div><p>A self-hosted YouTube media server for downloading, organizing and watching your personal video archive.</p><div class="source"><a href="https://www.tubearchivist.com/" target="_blank" rel="noopener">Website</a><a href="https://github.com/tubearchivist/tubearchivist" target="_blank" rel="noopener">Source</a><a href="https://docs.tubearchivist.com/" target="_blank" rel="noopener">Docs</a></div></div>
 </div></div></section>
 
-<section class="generator" id="generator"><div class="wrap"><div class="kicker" style="color:var(--peach)">The useful bit</div><h2>Let's build something.</h2><p class="lead">A guided setup instead of a wall of YAML.</p>
+<section class="generator" id="generator"><div class="wrap"><div class="kicker" style="color:var(--peach)">The useful bit</div><h2>Let's build something.</h2><p class="lead">A guided setup instead of a wall of YAML. Try the preview below, or go straight to the full generator.</p><div class="buttons" style="margin-top:6px"><a class="btn alt" href="generator.html">Open the full generator</a></div>
 <div class="shell"><div class="ghead"><span>Modular Media Server / Builder</span><span id="pct">14%</span></div><div class="progress"><div class="bar" id="bar"></div></div><div class="body"><div class="side" id="steps"></div><div class="main" id="main"></div></div></div></div></section>
 
 <section class="section" id="safety"><div class="wrap"><div class="about"><div><div class="kicker">A small but important thing</div><h2>Self-hosting comes with responsibility.</h2><p class="lead">This project helps you run software. It does not give you permission to download, archive, copy or distribute media you do not have the right to use.</p><div class="note"><strong>Torrents are also a security concern.</strong><br>Files can come from untrusted sources and may contain malware, ransomware, trojans, cryptominers or malicious scripts. A VPN can protect network privacy; it cannot make a malicious file safe.</div></div><div class="blob"><p>Own your server.<br>Know what's running on it.</p></div></div><div class="legal"><strong>Copyright:</strong> Only obtain, store, archive and share content you are legally permitted to use. This project does not provide or endorse piracy. <strong>Security:</strong> Keep your host, Docker engine, images and applications updated; do not blindly execute downloaded programs or scripts; use sensible firewall and network controls; and keep backups. This is general information, not legal or security advice.</div></div></section>
@@ -74,7 +85,7 @@ function storage(){main.innerHTML=`<h3>Where should everything live?</h3><p>Set 
 function creds(){main.innerHTML=`<h3>Any keys to bring along?</h3><p>API keys and provider credentials will live in <code>.env</code>.</p><div class="note"><strong>Nothing is sent anywhere in this prototype.</strong><br>A production version should make credential handling explicit and secure.</div>${actions()}`}
 function secrets(){main.innerHTML=`<h3>Making the secret sauce.</h3><p>Internal passwords and encryption secrets can be generated locally with secure browser randomness.</p><div class="options"><div class="option selected"><b>32-character secrets</b><span>Generated in your browser.</span></div><div class="option"><b>.env protection</b><span>The package ignores .env.</span></div></div>${actions()}`}
 function validate(){main.innerHTML=`<h3>One last look.</h3><p>Everything important gets a quick check before we hand over the files.</p><div class="note"><strong>✓ Modules selected<br>✓ Dependencies resolved<br>✓ Storage paths configured<br>✓ Secrets ready</strong></div>${actions(true,"Generate my files")}`}
-function finish(){main.innerHTML=`<h3>There we go.</h3><p>Your stack is ready to review.</p><div class="note"><strong>docker-compose.yml</strong><br>.env<br>.env.example<br>.gitignore<br>README.md</div><div class="actions"><button class="gen-btn back" onclick="n=0;selected.clear();render()">Start over</button><button class="gen-btn" onclick="alert('The production generator will download the generated package here.')">Download package</button></div>`}
+function finish(){main.innerHTML=`<h3>There we go.</h3><p>That is the shape of it. The full generator resolves dependencies, generates your secrets and writes every file — including a Caddyfile if you add a reverse proxy.</p><div class="note"><strong>docker-compose.yml</strong><br>.env<br>.env.example<br>.gitignore<br>Caddyfile<br>README.md</div><div class="actions"><button class="gen-btn back" onclick="n=0;selected.clear();render()">Start over</button><a class="gen-btn" href="generator.html" style="text-decoration:none;display:inline-block">Open the full generator</a></div>`}
 function go(d){n=Math.max(0,Math.min(6,n+d));render()}render();
 </script>
 </body>
