@@ -1164,6 +1164,32 @@ function renderStorage(){
 }
 
 /* ── connection ── */
+
+/* Updates just the domain-dependent text, leaving the input untouched
+   so the caret and focus survive typing. */
+function updateDomainPreview(){
+  var d = state.domain || "example.com";
+  var dns = $("dnsbox");
+  if(dns){
+    var names = [];
+    state.selected.forEach(function(id){
+      var m = M[id];
+      if(m.proxy && ["arcane","qbittorrent","sonarr","radarr","lidarr","bazarr",
+                     "jackett","tubearchivist","archivebox"].indexOf(id) === -1)
+        names.push(m.proxy + "." + d + " \u2192 " + m.name);
+    });
+    dns.innerHTML = "<strong>DNS records you will need</strong><p style='margin:10px 0 0'>"
+      + (names.length ? names.join("<br>") : "No public services selected.") + "</p>";
+  }
+  var pid = $("pidbox");
+  if(pid){
+    pid.innerHTML = "<strong>Passkeys need real HTTPS.</strong><p style='margin:10px 0 0'>"
+      + "Pocket ID will live at <code>https://id." + d + "</code>. "
+      + "Browsers only allow passkey registration on a proper HTTPS origin \u2014 you cannot use a bare "
+      + "LAN address. Finish DNS and certificates before setting it up.</p>";
+  }
+}
+
 function renderConn(){
   var hasCaddy = state.selected.indexOf("caddy") !== -1,
       hasTs    = state.selected.indexOf("tailscale") !== -1,
@@ -1189,7 +1215,17 @@ function renderConn(){
     var f = el("div","f wide");
     var lab = el("label",null,"Your domain"); lab.setAttribute("for","dom"); f.appendChild(lab);
     var i = el("input"); i.id = "dom"; i.value = state.domain; i.placeholder = "example.com";
-    i.oninput = function(){ state.domain = i.value.trim().replace(/^https?:\/\//,"").replace(/\/$/,""); renderConn(); };
+    // Never re-render the pane from oninput — that destroys this very
+    // input and drops focus after each keystroke. Patch in place instead.
+    i.oninput = function(){
+      state.domain = i.value.replace(/^https?:\/\//,"").replace(/\s+/g,"").replace(/\/+$/,"");
+      updateDomainPreview();
+    };
+    // Tidy up only once they leave the field, so typing is never fought.
+    i.onblur = function(){
+      i.value = state.domain;
+      updateDomainPreview();
+    };
     f.appendChild(i);
     var h = el("div","hint");
     h.innerHTML = "Just the domain, no <code>https://</code>. It must already point at this machine.";
@@ -1201,7 +1237,7 @@ function renderConn(){
       if(m.proxy && ["arcane","qbittorrent","sonarr","radarr","lidarr","bazarr","jackett","tubearchivist","archivebox"].indexOf(id)===-1)
         names.push(m.proxy + "." + (state.domain || "example.com") + " → " + m.name);
     });
-    var c = el("div","card");
+    var c = el("div","card"); c.id = "dnsbox";
     c.innerHTML = "<strong>DNS records you will need</strong><p style='margin:10px 0 0'>"
       + (names.length ? names.join("<br>") : "No public services selected.")
       + "</p>";
@@ -1224,7 +1260,7 @@ function renderConn(){
   }
 
   if(hasPid){
-    var p = el("div","card peach");
+    var p = el("div","card peach"); p.id = "pidbox";
     p.innerHTML = "<strong>Passkeys need real HTTPS.</strong><p style='margin:10px 0 0'>"
       + "Pocket ID will live at <code>https://id." + (state.domain || "example.com") + "</code>. "
       + "Browsers only allow passkey registration on a proper HTTPS origin — you cannot use a bare "
