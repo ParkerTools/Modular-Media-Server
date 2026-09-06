@@ -168,10 +168,12 @@ details.qa,details.m,.shell,.genout{box-shadow:0 1px 2px rgba(21,51,59,.04),0 6p
 .qs-expand{font-family:inherit;font-size:13px;font-weight:700;background:none;border:1px solid var(--line);border-radius:999px;padding:7px 14px;color:var(--muted);cursor:pointer}
 .qs-expand:hover{border-color:var(--teal);color:var(--blue)}
 .qs-signpost{margin-top:20px;font-size:15px;background:var(--white);border:1px solid var(--line);border-radius:14px;padding:14px 17px;display:inline-block}
+.qs-cli{background:#eaf8f7;border:1px solid #bfe3e2;border-radius:16px;padding:15px 18px;margin:0 0 26px;font-size:14.5px;line-height:1.7}
+.qs-cli b{color:var(--ink)}
 </style>
 </head>
 <body>
-<div class="wrap"><nav><div class="brand">modular<span>.</span>media</div><div class="navlinks"><a href="#quickstart">Quickstart</a><a href="guide.html">Guide</a><a href="platforms.html">Platforms</a><a href="#how">How it works</a><a href="#apps">Apps</a><a href="generator.html">Generator</a><a href="access.html">Access</a><a href="documentation.html">Documentation</a><a href="hardware.html">Hardware</a><a href="faq.html">Help</a><a href="#safety">Safety</a></div><button class="navbtn" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button></nav></div>
+<div class="wrap"><nav><div class="brand">modular<span>.</span>media</div><div class="navlinks"><a href="#quickstart">Quickstart</a><a href="guide.html">Guide</a><a href="platforms.html">Platforms</a><a href="#how">How it works</a><a href="#apps">Apps</a><a href="generator.html">Generator</a><a href="setup.html">App setup</a><a href="access.html">Access</a><a href="documentation.html">Documentation</a><a href="hardware.html">Hardware</a><a href="faq.html">Help</a><a href="#safety">Safety</a></div><button class="navbtn" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button></nav></div>
 
 <section class="hero"><div class="wrap"><div class="kicker">A calmer way to self-host</div><h1>Build the server you actually want.</h1><p>Modular Media Server is a friendly guide and Compose generator for putting together your own little corner of the internet. Start with one thing. Add another when you need it.</p><div class="buttons"><a class="btn" href="generator.html">Build a stack</a><a class="btn alt" href="#quickstart">Follow the quickstart</a></div></div></section>
 
@@ -238,6 +240,13 @@ details.qa,details.m,.shell,.genout{box-shadow:0 1px 2px rgba(21,51,59,.04),0 6p
 <div class="qs-need">
 <b>You need:</b> a machine that stays on — a mini PC, an old laptop, a NAS or a VPS — with Docker installed.
 <a href="platforms.html">Docker setup for Windows, macOS, Linux or NAS →</a>
+</div>
+
+<div class="qs-cli">
+<b>About the command line.</b> Step one is the only place you have to type commands, and they are all copy-and-paste.
+Once Arcane is running, everything after it — including every service you add later — is done by clicking in a browser.
+If that is still more than you want, a Synology or QNAP NAS can create the Arcane container from its own app store
+with no terminal at all.
 </div>
 
 <div class="qs-meta"><span><b>7 steps</b> · about 30 minutes</span><button class="qs-expand" id="qsx">Expand all</button></div>
