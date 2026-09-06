@@ -1,0 +1,1303 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Compose Generator · Modular Media Server</title>
+<meta name="description" content="Pick your modules and get a complete Docker Compose stack: dependencies resolved, secrets generated in your browser, files ready to deploy.">
+<link rel="canonical" href="https://parkertools.github.io/Modular-Media-Server/generator.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Modular Media Server">
+<meta property="og:title" content="Compose generator · Modular Media Server">
+<meta property="og:description" content="Pick your modules and get a complete Docker Compose stack: dependencies resolved, secrets generated in your browser, files ready to deploy.">
+<meta property="og:url" content="https://parkertools.github.io/Modular-Media-Server/generator.html">
+<meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#0081A7">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230081A7'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23FDFCDC'/%3E%3Ccircle cx='16' cy='16' r='2.5' fill='%23F07167'/%3E%3C/svg%3E">
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap');
+:root{--blue:#0081A7;--teal:#00AFB9;--cream:#FDFCDC;--peach:#FED9B7;--coral:#F07167;--ink:#15333b;--muted:#587078;--white:#fffef7;--line:#cfe3e4}
+*{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font-family:"DM Sans",sans-serif}
+a{color:var(--blue);text-decoration:none}a:hover{color:var(--coral)}
+.wrap{max-width:1240px;margin:auto;padding:0 24px}
+nav{height:78px;display:flex;align-items:center;justify-content:space-between}
+.brand{font-weight:700;font-size:18px;letter-spacing:-.04em;color:var(--ink)}.brand span{color:var(--coral)}
+.navlinks{display:flex;gap:22px;color:var(--muted);font-size:14px}.navlinks a{color:var(--muted)}.navlinks a:hover{color:var(--blue)}
+h1,h2,h3{font-family:Fraunces,serif;letter-spacing:-.045em;line-height:1.05}
+.head{padding:34px 0 26px}.kicker{text-transform:uppercase;letter-spacing:.15em;font-size:12px;font-weight:700;color:var(--blue)}
+h1{font-size:clamp(38px,5.5vw,58px);margin:14px 0 12px;max-width:800px}
+.head p{color:var(--muted);font-size:17px;line-height:1.7;max-width:660px;margin:0}
+p,li{color:var(--muted);line-height:1.7}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.87em;background:#eaf8f7;padding:2px 6px;border-radius:6px;color:#0e5a63}
+
+/* stepper */
+.steps{display:flex;gap:6px;flex-wrap:wrap;padding:4px 0 22px;border-bottom:1px solid var(--line);margin-bottom:26px}
+.stepbtn{font-family:inherit;font-size:13.5px;font-weight:700;padding:9px 16px;border-radius:999px;border:1px solid var(--line);background:var(--white);color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:8px}
+.stepbtn:hover{border-color:var(--teal);color:var(--blue)}
+.stepbtn.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.stepbtn .n{display:inline-grid;place-items:center;width:19px;height:19px;border-radius:50%;background:#dfeef0;color:var(--blue);font-size:11px}
+.stepbtn.on .n{background:rgba(255,255,255,.25);color:#fff}
+.stepbtn.done{border-color:#a9dde0;background:#eaf8f7;color:var(--blue)}
+
+.pane{display:none}.pane.on{display:block}
+h2.ph{font-size:32px;margin:0 0 10px}.pd{color:var(--muted);font-size:15.5px;line-height:1.7;max-width:680px;margin:0 0 24px}
+
+/* module picker */
+.build{display:grid;grid-template-columns:1fr 330px;gap:22px;align-items:start}
+.cat{margin-bottom:24px}
+.cath{display:flex;align-items:center;gap:10px;font-family:ui-monospace,monospace;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:10px}
+.cath .bar{height:2px;width:22px;border-radius:2px;background:var(--teal)}
+.mods{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.mod{background:var(--white);border:1px solid var(--line);border-radius:15px;padding:14px 15px;cursor:pointer;transition:.13s;position:relative;user-select:none}
+.mod:hover{border-color:var(--teal)}
+.mod.on{background:#eaf8f7;border-color:var(--teal)}
+.mod.auto{background:#fff1e4;border-color:#f4c8a6}
+.mod .top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:3px}
+.mod b{font-size:14.5px;letter-spacing:-.02em;color:var(--ink)}
+.mod .pt{font-family:ui-monospace,monospace;font-size:10.5px;color:var(--muted)}
+.mod p{font-size:12.5px;margin:0;line-height:1.5}
+.mod .flag{display:inline-block;margin-top:6px;font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:999px;background:#ffe0dc;color:#96382f}
+.mod .flag.auto{background:var(--peach);color:#744b32}
+.mod .tick{position:absolute;top:13px;right:13px;width:16px;height:16px;border-radius:50%;border:1.5px solid var(--line);background:#fff}
+.mod.on .tick{background:var(--teal);border-color:var(--teal)}
+.mod.on .tick:after{content:"";position:absolute;left:4px;top:5px;width:7px;height:3.5px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg)}
+.mod.on .top,.mod.auto .top{padding-right:22px}
+
+/* stack panel */
+.side{position:sticky;top:16px;background:var(--white);border:1px solid var(--line);border-radius:20px;padding:20px}
+.side h3{font-size:19px;margin:0 0 4px}
+.side .sub{font-size:12.5px;color:var(--muted);margin-bottom:14px}
+.stacklist{list-style:none;padding:0;margin:0 0 14px;max-height:340px;overflow:auto}
+.stacklist li{font-size:13.5px;padding:6px 9px;border-radius:8px;display:flex;justify-content:space-between;gap:8px;color:var(--ink)}
+.stacklist li.dep{color:var(--muted);font-size:12.5px;padding-left:20px}
+.stacklist li.dep:before{content:"└ ";color:var(--coral)}
+.stacklist li .x{color:var(--muted);cursor:pointer;font-size:15px;line-height:1}
+.stacklist li .x:hover{color:var(--coral)}
+.empty{font-size:13px;color:var(--muted);padding:14px 0;text-align:center}
+.presets{border-top:1px solid var(--line);padding-top:14px}
+.presets b{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:9px}
+.pbtn{font-family:inherit;font-size:12.5px;padding:6px 11px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer;margin:0 5px 5px 0}
+.pbtn:hover{border-color:var(--teal);color:var(--blue)}
+
+/* forms */
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:760px}
+.f{display:flex;flex-direction:column;gap:5px;margin-bottom:4px}
+.f label{font-size:13px;font-weight:700;color:var(--ink)}
+.f .hint{font-size:12px;color:var(--muted);line-height:1.5}
+.f input,.f select{font-family:inherit;font-size:14px;color:var(--ink);background:var(--white);border:1px solid var(--line);border-radius:11px;padding:11px 13px;outline:none;width:100%}
+.f input:focus,.f select:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,175,185,.12)}
+.f input.bad{border-color:var(--coral);background:#fff6f4}
+.wide{grid-column:1/-1}
+.toggle{display:flex;gap:10px;margin:6px 0 20px;flex-wrap:wrap}
+.tg{flex:1;min-width:230px;background:var(--white);border:1px solid var(--line);border-radius:16px;padding:16px;cursor:pointer}
+.tg.on{background:#eaf8f7;border-color:var(--teal)}
+.tg b{display:block;font-size:14.5px;color:var(--ink);margin-bottom:4px;letter-spacing:-.02em}
+.tg span{font-size:12.5px;color:var(--muted);line-height:1.55}
+.tg .rec{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px;background:#d3f0ef;color:#0e5a63;margin-left:6px}
+
+.card{background:var(--white);border:1px solid var(--line);border-radius:18px;padding:20px;margin:18px 0}
+.card.teal{background:#eaf8f7;border-color:#a9dde0}.card.peach{background:#fff1e4;border-color:#f4c8a6}
+.card strong{color:var(--ink)}
+.warning{border-left:5px solid var(--coral);background:#fff0e3;padding:15px 17px;border-radius:0 14px 14px 0;margin:16px 0;font-size:14.5px}
+.tip{border-left:5px solid var(--teal);background:#eaf8f7;padding:15px 17px;border-radius:0 14px 14px 0;margin:16px 0;font-size:14.5px}
+.warning strong,.tip strong{color:var(--ink)}
+
+/* validation */
+.vlist{list-style:none;padding:0;margin:0}
+.vlist li{display:flex;gap:11px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line);font-size:14.5px}
+.vlist li:last-child{border-bottom:none}
+.vi{flex-shrink:0;width:19px;height:19px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;color:#fff;margin-top:1px}
+.vi.ok{background:#2f9e73}.vi.warn{background:var(--peach);color:#744b32}.vi.err{background:var(--coral)}
+.vtext b{color:var(--ink)}
+.vtext span{display:block;font-size:13px;color:var(--muted);margin-top:2px;line-height:1.5}
+
+/* output */
+.tabs{display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--line);margin-bottom:0;padding-bottom:0}
+.tab{font-family:ui-monospace,monospace;font-size:12.5px;padding:10px 15px;border:none;background:none;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab:hover{color:var(--ink)}
+.tab.on{color:var(--blue);border-bottom-color:var(--blue);font-weight:700}
+.outwrap{background:#15333b;border-radius:0 0 16px 16px;overflow:hidden}
+.outbar{display:flex;justify-content:space-between;align-items:center;padding:11px 16px;background:#0f272e}
+.outname{font-family:ui-monospace,monospace;font-size:12px;color:#8fb3ae}
+.outacts{display:flex;gap:7px}
+.sbtn{font-family:inherit;font-size:12px;font-weight:700;padding:6px 12px;border-radius:8px;border:1px solid #2c4a52;background:transparent;color:#cfe3e4;cursor:pointer}
+.sbtn:hover{border-color:var(--teal);color:#fff}
+pre{margin:0;padding:19px;overflow:auto;max-height:520px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;line-height:1.65;color:#fdfcdc;white-space:pre}
+.btn{display:inline-block;border-radius:999px;padding:13px 24px;font-weight:700;font-size:15px;background:var(--blue);color:#fff;border:none;cursor:pointer;font-family:inherit}
+.btn:hover{background:#00688a;color:#fff}
+.btn:disabled{background:#b9ccd0;cursor:not-allowed}
+.btn.coral{background:var(--coral)}.btn.coral:hover{background:#d95a51}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}.btn.ghost:hover{background:transparent;border-color:var(--teal);color:var(--blue)}
+.nav2{display:flex;justify-content:space-between;gap:12px;margin:32px 0 60px;padding-top:22px;border-top:1px solid var(--line);flex-wrap:wrap}
+.count{font-size:13px;color:var(--muted)}
+footer{border-top:1px solid var(--line);padding:24px 0;color:var(--muted);font-size:13px}
+@media(max-width:980px){.navlinks{display:none}.build{grid-template-columns:1fr}.side{position:static}.mods{grid-template-columns:1fr}.fgrid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap"><nav><a class="brand" href="index.html">modular<span>.</span>media</a>
+<div class="navlinks"><a href="index.html">Home</a><a href="guide.html">Guide</a><a href="platforms.html">Platforms</a><a href="access.html">Access</a><a href="documentation.html">Documentation</a><a href="faq.html">Help</a></div></nav></div>
+
+<div class="wrap">
+<div class="head">
+<div class="kicker">Compose generator</div>
+<h1>Build your stack.</h1>
+<p>Pick what you want. Dependencies get added automatically, secrets are generated in your browser, and you get a complete set of files ready to deploy. Nothing is uploaded anywhere — this all runs locally on this page.</p>
+</div>
+
+<div class="steps" id="steps"></div>
+
+<!-- 1 MODULES -->
+<div class="pane on" id="pane-0">
+<h2 class="ph">Choose your modules</h2>
+<p class="pd">Click to add or remove. Required dependencies are pulled in for you and shown in amber — qBittorrent will always bring Gluetun with it.</p>
+<div class="build">
+<div id="cats"></div>
+<aside class="side">
+<h3>Your stack</h3>
+<div class="sub" id="stackcount">Nothing selected yet</div>
+<ul class="stacklist" id="stacklist"></ul>
+<div class="presets"><b>Or start from a preset</b><div id="presets"></div></div>
+</aside>
+</div>
+</div>
+
+<!-- 2 STORAGE -->
+<div class="pane" id="pane-1">
+<h2 class="ph">Storage</h2>
+<p class="pd">Where things live on your server. The layout choice below matters more than it looks — it decides whether finished downloads are moved instantly or copied, using twice the disk.</p>
+
+<div class="toggle" id="layout"></div>
+<div id="layoutnote"></div>
+
+<div class="fgrid" id="storagefields"></div>
+
+<div class="fgrid" style="margin-top:20px">
+<div class="f"><label for="puid">PUID</label><input id="puid" value="1000"><div class="hint">Run <code>id</code> on your server. On Docker Desktop, leave at 1000.</div></div>
+<div class="f"><label for="pgid">PGID</label><input id="pgid" value="1000"><div class="hint">The group id that should own your files.</div></div>
+<div class="f wide"><label for="tz">Timezone</label><input id="tz" placeholder="Europe/London"><div class="hint">An IANA name, like <code>America/New_York</code>. Detected from your browser.</div></div>
+</div>
+</div>
+
+<!-- 3 CONNECTION -->
+<div class="pane" id="pane-2">
+<h2 class="ph">Connection</h2>
+<p class="pd" id="conndesc"></p>
+<div id="connbody"></div>
+</div>
+
+<!-- 4 CREDENTIALS -->
+<div class="pane" id="pane-3">
+<h2 class="ph">Credentials</h2>
+<p class="pd" id="creddesc"></p>
+<div id="credbody"></div>
+</div>
+
+<!-- 5 SECRETS -->
+<div class="pane" id="pane-4">
+<h2 class="ph">Secrets</h2>
+<p class="pd">Generated in your browser with <code>crypto.getRandomValues</code> — the same source of randomness your browser uses for HTTPS. They never leave this page.</p>
+<div id="secretbody"></div>
+</div>
+
+<!-- 6 REVIEW -->
+<div class="pane" id="pane-5">
+<h2 class="ph">Review</h2>
+<p class="pd">A last check before the files are written.</p>
+<div class="card"><ul class="vlist" id="vlist"></ul></div>
+<div id="vsummary"></div>
+</div>
+
+<!-- 7 OUTPUT -->
+<div class="pane" id="pane-6">
+<h2 class="ph">Your files</h2>
+<p class="pd">Copy each one, or download them. Put them all in the same folder and run <code>docker compose up -d</code> — or paste the Compose and environment files into an Arcane project.</p>
+<div style="margin-bottom:14px"><button class="btn" id="dlall">Download all files</button> <button class="btn ghost" id="regen">Regenerate secrets</button></div>
+<div class="tabs" id="filetabs"></div>
+<div class="outwrap">
+<div class="outbar"><span class="outname" id="outname"></span>
+<div class="outacts"><button class="sbtn" id="copyone">Copy</button><button class="sbtn" id="dlone">Download</button></div></div>
+<pre id="outbody"></pre>
+</div>
+<div id="postnotes"></div>
+</div>
+
+<div class="nav2">
+<button class="btn ghost" id="back">Back</button>
+<span class="count" id="stepcount"></span>
+<button class="btn" id="next">Continue</button>
+</div>
+</div>
+
+<footer><div class="wrap">Modular Media Server · <a href="guide.html">Guide</a> · <a href="access.html">Access</a> · <a href="faq.html">Help</a> · Start small. Add what you need. Understand what you're running.</div></footer>
+
+<script>
+/* ══════════════ GENERATOR CORE — pure logic, no DOM ══════════════ */
+var CORE = (function(){
+"use strict";
+
+var CATS = [
+  {id:"media",   name:"Media serving"},
+  {id:"auto",    name:"Automation"},
+  {id:"dl",      name:"Downloads"},
+  {id:"photos",  name:"Photos & music"},
+  {id:"monitor", name:"Monitoring & archives"},
+  {id:"conn",    name:"Connection"},
+  {id:"auth",    name:"Authentication"},
+  {id:"manage",  name:"Management"}
+];
+
+// p() resolves a path for the chosen storage layout.
+function p(c, kind){
+  if(c.unified){
+    if(kind==="downloads") return "${DATA_ROOT}/downloads";
+    if(kind==="media")     return "${DATA_ROOT}/media";
+    return "${DATA_ROOT}";
+  }
+  if(kind==="downloads") return "${DOWNLOADS_ROOT}";
+  return "${MEDIA_ROOT}";
+}
+// Volume lines for an *arr app: one shared mount when unified, two when not.
+function arrVols(c, sub){
+  if(c.unified) return ["      - ${DATA_ROOT}:/data"];
+  return ["      - ${MEDIA_ROOT}/"+sub+":/"+sub, "      - ${DOWNLOADS_ROOT}:/downloads"];
+}
+function arrLib(c, sub){ return c.unified ? "/data/media/"+sub : "/"+sub; }
+
+var MODULES = {
+
+  /* ── media ── */
+  jellyfin:{cat:"media",name:"Jellyfin",port:8096,proxy:"jellyfin",sub:"jellyfin",
+    desc:"Media server for films, TV and music.",
+    compose:function(c){
+      var v = c.unified ? "      - ${DATA_ROOT}/media:/media:ro" : "      - ${MEDIA_ROOT}:/media:ro";
+      return ["","  jellyfin:","    image: jellyfin/jellyfin:latest","    container_name: jellyfin",
+      "    user: \"${PUID}:${PGID}\"","    ports:","      - \"8096:8096\"","    volumes:",
+      "      - ${CONFIG_ROOT}/jellyfin/config:/config","      - ${CONFIG_ROOT}/jellyfin/cache:/cache",v,
+      "    environment:","      - TZ=${TZ}",
+      "    # Intel QuickSync transcoding on native Linux only — not on Docker Desktop.",
+      "    # devices:","    #   - /dev/dri:/dev/dri","    restart: unless-stopped"].join("\n");}},
+
+  jellyseerr:{cat:"media",name:"Jellyseerr",port:5055,proxy:"requests",recommends:["jellyfin"],
+    desc:"Request and discovery front end for your household.",
+    compose:function(){return ["","  jellyseerr:","    image: fallenbagel/jellyseerr:latest",
+      "    container_name: jellyseerr","    ports:","      - \"5055:5055\"","    volumes:",
+      "      - ${CONFIG_ROOT}/jellyseerr:/app/config","    environment:","      - TZ=${TZ}",
+      "    restart: unless-stopped"].join("\n");}},
+
+  /* ── automation ── */
+  sonarr:{cat:"auto",name:"Sonarr",port:8989,desc:"Automated TV series management.",
+    compose:function(c){return arr("sonarr",8989,c,"tv");}},
+  radarr:{cat:"auto",name:"Radarr",port:7878,desc:"Automated film management.",
+    compose:function(c){return arr("radarr",7878,c,"movies");}},
+  lidarr:{cat:"auto",name:"Lidarr",port:8686,desc:"Automated music collection management.",
+    compose:function(c){return arr("lidarr",8686,c,"music");}},
+  bazarr:{cat:"auto",name:"Bazarr",port:6767,recommends:["sonarr","radarr"],
+    desc:"Fetches subtitles for Sonarr and Radarr libraries.",
+    compose:function(c){
+      var v = c.unified ? ["      - ${DATA_ROOT}:/data"]
+                        : ["      - ${MEDIA_ROOT}/movies:/movies","      - ${MEDIA_ROOT}/tv:/tv"];
+      return ["","  bazarr:","    image: lscr.io/linuxserver/bazarr:latest","    container_name: bazarr",
+      "    ports:","      - \"6767:6767\"","    volumes:","      - ${CONFIG_ROOT}/bazarr:/config"]
+      .concat(v).concat(["    environment:","      - PUID=${PUID}","      - PGID=${PGID}",
+      "      - TZ=${TZ}","    restart: unless-stopped"]).join("\n");}},
+
+  /* ── downloads ── */
+  gluetun:{cat:"dl",name:"Gluetun",desc:"VPN container. Everything that downloads routes through it.",
+    needsVpn:true,
+    compose:function(c){
+      var ports=[];
+      if(c.has("qbittorrent")) ports.push("      - \"8080:8080\"   # qBittorrent web UI",
+                                          "      - \"6881:6881\"","      - \"6881:6881/udp\"");
+      if(c.has("jackett"))     ports.push("      - \"9117:9117\"   # Jackett");
+      if(!ports.length)        ports.push("      # nothing published — no VPN-routed service selected");
+      var creds = c.vpnType==="wireguard"
+        ? ["      - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}",
+           "      - WIREGUARD_ADDRESSES=${WIREGUARD_ADDRESSES}"]
+        : ["      - OPENVPN_USER=${OPENVPN_USER}","      - OPENVPN_PASSWORD=${OPENVPN_PASSWORD}"];
+      return ["","  # Containers using network_mode: service:gluetun publish their ports here,",
+      "  # because they share this container's network stack.",
+      "  gluetun:","    image: qmcgaw/gluetun:latest","    container_name: gluetun",
+      "    cap_add:","      - NET_ADMIN","    devices:","      - /dev/net/tun:/dev/net/tun",
+      "    ports:"].concat(ports).concat(["    volumes:","      - ${CONFIG_ROOT}/gluetun:/gluetun",
+      "    environment:","      - VPN_SERVICE_PROVIDER=${VPN_SERVICE_PROVIDER}",
+      "      - VPN_TYPE=${VPN_TYPE}"]).concat(creds)
+      .concat(["      - SERVER_COUNTRIES=${VPN_SERVER_COUNTRIES}","      - TZ=${TZ}",
+      "    restart: unless-stopped"]).join("\n");}},
+
+  qbittorrent:{cat:"dl",name:"qBittorrent",port:8080,requires:["gluetun"],
+    desc:"Download client. Locked to the VPN — no VPN, no network.",
+    compose:function(c){
+      var v = c.unified ? "      - ${DATA_ROOT}:/data" : "      - ${DOWNLOADS_ROOT}:/downloads";
+      return ["","  # Tied to Gluetun's network. If the VPN drops, this loses its",
+      "  # connection too — that is the kill switch working as intended.",
+      "  qbittorrent:","    image: lscr.io/linuxserver/qbittorrent:latest",
+      "    container_name: qbittorrent","    network_mode: \"service:gluetun\"","    volumes:",
+      "      - ${CONFIG_ROOT}/qbittorrent:/config",v,"    environment:","      - PUID=${PUID}",
+      "      - PGID=${PGID}","      - TZ=${TZ}","      - WEBUI_PORT=8080","    depends_on:",
+      "      gluetun:","        condition: service_started","    restart: unless-stopped"].join("\n");}},
+
+  jackett:{cat:"dl",name:"Jackett",port:9117,desc:"Indexer proxy for the *arr apps.",
+    compose:function(c){
+      if(c.has("gluetun")) return ["","  jackett:","    image: lscr.io/linuxserver/jackett:latest",
+        "    container_name: jackett","    network_mode: \"service:gluetun\"","    volumes:",
+        "      - ${CONFIG_ROOT}/jackett:/config","    environment:","      - PUID=${PUID}",
+        "      - PGID=${PGID}","      - TZ=${TZ}","    depends_on:","      gluetun:",
+        "        condition: service_started","    restart: unless-stopped"].join("\n");
+      return ["","  jackett:","    image: lscr.io/linuxserver/jackett:latest",
+        "    container_name: jackett","    ports:","      - \"9117:9117\"","    volumes:",
+        "      - ${CONFIG_ROOT}/jackett:/config","    environment:","      - PUID=${PUID}",
+        "      - PGID=${PGID}","      - TZ=${TZ}","    restart: unless-stopped"].join("\n");}},
+
+  /* ── photos & music ── */
+  immich:{cat:"photos",name:"Immich",port:2283,proxy:"photos",oidc:true,
+    desc:"Photo and video library with phone backup. Brings its own database.",
+    secrets:[{key:"IMMICH_DB_PASSWORD",label:"Immich database password"}],
+    compose:function(){return ["","  immich-server:","    image: ghcr.io/immich-app/immich-server:release",
+      "    container_name: immich_server","    ports:","      - \"2283:2283\"","    volumes:",
+      "      - ${PHOTOS_ROOT}:/usr/src/app/upload","      - /etc/localtime:/etc/localtime:ro",
+      "    environment:","      - DB_HOSTNAME=immich_postgres","      - DB_USERNAME=postgres",
+      "      - DB_PASSWORD=${IMMICH_DB_PASSWORD}","      - DB_DATABASE_NAME=immich",
+      "      - REDIS_HOSTNAME=immich_redis","      - TZ=${TZ}","    depends_on:",
+      "      - immich-redis","      - immich-postgres","    restart: unless-stopped","",
+      "  immich-machine-learning:",
+      "    image: ghcr.io/immich-app/immich-machine-learning:release","    container_name: immich_ml",
+      "    volumes:","      - ${CONFIG_ROOT}/immich/ml-cache:/cache","    restart: unless-stopped","",
+      "  immich-redis:","    image: docker.io/valkey/valkey:8-bookworm","    container_name: immich_redis",
+      "    healthcheck:","      test: redis-cli ping || exit 1","    restart: unless-stopped","",
+      "  immich-postgres:",
+      "    image: ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0",
+      "    container_name: immich_postgres","    environment:",
+      "      - POSTGRES_PASSWORD=${IMMICH_DB_PASSWORD}","      - POSTGRES_USER=postgres",
+      "      - POSTGRES_DB=immich","      - POSTGRES_INITDB_ARGS=--data-checksums","    volumes:",
+      "      - ${CONFIG_ROOT}/immich/postgres:/var/lib/postgresql/data",
+      "    restart: unless-stopped"].join("\n");}},
+
+  kima:{cat:"photos",name:"Kima",port:3030,volume:"kima_data",
+    desc:"Music streaming built on your own library. Postgres and Redis are inside the image.",
+    secrets:[{key:"KIMA_SESSION_SECRET",label:"Kima session secret"},
+             {key:"KIMA_ENCRYPTION_KEY",label:"Kima settings encryption key"}],
+    compose:function(c){
+      var m = c.unified ? "      - ${DATA_ROOT}/media/music:/music" : "      - ${MEDIA_ROOT}/music:/music";
+      return ["","  # All-in-one image: Postgres and Redis run inside the container.",
+      "  kima:","    image: chevron7locked/kima:latest","    container_name: kima","    ports:",
+      "      - \"3030:3030\"","    volumes:",m,"      - kima_data:/data","    environment:",
+      "      - SESSION_SECRET=${KIMA_SESSION_SECRET}",
+      "      - SETTINGS_ENCRYPTION_KEY=${KIMA_ENCRYPTION_KEY}","      - TZ=${TZ}",
+      "    # Lets Lidarr reach Kima's webhook callback on Linux hosts.",
+      "    extra_hosts:","      - \"host.docker.internal:host-gateway\"",
+      "    restart: unless-stopped"].join("\n");}},
+
+  /* ── monitoring & archives ── */
+  "uptime-kuma":{cat:"monitor",name:"Uptime Kuma",port:3001,desc:"Monitoring and status pages.",
+    compose:function(){return ["","  uptime-kuma:","    image: louislam/uptime-kuma:1",
+      "    container_name: uptime-kuma","    ports:","      - \"3001:3001\"","    volumes:",
+      "      - ${CONFIG_ROOT}/uptime-kuma:/app/data","    environment:","      - TZ=${TZ}",
+      "    restart: unless-stopped"].join("\n");}},
+
+  archivebox:{cat:"monitor",name:"ArchiveBox",port:8000,desc:"Web page archiving.",
+    secrets:[{key:"ARCHIVEBOX_PASSWORD",label:"ArchiveBox admin password"}],
+    compose:function(){return ["","  archivebox:","    image: archivebox/archivebox:latest",
+      "    container_name: archivebox","    ports:","      - \"8000:8000\"","    volumes:",
+      "      - ${CONFIG_ROOT}/archivebox:/data","    environment:","      - ALLOWED_HOSTS=*",
+      "      - PUBLIC_INDEX=False","      - PUBLIC_SNAPSHOTS=False","      - PUBLIC_ADD_VIEW=False",
+      "      - ADMIN_USERNAME=admin","      - ADMIN_PASSWORD=${ARCHIVEBOX_PASSWORD}",
+      "      - TZ=${TZ}","    restart: unless-stopped"].join("\n");}},
+
+  tubearchivist:{cat:"monitor",name:"Tube Archivist",port:8001,arm:true,
+    desc:"YouTube archiving. Needs Elasticsearch, which is heavy on ARM.",
+    secrets:[{key:"TA_PASSWORD",label:"Tube Archivist admin password"},
+             {key:"TA_ES_PASSWORD",label:"Tube Archivist Elasticsearch password"}],
+    compose:function(c){
+      var m = c.unified ? "      - ${DATA_ROOT}/media/youtube:/youtube" : "      - ${MEDIA_ROOT}/youtube:/youtube";
+      return ["","  tubearchivist:","    image: bbilly1/tubearchivist:latest",
+      "    container_name: tubearchivist","    ports:","      - \"8001:8000\"","    volumes:",m,
+      "      - ${CONFIG_ROOT}/tubearchivist/cache:/cache","    environment:",
+      "      - ES_URL=http://tubearchivist-es:9200",
+      "      - REDIS_CON=redis://tubearchivist-redis:6379","      - HOST_UID=${PUID}",
+      "      - HOST_GID=${PGID}","      - TA_HOST=http://localhost:8001","      - TA_USERNAME=admin",
+      "      - TA_PASSWORD=${TA_PASSWORD}","      - ELASTIC_PASSWORD=${TA_ES_PASSWORD}",
+      "      - TZ=${TZ}","    depends_on:","      - tubearchivist-es","      - tubearchivist-redis",
+      "    restart: unless-stopped","","  tubearchivist-redis:","    image: redis:7",
+      "    container_name: tubearchivist_redis","    volumes:",
+      "      - ${CONFIG_ROOT}/tubearchivist/redis:/data","    depends_on:","      - tubearchivist-es",
+      "    restart: unless-stopped","","  tubearchivist-es:",
+      "    image: bbilly1/tubearchivist-es:latest","    container_name: tubearchivist_es",
+      "    environment:","      - ELASTIC_PASSWORD=${TA_ES_PASSWORD}",
+      "      - ES_JAVA_OPTS=-Xms512m -Xmx512m","      - xpack.security.enabled=true",
+      "      - discovery.type=single-node",
+      "      - path.repo=/usr/share/elasticsearch/data/snapshot","    volumes:",
+      "      - ${CONFIG_ROOT}/tubearchivist/es:/usr/share/elasticsearch/data",
+      "    restart: unless-stopped"].join("\n");}},
+
+  /* ── connection ── */
+  caddy:{cat:"conn",name:"Caddy",needsDomain:true,
+    desc:"Reverse proxy with automatic HTTPS. The only container that should face the internet.",
+    compose:function(){return ["","  # Terminates HTTPS and routes by hostname. Forward only 80",
+      "  # and 443 on your router — never the application ports.",
+      "  caddy:","    image: caddy:latest","    container_name: caddy","    ports:",
+      "      - \"80:80\"","      - \"443:443\"","    volumes:",
+      "      - ./Caddyfile:/etc/caddy/Caddyfile:ro","      - ${CONFIG_ROOT}/caddy/data:/data",
+      "      - ${CONFIG_ROOT}/caddy/config:/config","    environment:","      - TZ=${TZ}",
+      "    restart: unless-stopped"].join("\n");}},
+
+  tailscale:{cat:"conn",name:"Tailscale",
+    desc:"Private mesh network. Nothing is published publicly. Often simpler installed on the host.",
+    secretsManual:[{key:"TS_AUTHKEY",label:"Tailscale auth key",hint:"Generate one in the Tailscale admin console under Settings → Keys."}],
+    compose:function(){return ["","  # Reaches your services without exposing anything publicly.",
+      "  # Installing Tailscale directly on the host is usually simpler than this;",
+      "  # use the container when you cannot install on the host.",
+      "  tailscale:","    image: tailscale/tailscale:latest","    container_name: tailscale",
+      "    hostname: media-server","    cap_add:","      - NET_ADMIN","      - SYS_MODULE",
+      "    devices:","      - /dev/net/tun:/dev/net/tun","    volumes:",
+      "      - ${CONFIG_ROOT}/tailscale:/var/lib/tailscale","    environment:",
+      "      - TS_AUTHKEY=${TS_AUTHKEY}","      - TS_STATE_DIR=/var/lib/tailscale",
+      "      - TS_USERSPACE=false","    restart: unless-stopped"].join("\n");}},
+
+  /* ── authentication ── */
+  "pocket-id":{cat:"auth",name:"Pocket ID",requires:["caddy"],needsDomain:true,proxy:"id",
+    desc:"Passkey single sign-on. Needs HTTPS on a real domain — passkeys will not work without it.",
+    secrets:[{key:"POCKETID_ENCRYPTION_KEY",label:"Pocket ID encryption key"}],
+    compose:function(){return ["","  # Passkey-only identity provider. APP_URL must exactly match the",
+      "  # address you visit — passkeys are bound to that origin.",
+      "  # Reachable only through Caddy; it publishes no host port.",
+      "  pocket-id:","    image: ghcr.io/pocket-id/pocket-id:v2","    container_name: pocket-id",
+      "    expose:","      - \"1411\"","    volumes:",
+      "      - ${CONFIG_ROOT}/pocket-id:/app/data","    environment:",
+      "      - APP_URL=${POCKETID_URL}",
+      "      - ENCRYPTION_KEY=${POCKETID_ENCRYPTION_KEY}","      - TRUST_PROXY=true",
+      "      - PUID=${PUID}","      - PGID=${PGID}","      - TZ=${TZ}",
+      "    restart: unless-stopped"].join("\n");}},
+
+  /* ── management ── */
+  arcane:{cat:"manage",name:"Arcane",port:3552,oidc:true,privileged:true,
+    desc:"Docker management in a browser. Holds the Docker socket — keep it private.",
+    secrets:[{key:"ARCANE_ENCRYPTION_KEY",label:"Arcane encryption key"},
+             {key:"ARCANE_JWT_SECRET",label:"Arcane JWT secret"}],
+    compose:function(){return ["","  # Mounts the Docker socket, which is equivalent to root on this host.",
+      "  # Keep it on your LAN or behind Tailscale. Never proxy it publicly.",
+      "  arcane:","    image: ghcr.io/getarcaneapp/arcane:latest","    container_name: arcane",
+      "    ports:","      - \"3552:3552\"","    volumes:",
+      "      - /var/run/docker.sock:/var/run/docker.sock","      - ${CONFIG_ROOT}/arcane:/app/data",
+      "      - .:/app/data/projects","    environment:","      - APP_URL=${ARCANE_APP_URL}",
+      "      - PUID=${PUID}","      - PGID=${PGID}",
+      "      - ENCRYPTION_KEY=${ARCANE_ENCRYPTION_KEY}","      - JWT_SECRET=${ARCANE_JWT_SECRET}",
+      "    restart: unless-stopped"].join("\n");}}
+};
+
+function arr(id, port, c, sub){
+  return ["","  "+id+":","    image: lscr.io/linuxserver/"+id+":latest","    container_name: "+id,
+  "    ports:","      - \""+port+":"+port+"\"","    volumes:","      - ${CONFIG_ROOT}/"+id+":/config"]
+  .concat(arrVols(c,sub)).concat(["    environment:","      - PUID=${PUID}","      - PGID=${PGID}",
+  "      - TZ=${TZ}","    restart: unless-stopped"]).join("\n");
+}
+
+var PRESETS = {
+  "Media player":["jellyfin"],
+  "Basic server":["arcane","jellyfin","jellyseerr"],
+  "Automated":["arcane","jellyfin","jellyseerr","sonarr","radarr","bazarr","gluetun","qbittorrent","jackett"],
+  "Music":["arcane","jellyfin","lidarr","kima","gluetun","qbittorrent"],
+  "Photos":["arcane","immich"],
+  "Archive":["arcane","archivebox","tubearchivist"],
+  "Remote + SSO":["arcane","jellyfin","jellyseerr","immich","caddy","pocket-id"]
+};
+
+// Never proxy these publicly, whatever the user picks.
+var NEVER_PROXY = ["arcane","qbittorrent","sonarr","radarr","lidarr","bazarr","jackett","tubearchivist","archivebox"];
+
+function resolve(sel){
+  var out = sel.slice(), added = [], guard = 0;
+  while(guard++ < 20){
+    var grew = false;
+    out.slice().forEach(function(id){
+      var m = MODULES[id]; if(!m || !m.requires) return;
+      m.requires.forEach(function(r){
+        if(out.indexOf(r) === -1){ out.push(r); added.push({dep:r, from:id}); grew = true; }
+      });
+    });
+    if(!grew) break;
+  }
+  return {list:out, added:added};
+}
+
+function ctx(state){
+  var sel = state.selected;
+  return {
+    unified: state.layout === "unified",
+    vpnType: state.vpnType,
+    domain: state.domain,
+    has: function(id){ return sel.indexOf(id) !== -1; }
+  };
+}
+
+function orderOf(id){
+  var order = ["arcane","jellyfin","jellyseerr","sonarr","radarr","lidarr","bazarr","gluetun",
+    "qbittorrent","jackett","immich","kima","uptime-kuma","archivebox","tubearchivist",
+    "tailscale","caddy","pocket-id"];
+  var i = order.indexOf(id); return i === -1 ? 99 : i;
+}
+
+function buildCompose(state){
+  var c = ctx(state);
+  var sel = state.selected.slice().sort(function(a,b){ return orderOf(a) - orderOf(b); });
+  var out = ["# ─────────────────────────────────────────────────────────────────────────",
+    "#  Modular Media Server",
+    "#  Generated by the Compose Generator — edit freely, it is yours now.",
+    "#",
+    "#  Settings live in .env beside this file.",
+    "#  Start with:  docker compose up -d",
+    "# ─────────────────────────────────────────────────────────────────────────","","services:"];
+  sel.forEach(function(id){ if(MODULES[id]) out.push(MODULES[id].compose(c)); });
+  var vols = sel.filter(function(id){ return MODULES[id] && MODULES[id].volume; })
+                .map(function(id){ return MODULES[id].volume; });
+  if(vols.length){
+    out.push("");
+    out.push("volumes:");
+    vols.forEach(function(v){ out.push("  "+v+":"); });
+  }
+  return out.join("\n") + "\n";
+}
+
+function collectSecrets(state){
+  var s = [];
+  state.selected.forEach(function(id){
+    var m = MODULES[id];
+    if(m && m.secrets) m.secrets.forEach(function(x){ s.push(x); });
+  });
+  return s;
+}
+function collectManual(state){
+  var s = [];
+  state.selected.forEach(function(id){
+    var m = MODULES[id];
+    if(m && m.secretsManual) m.secretsManual.forEach(function(x){ s.push(x); });
+  });
+  return s;
+}
+
+function buildEnv(state, example){
+  var v = function(real){ return example ? "CHANGEME" : (real || ""); };
+  var L = ["# Modular Media Server — environment",
+    example ? "# Template. Copy to .env and fill in every CHANGEME."
+            : "# Real values and secrets. Never commit this file.",
+    "","# ── Paths ────────────────────────────────────────────────────────────────",
+    "CONFIG_ROOT="+state.configRoot];
+  if(state.layout === "unified"){
+    L.push("DATA_ROOT="+state.dataRoot);
+    L.push("# Downloads and media share one parent so imports can hardlink");
+    L.push("# instead of copying: "+state.dataRoot+"/downloads and "+state.dataRoot+"/media");
+  } else {
+    L.push("MEDIA_ROOT="+state.mediaRoot);
+    L.push("DOWNLOADS_ROOT="+state.downloadsRoot);
+  }
+  if(state.selected.indexOf("immich") !== -1) L.push("PHOTOS_ROOT="+state.photosRoot);
+
+  L.push("","# ── Ownership and time ───────────────────────────────────────────────────",
+    "PUID="+state.puid,"PGID="+state.pgid,"TZ="+state.tz);
+
+  if(state.selected.indexOf("caddy") !== -1 || state.selected.indexOf("pocket-id") !== -1){
+    L.push("","# ── Domain ───────────────────────────────────────────────────────────────",
+      "BASE_DOMAIN="+(state.domain || "example.com"));
+  }
+  if(state.selected.indexOf("arcane") !== -1){
+    L.push("","# ── Arcane ───────────────────────────────────────────────────────────────",
+      "ARCANE_APP_URL=http://localhost:3552",
+      "ARCANE_ENCRYPTION_KEY="+v(state.secrets.ARCANE_ENCRYPTION_KEY),
+      "ARCANE_JWT_SECRET="+v(state.secrets.ARCANE_JWT_SECRET));
+  }
+  if(state.selected.indexOf("pocket-id") !== -1){
+    L.push("","# ── Pocket ID ────────────────────────────────────────────────────────────",
+      "# Must match the address you visit exactly — passkeys bind to this origin.",
+      "POCKETID_URL=https://id."+(state.domain || "example.com"),
+      "POCKETID_ENCRYPTION_KEY="+v(state.secrets.POCKETID_ENCRYPTION_KEY));
+  }
+  if(state.selected.indexOf("tailscale") !== -1){
+    L.push("","# ── Tailscale ────────────────────────────────────────────────────────────",
+      "# Generate in the Tailscale admin console under Settings → Keys.",
+      "TS_AUTHKEY="+(example ? "CHANGEME" : (state.manual.TS_AUTHKEY || "CHANGEME")));
+  }
+  if(state.selected.indexOf("gluetun") !== -1){
+    L.push("","# ── VPN ──────────────────────────────────────────────────────────────────",
+      "# Provider names must match Gluetun's own spelling, in lowercase.",
+      "VPN_SERVICE_PROVIDER="+(example ? "CHANGEME" : (state.vpnProvider || "CHANGEME")),
+      "VPN_TYPE="+state.vpnType,
+      "VPN_SERVER_COUNTRIES="+(example ? "" : (state.vpnCountry || "")));
+    if(state.vpnType === "wireguard"){
+      L.push("WIREGUARD_PRIVATE_KEY="+(example ? "CHANGEME" : (state.vpnKey || "CHANGEME")),
+        "WIREGUARD_ADDRESSES="+(example ? "CHANGEME" : (state.vpnAddr || "CHANGEME")));
+    } else {
+      L.push("OPENVPN_USER="+(example ? "CHANGEME" : (state.vpnUser || "CHANGEME")),
+        "OPENVPN_PASSWORD="+(example ? "CHANGEME" : (state.vpnPass || "CHANGEME")));
+    }
+  }
+  collectSecrets(state).forEach(function(s){
+    if(["ARCANE_ENCRYPTION_KEY","ARCANE_JWT_SECRET","POCKETID_ENCRYPTION_KEY"].indexOf(s.key) !== -1) return;
+    L.push("","# "+s.label, s.key+"="+v(state.secrets[s.key]));
+  });
+  return L.join("\n") + "\n";
+}
+
+function buildCaddyfile(state){
+  var d = state.domain || "example.com";
+  var L = ["# Caddyfile — generated by the Compose Generator",
+    "#",
+    "# Caddy requests a certificate for each name below, so every one must",
+    "# already resolve to this machine. Delete any you are not using.",
+    "#",
+    "# While testing, uncomment this to avoid hitting rate limits on failures:",
+    "# {",
+    "#     acme_ca https://acme-staging-v02.api.letsencrypt.org/directory",
+    "# }",""];
+  var proxied = [];
+  state.selected.forEach(function(id){
+    var m = MODULES[id];
+    if(!m || !m.proxy || NEVER_PROXY.indexOf(id) !== -1) return;
+    var target = id === "pocket-id" ? "pocket-id:1411"
+               : id === "immich"    ? "immich-server:2283"
+               : id + ":" + m.port;
+    L.push(m.proxy + "." + d + " {", "    reverse_proxy " + target, "}", "");
+    proxied.push(id);
+  });
+  if(!proxied.length) L.push("# No public services selected yet.","");
+  var held = state.selected.filter(function(id){ return NEVER_PROXY.indexOf(id) !== -1; })
+                           .map(function(id){ return MODULES[id].name; });
+  if(held.length){
+    L.push("# Deliberately not proxied: " + held.join(", ") + ".");
+    L.push("# These hold the Docker socket, write files anywhere, or authenticate");
+    L.push("# weakly. Reach them over Tailscale or your LAN instead.");
+  }
+  return L.join("\n") + "\n";
+}
+
+function buildGitignore(){
+  return ["# Never commit real secrets.",".env",".env.backup.*","","# Application data",
+    "config/","data/",""].join("\n");
+}
+
+function serviceUrl(id, state){
+  var m = MODULES[id];
+  if(id === "pocket-id") return "https://id." + (state.domain || "example.com");
+  if(id === "caddy")     return "https://" + (state.domain || "example.com");
+  if(id === "tailscale") return "(no web interface)";
+  return m && m.port ? "http://localhost:" + m.port : "—";
+}
+
+function buildReadme(state){
+  var L = ["# My media server","",
+    "Generated by the Modular Media Server Compose Generator.","",
+    "## Running it","",
+    "    docker compose up -d      # start everything",
+    "    docker compose ps         # what is running",
+    "    docker compose logs -f    # watch the logs",
+    "    docker compose pull       # fetch newer images",
+    "    docker compose down       # stop everything","",
+    "## What is here","","| Service | Address |","| --- | --- |"];
+  state.selected.slice().sort(function(a,b){ return orderOf(a)-orderOf(b); }).forEach(function(id){
+    if(MODULES[id]) L.push("| " + MODULES[id].name + " | " + serviceUrl(id, state) + " |");
+  });
+  L.push("", "Replace `localhost` with your server's address when connecting from",
+    "another machine.","",
+    "## Files","",
+    "- `docker-compose.yml` — the stack",
+    "- `.env` — your real settings and secrets, **never commit this**",
+    "- `.env.example` — a blank template that is safe to share",
+    "- `.gitignore` — keeps `.env` out of git");
+  if(state.selected.indexOf("caddy") !== -1) L.push("- `Caddyfile` — reverse proxy routes");
+  L.push("","## First steps","",
+    "1. Set a password on every service that asks. Some start unprotected.",
+    "2. Point the *arr apps at your download client and indexers.",
+    "3. Check the paths inside containers match what you set in `.env`.");
+
+  if(state.selected.indexOf("qbittorrent") !== -1){
+    L.push("","## Before downloading anything","",
+      "Confirm the VPN is carrying the traffic:","",
+      "    docker compose exec gluetun wget -qO- https://ipinfo.io/ip","",
+      "That must not be your home address. If Gluetun is unhealthy, qBittorrent",
+      "loses its network with it — that is intended, not a fault.","",
+      "qBittorrent generates a temporary password on first start. Find it with:","",
+      "    docker compose logs qbittorrent | grep -i password","",
+      "Downloaded files can carry malware. A VPN changes how traffic is routed;",
+      "it does not make a file safe. Only download what you are entitled to.");
+  }
+  if(state.selected.indexOf("sonarr") !== -1 || state.selected.indexOf("radarr") !== -1){
+    L.push("","## Connecting the *arr apps","",
+      "Inside a container, `localhost` means that container. Use container names:","");
+    if(state.selected.indexOf("gluetun") !== -1){
+      L.push("- Download client host: `gluetun`, port 8080 — **not** `qbittorrent`,",
+        "  because it shares Gluetun's network and has no name of its own.");
+      if(state.selected.indexOf("jackett") !== -1) L.push("- Jackett host: `gluetun`, port 9117.");
+    } else {
+      L.push("- Download client host: `qbittorrent`, port 8080.");
+    }
+    if(state.layout === "unified"){
+      L.push("","Both apps see one `/data` mount, so set the download folder to",
+        "`/data/downloads` and libraries under `/data/media`. Keeping them on one",
+        "mount is what lets imports hardlink instead of copying.");
+    } else {
+      L.push("","Downloads and media are mounted separately, so imports will copy",
+        "rather than hardlink and use twice the space. Switching to a shared",
+        "parent folder later means re-importing your library.");
+    }
+  }
+  if(state.selected.indexOf("pocket-id") !== -1){
+    L.push("","## Pocket ID","",
+      "1. Point DNS at this machine and forward only ports 80 and 443.",
+      "2. Visit https://id." + (state.domain || "example.com") + " and finish the setup wizard.",
+      "3. **Register a second passkey on another device immediately.** One passkey",
+      "   on one device means a lost phone locks you out of every connected app.","",
+      "Recovery link if you lose access:","",
+      "    docker compose exec pocket-id /app/pocket-id one-time-access-token admin");
+  }
+  if(state.selected.indexOf("kima") !== -1){
+    L.push("","## Kima","",
+      "Kima has a built-in Soulseek downloader that is **not** routed through",
+      "Gluetun — it runs on the normal network so it can also serve your library.",
+      "If you configure Soulseek, that traffic uses your ordinary connection.",
+      "Leaving it unconfigured avoids the question; everything else still works.");
+  }
+  L.push("","## Backups","",
+    "Back up `" + state.configRoot + "` and this directory. That is your",
+    "configuration and your secrets. Media can usually be re-acquired; a working",
+    "setup and your photos often cannot.","",
+    "## Licences","",
+    "Each application here is a separate open-source project with its own licence",
+    "and terms. This file grants you no rights to any content — you are",
+    "responsible for what you store and share.");
+  return L.join("\n") + "\n";
+}
+
+function validate(state){
+  var r = [], sel = state.selected;
+  function ok(t,s){ r.push({level:"ok",title:t,note:s}); }
+  function warn(t,s){ r.push({level:"warn",title:t,note:s}); }
+  function err(t,s){ r.push({level:"err",title:t,note:s}); }
+
+  if(!sel.length) err("Nothing selected","Pick at least one module.");
+  else ok(sel.length + " service" + (sel.length===1?"":"s") + " selected", "");
+
+  if(sel.indexOf("qbittorrent") !== -1){
+    if(sel.indexOf("gluetun") === -1){
+      err("qBittorrent has no VPN","Gluetun is required and should have been added automatically.");
+    } else if(!state.vpnProvider ||
+              (state.vpnType==="wireguard" ? (!state.vpnKey || !state.vpnAddr)
+                                           : (!state.vpnUser || !state.vpnPass))){
+      err("VPN credentials missing",
+        "qBittorrent will not start until these are filled in. Placeholders are written to .env so nothing leaks in the meantime.");
+    } else {
+      ok("qBittorrent is behind a configured VPN","");
+    }
+  }
+  if(sel.indexOf("caddy") !== -1){
+    if(!state.domain) err("No domain set","Caddy cannot obtain certificates without one.");
+    else ok("Domain set to " + state.domain, "DNS must already point at this machine.");
+  }
+  if(sel.indexOf("pocket-id") !== -1){
+    if(sel.indexOf("caddy") === -1) err("Pocket ID needs a reverse proxy","Passkeys require HTTPS.");
+    else ok("Pocket ID will be served over HTTPS","Register two passkeys on separate devices.");
+  }
+  if(sel.indexOf("tailscale") !== -1 && !state.manual.TS_AUTHKEY){
+    warn("No Tailscale auth key","A CHANGEME placeholder is written; the container will not connect until you replace it.");
+  }
+  if(state.layout === "unified") ok("Unified storage layout","Imports can hardlink instead of copying.");
+  else warn("Split storage layout",
+    "Downloads and media are separate mounts, so imports will copy and use twice the space. Changing later means re-importing.");
+
+  var arrs = ["sonarr","radarr","lidarr"].filter(function(a){ return sel.indexOf(a) !== -1; });
+  if(arrs.length && sel.indexOf("jackett") === -1)
+    warn("No indexer selected","Sonarr, Radarr and Lidarr need indexers to search. Jackett provides them.");
+  if(sel.indexOf("jellyseerr") !== -1 && sel.indexOf("jellyfin") === -1)
+    warn("Jellyseerr without Jellyfin","It will need an existing media server to point at.");
+  if(sel.indexOf("bazarr") !== -1 && !arrs.length)
+    warn("Bazarr has nothing to work with","It fetches subtitles for Sonarr and Radarr libraries.");
+  if(sel.indexOf("arcane") !== -1)
+    warn("Arcane holds the Docker socket","That is root access to this host. Keep it on your LAN or behind Tailscale — never proxy it publicly.");
+  if(sel.indexOf("kima") !== -1)
+    warn("Kima's downloader bypasses the VPN","Its built-in Soulseek support runs on the normal network, not through Gluetun.");
+  if(!state.tz) warn("No timezone set","Schedules and timestamps will use UTC.");
+  return r;
+}
+
+function buildAll(state){
+  var files = [
+    {name:"docker-compose.yml", body:buildCompose(state)},
+    {name:".env",               body:buildEnv(state,false)},
+    {name:".env.example",       body:buildEnv(state,true)},
+    {name:".gitignore",         body:buildGitignore()},
+    {name:"README.md",          body:buildReadme(state)}
+  ];
+  if(state.selected.indexOf("caddy") !== -1)
+    files.splice(1,0,{name:"Caddyfile", body:buildCaddyfile(state)});
+  return files;
+}
+
+return {CATS:CATS, MODULES:MODULES, PRESETS:PRESETS, resolve:resolve, validate:validate,
+        buildAll:buildAll, buildCompose:buildCompose, buildEnv:buildEnv,
+        buildCaddyfile:buildCaddyfile, buildReadme:buildReadme,
+        collectSecrets:collectSecrets, collectManual:collectManual, serviceUrl:serviceUrl};
+})();
+if(typeof module!=="undefined"&&module.exports){module.exports=CORE;}
+/* ══════════════ END CORE ══════════════ */
+</script>
+
+<script>
+/* ══════════════ UI ══════════════ */
+(function(){
+"use strict";
+var M = CORE.MODULES;
+
+var state = {
+  selected:[], auto:[], layout:"unified",
+  configRoot:"/srv/media-server/config", dataRoot:"/srv/data",
+  mediaRoot:"/srv/media", downloadsRoot:"/srv/downloads", photosRoot:"/srv/photos",
+  puid:"1000", pgid:"1000", tz:"",
+  domain:"", vpnType:"wireguard", vpnProvider:"", vpnKey:"", vpnAddr:"",
+  vpnUser:"", vpnPass:"", vpnCountry:"",
+  secrets:{}, manual:{}
+};
+try{ state.tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ""; }catch(e){}
+
+var STEPS = ["Modules","Storage","Connection","Credentials","Secrets","Review","Files"];
+var step = 0, files = [], activeFile = 0;
+
+function $(id){ return document.getElementById(id); }
+function el(t,c,x){ var e=document.createElement(t); if(c)e.className=c; if(x!==undefined)e.textContent=x; return e; }
+
+function rand(){
+  var b = new Uint8Array(32);
+  (window.crypto||window.msCrypto).getRandomValues(b);
+  var s = btoa(String.fromCharCode.apply(null, b));
+  return s.replace(/\+/g,"-").replace(/\//g,"_").replace(/=/g,"").slice(0,43);
+}
+function genSecrets(){
+  var need = CORE.collectSecrets(state), fresh = {};
+  need.forEach(function(s){ fresh[s.key] = rand(); });
+  state.secrets = fresh;
+}
+
+/* ── steps ── */
+function renderSteps(){
+  var w = $("steps"); w.innerHTML = "";
+  STEPS.forEach(function(name,i){
+    var b = el("button","stepbtn"+(i===step?" on":(i<step?" done":"")));
+    b.appendChild(el("span","n",String(i+1)));
+    b.appendChild(document.createTextNode(name));
+    b.onclick = function(){ go(i); };
+    w.appendChild(b);
+  });
+  $("stepcount").textContent = "Step " + (step+1) + " of " + STEPS.length;
+  $("back").style.visibility = step === 0 ? "hidden" : "visible";
+  $("next").textContent = step === STEPS.length-1 ? "Done" : "Continue";
+  $("next").disabled = (step === 0 && !state.selected.length);
+}
+function go(i){
+  if(i < 0 || i > STEPS.length-1) return;
+  if(i > 0 && !state.selected.length) return;
+  step = i;
+  for(var k=0;k<STEPS.length;k++) $("pane-"+k).classList.toggle("on", k===step);
+  if(step===1) renderStorage();
+  if(step===2) renderConn();
+  if(step===3) renderCred();
+  if(step===4){ if(!Object.keys(state.secrets).length) genSecrets(); renderSecrets(); }
+  if(step===5) renderReview();
+  if(step===6){ if(!Object.keys(state.secrets).length) genSecrets(); buildFiles(); }
+  renderSteps();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+/* ── modules ── */
+function renderCats(){
+  var w = $("cats"); w.innerHTML = "";
+  CORE.CATS.forEach(function(cat){
+    var ids = Object.keys(M).filter(function(id){ return M[id].cat === cat.id; });
+    if(!ids.length) return;
+    var box = el("div","cat");
+    var h = el("div","cath"); h.appendChild(el("span","bar")); h.appendChild(document.createTextNode(cat.name));
+    box.appendChild(h);
+    var grid = el("div","mods");
+    ids.forEach(function(id){
+      var m = M[id], on = state.selected.indexOf(id) !== -1, isAuto = state.auto.indexOf(id) !== -1;
+      var card = el("div","mod"+(on?" on":"")+(isAuto?" auto":""));
+      var top = el("div","top");
+      top.appendChild(el("b",null,m.name));
+      if(m.port) top.appendChild(el("span","pt",":"+m.port));
+      card.appendChild(top);
+      card.appendChild(el("p",null,m.desc));
+      if(isAuto) card.appendChild(el("span","flag auto","added automatically"));
+      else if(m.privileged) card.appendChild(el("span","flag","privileged"));
+      else if(m.requires) card.appendChild(el("span","flag","needs "+m.requires.map(function(r){return M[r].name;}).join(", ")));
+      card.appendChild(el("span","tick"));
+      card.onclick = function(){ toggle(id); };
+      grid.appendChild(card);
+    });
+    box.appendChild(grid); w.appendChild(box);
+  });
+}
+function toggle(id){
+  var i = state.selected.indexOf(id);
+  if(i === -1) state.selected.push(id);
+  else {
+    // removing something another module needs takes its dependant with it
+    state.selected.splice(i,1);
+    state.selected = state.selected.filter(function(s){
+      var m = M[s];
+      if(!m.requires) return true;
+      return m.requires.every(function(r){ return state.selected.indexOf(r) !== -1 || r === id ? m.requires.indexOf(id)===-1 : true; });
+    });
+    state.selected = state.selected.filter(function(s){
+      var m = M[s];
+      return !m.requires || m.requires.indexOf(id) === -1;
+    });
+  }
+  applyDeps();
+}
+function applyDeps(){
+  var r = CORE.resolve(state.selected);
+  state.selected = r.list;
+  state.auto = r.added.map(function(a){ return a.dep; });
+  state.secrets = {};
+  renderCats(); renderStack(); renderSteps();
+}
+function renderStack(){
+  var l = $("stacklist"); l.innerHTML = "";
+  if(!state.selected.length){
+    l.appendChild(el("div","empty","Pick a module to begin, or choose a preset below."));
+    $("stackcount").textContent = "Nothing selected yet";
+    return;
+  }
+  var count = state.selected.length;
+  $("stackcount").textContent = count + " service" + (count===1?"":"s") + " selected";
+  state.selected.slice().sort().forEach(function(id){
+    var isAuto = state.auto.indexOf(id) !== -1;
+    var li = el("li", isAuto ? "dep" : "");
+    li.appendChild(document.createTextNode(M[id].name + (isAuto ? " (required)" : "")));
+    var x = el("span","x","×"); x.onclick = function(e){ e.stopPropagation(); toggle(id); };
+    li.appendChild(x); l.appendChild(li);
+  });
+}
+function renderPresets(){
+  var w = $("presets"); w.innerHTML = "";
+  Object.keys(CORE.PRESETS).forEach(function(name){
+    var b = el("button","pbtn",name);
+    b.onclick = function(){ state.selected = CORE.PRESETS[name].slice(); applyDeps(); };
+    w.appendChild(b);
+  });
+}
+
+/* ── storage ── */
+function renderStorage(){
+  var t = $("layout"); t.innerHTML = "";
+  [{id:"unified",title:"One shared folder",rec:true,
+    body:"Downloads and media sit under a single parent, mounted once as /data. Finished downloads are hardlinked into your library instantly, using no extra space."},
+   {id:"split",title:"Separate folders",rec:false,
+    body:"Media and downloads are mounted separately. Simpler to picture, but every import copies the file, so a finished download occupies twice the disk."}
+  ].forEach(function(o){
+    var d = el("div","tg"+(state.layout===o.id?" on":""));
+    var b = el("b"); b.appendChild(document.createTextNode(o.title));
+    if(o.rec){ var r = el("span","rec","recommended"); b.appendChild(r); }
+    d.appendChild(b); d.appendChild(el("span",null,o.body));
+    d.onclick = function(){ state.layout = o.id; renderStorage(); };
+    t.appendChild(d);
+  });
+
+  $("layoutnote").innerHTML = state.layout === "unified"
+    ? '<div class="tip"><strong>Why this matters.</strong> Sonarr and Radarr can hardlink — giving one file two names for free — but only when downloads and library are on the same filesystem <em>and</em> visible through one mount. Two separate mounts silently double your disk use, and changing it later means re-importing everything.</div>'
+    : '<div class="warning"><strong>This will copy every import.</strong> A finished 40&nbsp;GB download becomes 80&nbsp;GB until you delete the original, and seeding means you often cannot. Choose the shared folder unless you have a specific reason not to.</div>';
+
+  var f = $("storagefields"); f.innerHTML = "";
+  function field(id, label, val, hint, wide){
+    var d = el("div","f"+(wide?" wide":""));
+    var lab = el("label",null,label); lab.setAttribute("for","fld-"+id); d.appendChild(lab);
+    var i = el("input"); i.id = "fld-"+id; i.value = val;
+    i.oninput = function(){ state[id] = i.value; };
+    d.appendChild(i);
+    var h = el("div","hint"); h.innerHTML = hint; d.appendChild(h);
+    f.appendChild(d);
+  }
+  field("configRoot","Config root",state.configRoot,"Application settings and databases. Small, but the thing you most want backed up.",true);
+  if(state.layout === "unified"){
+    field("dataRoot","Data root",state.dataRoot,
+      "Downloads and media both live under here, as <code>downloads/</code> and <code>media/</code>.",true);
+  } else {
+    field("mediaRoot","Media root",state.mediaRoot,"Your library — <code>movies/</code>, <code>tv/</code>, <code>music/</code>.");
+    field("downloadsRoot","Downloads",state.downloadsRoot,"Working space for in-progress downloads.");
+  }
+  if(state.selected.indexOf("immich") !== -1)
+    field("photosRoot","Photos",state.photosRoot,"Immich's upload folder. Back this up — it is irreplaceable.",true);
+
+  $("puid").value = state.puid; $("pgid").value = state.pgid; $("tz").value = state.tz;
+  $("puid").oninput = function(){ state.puid = this.value; };
+  $("pgid").oninput = function(){ state.pgid = this.value; };
+  $("tz").oninput   = function(){ state.tz   = this.value; };
+}
+
+/* ── connection ── */
+function renderConn(){
+  var hasCaddy = state.selected.indexOf("caddy") !== -1,
+      hasTs    = state.selected.indexOf("tailscale") !== -1,
+      hasPid   = state.selected.indexOf("pocket-id") !== -1,
+      b = $("connbody");
+  b.innerHTML = "";
+  $("conndesc").textContent = (hasCaddy || hasTs)
+    ? "How people reach your server from outside the house."
+    : "You have not selected a connection module, so everything stays on your local network.";
+
+  if(!hasCaddy && !hasTs){
+    b.innerHTML = '<div class="card teal"><strong>Local network only.</strong><p style="margin:10px 0 0">'
+      + 'Your services will be reachable at your server\'s address on your own network and nowhere else. '
+      + 'That is a perfectly good place to start, and the safest default.</p></div>'
+      + '<div class="tip"><strong>Want remote access?</strong> Go back and add <b>Tailscale</b> for private access '
+      + 'from your own devices, or <b>Caddy</b> to publish services on a real domain. The '
+      + '<a href="access.html">access guide</a> compares them properly.</div>';
+    return;
+  }
+
+  if(hasCaddy){
+    var d = el("div","fgrid");
+    var f = el("div","f wide");
+    var lab = el("label",null,"Your domain"); lab.setAttribute("for","dom"); f.appendChild(lab);
+    var i = el("input"); i.id = "dom"; i.value = state.domain; i.placeholder = "example.com";
+    i.oninput = function(){ state.domain = i.value.trim().replace(/^https?:\/\//,"").replace(/\/$/,""); renderConn(); };
+    f.appendChild(i);
+    var h = el("div","hint");
+    h.innerHTML = "Just the domain, no <code>https://</code>. It must already point at this machine.";
+    f.appendChild(h); d.appendChild(f); b.appendChild(d);
+
+    var names = [];
+    state.selected.forEach(function(id){
+      var m = M[id];
+      if(m.proxy && ["arcane","qbittorrent","sonarr","radarr","lidarr","bazarr","jackett","tubearchivist","archivebox"].indexOf(id)===-1)
+        names.push(m.proxy + "." + (state.domain || "example.com") + " → " + m.name);
+    });
+    var c = el("div","card");
+    c.innerHTML = "<strong>DNS records you will need</strong><p style='margin:10px 0 0'>"
+      + (names.length ? names.join("<br>") : "No public services selected.")
+      + "</p>";
+    b.appendChild(c);
+
+    var held = state.selected.filter(function(id){
+      return ["arcane","qbittorrent","sonarr","radarr","lidarr","bazarr","jackett"].indexOf(id)!==-1;
+    }).map(function(id){ return M[id].name; });
+    if(held.length){
+      var w = el("div","warning");
+      w.innerHTML = "<strong>Kept off the internet on purpose: " + held.join(", ") + ".</strong> "
+        + "These hold the Docker socket, can write files anywhere, or authenticate weakly. "
+        + "The generated Caddyfile leaves them out — reach them over Tailscale or your LAN.";
+      b.appendChild(w);
+    }
+    var t = el("div","tip");
+    t.innerHTML = "<strong>Forward only ports 80 and 443</strong> on your router — never the application ports. "
+      + "Port 80 is needed for certificate issuance, not for serving your site.";
+    b.appendChild(t);
+  }
+
+  if(hasPid){
+    var p = el("div","card peach");
+    p.innerHTML = "<strong>Passkeys need real HTTPS.</strong><p style='margin:10px 0 0'>"
+      + "Pocket ID will live at <code>https://id." + (state.domain || "example.com") + "</code>. "
+      + "Browsers only allow passkey registration on a proper HTTPS origin — you cannot use a bare "
+      + "LAN address. Finish DNS and certificates before setting it up.</p>";
+    b.appendChild(p);
+  }
+
+  if(hasTs){
+    var g = el("div","fgrid");
+    var f2 = el("div","f wide");
+    var l2 = el("label",null,"Tailscale auth key"); l2.setAttribute("for","tsk"); f2.appendChild(l2);
+    var i2 = el("input"); i2.id = "tsk"; i2.value = state.manual.TS_AUTHKEY || "";
+    i2.placeholder = "tskey-auth-…";
+    i2.oninput = function(){ state.manual.TS_AUTHKEY = i2.value.trim(); };
+    f2.appendChild(i2);
+    var h2 = el("div","hint");
+    h2.innerHTML = "From the Tailscale admin console, under Settings → Keys. Leave blank to fill in later — a placeholder is written to <code>.env</code>.";
+    f2.appendChild(h2); g.appendChild(f2); b.appendChild(g);
+    var t2 = el("div","tip");
+    t2.innerHTML = "<strong>Installing Tailscale on the host is usually simpler</strong> than running it in a container, "
+      + "and gives every service on the machine private remote access at once. The container is here for cases where you cannot.";
+    b.appendChild(t2);
+  }
+}
+
+/* ── credentials ── */
+function renderCred(){
+  var hasVpn = state.selected.indexOf("gluetun") !== -1, b = $("credbody");
+  b.innerHTML = "";
+  $("creddesc").textContent = hasVpn
+    ? "Gluetun needs real credentials. qBittorrent routes every byte through it, so if these are wrong the download client will not start at all."
+    : "Nothing you have selected needs external credentials.";
+
+  if(!hasVpn){
+    b.innerHTML = '<div class="card teal"><strong>Nothing to enter here.</strong>'
+      + '<p style="margin:10px 0 0">API keys between the *arr apps are generated by those apps themselves, '
+      + 'so you will copy them between web interfaces after the stack is running.</p></div>';
+    return;
+  }
+
+  var g = el("div","fgrid");
+  function fld(key,label,hint,ph,wide){
+    var d = el("div","f"+(wide?" wide":""));
+    var l = el("label",null,label); l.setAttribute("for","c-"+key); d.appendChild(l);
+    var i = el("input"); i.id = "c-"+key; i.value = state[key]||""; if(ph) i.placeholder = ph;
+    i.oninput = function(){ state[key] = i.value.trim(); };
+    d.appendChild(i);
+    var h = el("div","hint"); h.innerHTML = hint; d.appendChild(h);
+    g.appendChild(d);
+  }
+  var sel = el("div","f");
+  var sl = el("label",null,"Connection type"); sl.setAttribute("for","vt"); sel.appendChild(sl);
+  var s = el("select"); s.id = "vt";
+  [["wireguard","WireGuard (recommended)"],["openvpn","OpenVPN"]].forEach(function(o){
+    var op = el("option",null,o[1]); op.value = o[0];
+    if(state.vpnType===o[0]) op.selected = true; s.appendChild(op);
+  });
+  s.onchange = function(){ state.vpnType = s.value; renderCred(); };
+  sel.appendChild(s);
+  var sh = el("div","hint"); sh.innerHTML = "WireGuard is faster and simpler where your provider offers it.";
+  sel.appendChild(sh); g.appendChild(sel);
+
+  fld("vpnProvider","VPN provider",
+    "Lowercase, spelled as Gluetun spells it — <code>mullvad</code>, <code>private internet access</code>, <code>protonvpn</code>.",
+    "mullvad");
+  if(state.vpnType === "wireguard"){
+    fld("vpnKey","WireGuard private key",
+      "The <strong>private</strong> key, not the public one. Around 44 characters ending in <code>=</code>.","",true);
+    fld("vpnAddr","WireGuard address","Provided with your key, e.g. <code>10.64.0.2/32</code>.","10.64.0.2/32");
+  } else {
+    fld("vpnUser","OpenVPN username","Your provider's OpenVPN username, which is often not your account email.");
+    fld("vpnPass","OpenVPN password","The OpenVPN password from your provider.");
+  }
+  fld("vpnCountry","Server country (optional)","Leave blank for your provider's default. A country with no servers stops Gluetun starting.","Netherlands");
+  b.appendChild(g);
+
+  var w = el("div","warning");
+  w.innerHTML = "<strong>These go into <code>.env</code> in plain text.</strong> That file is written with restrictive "
+    + "permissions and listed in <code>.gitignore</code>, but never commit it or paste it anywhere public. "
+    + "Leave fields blank and placeholders are written instead — nothing is invented.";
+  b.appendChild(w);
+  var t = el("div","tip");
+  t.innerHTML = "<strong>Once it is running, verify it.</strong> <code>docker compose exec gluetun wget -qO- https://ipinfo.io/ip</code> "
+    + "must not return your home address.";
+  b.appendChild(t);
+}
+
+/* ── secrets ── */
+function renderSecrets(){
+  var b = $("secretbody"); b.innerHTML = "";
+  var need = CORE.collectSecrets(state);
+  if(!need.length){
+    b.innerHTML = '<div class="card teal"><strong>Nothing selected needs a generated secret.</strong>'
+      + '<p style="margin:10px 0 0">You can move straight on.</p></div>';
+    return;
+  }
+  var c = el("div","card");
+  c.appendChild(el("strong",null,"Generated for this stack"));
+  var ul = el("ul","vlist"); ul.style.marginTop = "12px";
+  need.forEach(function(s){
+    var li = el("li");
+    var ic = el("span","vi ok","✓"); li.appendChild(ic);
+    var tx = el("div","vtext");
+    tx.appendChild(el("b",null,s.label));
+    var sp = el("span"); sp.style.fontFamily = "ui-monospace,monospace";
+    sp.style.wordBreak = "break-all";
+    sp.textContent = state.secrets[s.key] || "";
+    tx.appendChild(sp); li.appendChild(tx); ul.appendChild(li);
+  });
+  c.appendChild(ul); b.appendChild(c);
+
+  var btn = el("button","btn ghost","Generate new values");
+  btn.onclick = function(){ genSecrets(); renderSecrets(); };
+  b.appendChild(btn);
+
+  var t = el("div","tip");
+  t.innerHTML = "<strong>Each is 32 random bytes</strong> from <code>crypto.getRandomValues</code>, generated in your "
+    + "browser and never transmitted. No two services share a value. They appear in <code>.env</code> only — "
+    + "<code>.env.example</code> gets placeholders.";
+  b.appendChild(t);
+
+  if(state.selected.indexOf("immich") !== -1){
+    var w = el("div","warning");
+    w.innerHTML = "<strong>Do not change Immich's database password after first run.</strong> The existing database "
+      + "still expects the old one, and the app will fail to connect. Regenerating here before deploying is fine.";
+    b.appendChild(w);
+  }
+}
+
+/* ── review ── */
+function renderReview(){
+  var res = CORE.validate(state), ul = $("vlist");
+  ul.innerHTML = "";
+  res.forEach(function(r){
+    var li = el("li");
+    var sym = r.level === "ok" ? "✓" : (r.level === "warn" ? "!" : "×");
+    li.appendChild(el("span","vi "+r.level, sym));
+    var tx = el("div","vtext");
+    tx.appendChild(el("b",null,r.title));
+    if(r.note) tx.appendChild(el("span",null,r.note));
+    li.appendChild(tx); ul.appendChild(li);
+  });
+  var errs = res.filter(function(r){ return r.level === "err"; }).length;
+  var warns = res.filter(function(r){ return r.level === "warn"; }).length;
+  $("vsummary").innerHTML = errs
+    ? '<div class="warning"><strong>' + errs + ' thing' + (errs===1?"":"s") + ' need attention.</strong> '
+      + 'You can still generate the files — anything missing is written as <code>CHANGEME</code> so nothing is '
+      + 'silently wrong, but the stack will not start until you fill those in.</div>'
+    : (warns
+      ? '<div class="tip"><strong>Ready to generate.</strong> The notes above are worth reading, but none of them block you.</div>'
+      : '<div class="tip"><strong>All clear.</strong> Nothing outstanding.</div>');
+}
+
+/* ── output ── */
+function buildFiles(){
+  files = CORE.buildAll(state);
+  activeFile = 0;
+  var t = $("filetabs"); t.innerHTML = "";
+  files.forEach(function(f,i){
+    var b = el("button","tab"+(i===0?" on":""),f.name);
+    b.onclick = function(){ activeFile = i; showFile(); };
+    t.appendChild(b);
+  });
+  showFile();
+  var notes = [];
+  if(state.selected.indexOf("caddy") !== -1)
+    notes.push("Point your DNS records at this machine and forward only ports 80 and 443 before starting Caddy.");
+  if(state.selected.indexOf("pocket-id") !== -1)
+    notes.push("After Pocket ID is up, register a second passkey on another device straight away. One passkey on one device means a lost phone locks you out of every connected app.");
+  if(state.selected.indexOf("qbittorrent") !== -1)
+    notes.push("Verify the VPN before downloading: <code>docker compose exec gluetun wget -qO- https://ipinfo.io/ip</code> must not show your home address.");
+  if(state.selected.indexOf("arcane") !== -1)
+    notes.push("Arcane mounts the Docker socket, which is root on this host. Keep it on your LAN or behind Tailscale.");
+  $("postnotes").innerHTML = notes.length
+    ? '<div class="card peach" style="margin-top:20px"><strong>Before you start it</strong><ul style="margin:10px 0 0">'
+      + notes.map(function(n){ return "<li>"+n+"</li>"; }).join("") + "</ul></div>"
+    : "";
+}
+function showFile(){
+  var f = files[activeFile];
+  $("outname").textContent = f.name;
+  $("outbody").textContent = f.body;
+  var tabs = $("filetabs").children;
+  for(var i=0;i<tabs.length;i++) tabs[i].classList.toggle("on", i===activeFile);
+}
+function download(name, body){
+  var blob = new Blob([body], {type:"text/plain;charset=utf-8"});
+  var url = URL.createObjectURL(blob), a = el("a");
+  a.href = url; a.download = name; document.body.appendChild(a); a.click();
+  document.body.removeChild(a); setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
+}
+$("copyone").onclick = function(){
+  var b = this;
+  navigator.clipboard.writeText(files[activeFile].body).then(function(){
+    b.textContent = "Copied"; setTimeout(function(){ b.textContent = "Copy"; }, 1600);
+  });
+};
+$("dlone").onclick = function(){ download(files[activeFile].name, files[activeFile].body); };
+$("dlall").onclick = function(){
+  files.forEach(function(f,i){ setTimeout(function(){ download(f.name, f.body); }, i*350); });
+};
+$("regen").onclick = function(){ genSecrets(); buildFiles(); };
+$("next").onclick = function(){ if(step < STEPS.length-1) go(step+1); };
+$("back").onclick = function(){ go(step-1); };
+
+renderCats(); renderStack(); renderPresets(); renderSteps();
+})();
+</script>
+</body></html>
