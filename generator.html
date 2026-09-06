@@ -212,6 +212,16 @@ details.qa,details.m,.shell,.genout{box-shadow:0 1px 2px rgba(21,51,59,.04),0 6p
 .dnote{border-left:4px solid var(--teal);background:#e4f5f4;padding:13px 15px;border-radius:0 12px 12px 0;font-size:13.5px;line-height:1.6}
 .dwarn b,.dnote b{color:var(--ink)}
 @media(min-width:1000px){.deploy{grid-template-columns:repeat(3,1fr);align-items:start}}
+
+.secretrow{display:flex;align-items:center;gap:8px;margin-top:4px;flex-wrap:wrap}
+.secretval{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;
+  word-break:break-all;background:#eaf8f7;border:1px solid var(--line);border-radius:7px;
+  padding:4px 9px;color:var(--ink);letter-spacing:.5px;flex:1;min-width:150px}
+.secretbtn{font-family:inherit;font-size:11.5px;font-weight:700;padding:5px 11px;border-radius:999px;
+  border:1px solid var(--line);background:var(--white);color:var(--muted);cursor:pointer;flex-shrink:0}
+.secretbtn:hover{border-color:var(--teal);color:var(--blue)}
+.secretfield{display:flex;gap:8px;align-items:center}
+.secretfield input{flex:1;min-width:0}
 </style>
 </head>
 <body>
@@ -276,7 +286,7 @@ details.qa,details.m,.shell,.genout{box-shadow:0 1px 2px rgba(21,51,59,.04),0 6p
 <!-- 5 SECRETS -->
 <div class="pane" id="pane-4">
 <h2 class="ph">Secrets</h2>
-<p class="pd">Generated in your browser with <code>crypto.getRandomValues</code> — the same source of randomness your browser uses for HTTPS. They never leave this page.</p>
+<p class="pd">Generated in your browser with <code>crypto.getRandomValues</code> — the same source of randomness your browser uses for HTTPS. They never leave this page, and stay masked on screen until you choose to reveal one.</p>
 <div id="secretbody"></div>
 </div>
 
@@ -296,9 +306,10 @@ details.qa,details.m,.shell,.genout{box-shadow:0 1px 2px rgba(21,51,59,.04),0 6p
 <div class="tabs" id="filetabs"></div>
 <div class="outwrap">
 <div class="outbar"><span class="outname" id="outname"></span>
-<div class="outacts"><button class="sbtn" id="copyone">Copy</button><button class="sbtn" id="dlone">Download</button></div></div>
+<div class="outacts"><button class="sbtn" id="revealbtn">Show secrets</button><button class="sbtn" id="copyone">Copy</button><button class="sbtn" id="dlone">Download</button></div></div>
 <pre id="outbody"></pre>
 </div>
+<div class="tip" id="masknote" style="margin-top:14px"><strong>Secrets are hidden on screen.</strong> The dots stand in for real values so nothing leaks into a screenshot or over your shoulder. Copy and Download always give you the real file.</div>
 <div id="postnotes"></div>
 
 <h3 style="font-family:Fraunces,serif;font-size:26px;letter-spacing:-.04em;margin:38px 0 12px">Where do these files go?</h3>
@@ -977,7 +988,7 @@ var state = {
   puid:"1000", pgid:"1000", tz:"",
   domain:"", vpnType:"wireguard", vpnProvider:"", vpnKey:"", vpnAddr:"",
   vpnUser:"", vpnPass:"", vpnCountry:"",
-  secrets:{}, manual:{}
+  secrets:{}, manual:{}, showSecrets:false
 };
 try{ state.tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ""; }catch(e){}
 
@@ -1302,12 +1313,28 @@ function renderCred(){
   }
 
   var g = el("div","fgrid");
-  function fld(key,label,hint,ph,wide){
+  function fld(key,label,hint,ph,wide,secret){
     var d = el("div","f"+(wide?" wide":""));
     var l = el("label",null,label); l.setAttribute("for","c-"+key); d.appendChild(l);
     var i = el("input"); i.id = "c-"+key; i.value = state[key]||""; if(ph) i.placeholder = ph;
+    i.autocomplete = "off"; i.spellcheck = false;
+    if(secret){
+      // Credentials are masked as you type, like any password field.
+      i.type = "password";
+      var wrap = el("div","secretfield");
+      wrap.appendChild(i);
+      var eye = el("button","secretbtn"); eye.type = "button"; eye.textContent = "Reveal";
+      eye.onclick = function(){
+        var hidden = i.type === "password";
+        i.type = hidden ? "text" : "password";
+        eye.textContent = hidden ? "Hide" : "Reveal";
+      };
+      wrap.appendChild(eye);
+      d.appendChild(wrap);
+    } else {
+      d.appendChild(i);
+    }
     i.oninput = function(){ state[key] = i.value.trim(); };
-    d.appendChild(i);
     var h = el("div","hint"); h.innerHTML = hint; d.appendChild(h);
     g.appendChild(d);
   }
@@ -1328,11 +1355,11 @@ function renderCred(){
     "mullvad");
   if(state.vpnType === "wireguard"){
     fld("vpnKey","WireGuard private key",
-      "The <strong>private</strong> key, not the public one. Around 44 characters ending in <code>=</code>.","",true);
+      "The <strong>private</strong> key, not the public one. Around 44 characters ending in <code>=</code>.","",true,true);
     fld("vpnAddr","WireGuard address","Provided with your key, e.g. <code>10.64.0.2/32</code>.","10.64.0.2/32");
   } else {
     fld("vpnUser","OpenVPN username","Your provider's OpenVPN username, which is often not your account email.");
-    fld("vpnPass","OpenVPN password","The OpenVPN password from your provider.");
+    fld("vpnPass","OpenVPN password","The OpenVPN password from your provider.","",false,true);
   }
   fld("vpnCountry","Server country (optional)","Leave blank for your provider's default. A country with no servers stops Gluetun starting.","Netherlands");
   b.appendChild(g);
@@ -1349,6 +1376,35 @@ function renderCred(){
 }
 
 /* ── secrets ── */
+
+/* Secrets are never painted on screen by default — a screenshot or a
+   shoulder should not be enough to leak them. The real values still go
+   into the copied text and the downloaded files. */
+function maskValue(v){
+  if(!v) return "";
+  if(v === "CHANGEME") return v;
+  return "\u2022".repeat(Math.min(v.length, 40));
+}
+/* Every value worth hiding in the file previews. */
+function secretValues(){
+  var out = [];
+  Object.keys(state.secrets).forEach(function(k){
+    var v = state.secrets[k]; if(v && v.length > 7) out.push(v);
+  });
+  [state.vpnKey, state.vpnPass, state.vpnUser, state.manual.TS_AUTHKEY].forEach(function(v){
+    if(v && v.length > 3 && v !== "CHANGEME") out.push(v);
+  });
+  return out;
+}
+function maskBody(text){
+  var vals = secretValues();
+  vals.sort(function(a,b){ return b.length - a.length; });
+  vals.forEach(function(v){
+    text = text.split(v).join("\u2022".repeat(Math.min(v.length, 40)));
+  });
+  return text;
+}
+
 function renderSecrets(){
   var b = $("secretbody"); b.innerHTML = "";
   var need = CORE.collectSecrets(state);
@@ -1361,14 +1417,39 @@ function renderSecrets(){
   c.appendChild(el("strong",null,"Generated for this stack"));
   var ul = el("ul","vlist"); ul.style.marginTop = "12px";
   need.forEach(function(s){
+    var val = state.secrets[s.key] || "";
     var li = el("li");
-    var ic = el("span","vi ok","✓"); li.appendChild(ic);
+    li.appendChild(el("span","vi ok","\u2713"));
     var tx = el("div","vtext");
     tx.appendChild(el("b",null,s.label));
-    var sp = el("span"); sp.style.fontFamily = "ui-monospace,monospace";
-    sp.style.wordBreak = "break-all";
-    sp.textContent = state.secrets[s.key] || "";
-    tx.appendChild(sp); li.appendChild(tx); ul.appendChild(li);
+
+    var row = el("div","secretrow");
+    var sp = el("code","secretval");
+    sp.textContent = maskValue(val);
+    sp.dataset.real = val;
+    sp.dataset.shown = "0";
+    row.appendChild(sp);
+
+    var eye = el("button","secretbtn","Reveal");
+    eye.type = "button";
+    eye.onclick = function(){
+      var on = sp.dataset.shown === "1";
+      sp.textContent = on ? maskValue(sp.dataset.real) : sp.dataset.real;
+      sp.dataset.shown = on ? "0" : "1";
+      eye.textContent = on ? "Reveal" : "Hide";
+    };
+    row.appendChild(eye);
+
+    var cp = el("button","secretbtn","Copy");
+    cp.type = "button";
+    cp.onclick = function(){
+      navigator.clipboard.writeText(sp.dataset.real).then(function(){
+        cp.textContent = "Copied"; setTimeout(function(){ cp.textContent = "Copy"; }, 1500);
+      });
+    };
+    row.appendChild(cp);
+
+    tx.appendChild(row); li.appendChild(tx); ul.appendChild(li);
   });
   c.appendChild(ul); b.appendChild(c);
 
@@ -1378,7 +1459,8 @@ function renderSecrets(){
 
   var t = el("div","tip");
   t.innerHTML = "<strong>Each is 32 random bytes</strong> from <code>crypto.getRandomValues</code>, generated in your "
-    + "browser and never transmitted. No two services share a value. They appear in <code>.env</code> only — "
+    + "browser and never transmitted. No two services share a value. They stay hidden here so nothing leaks into a "
+    + "screenshot — reveal or copy one at a time. They land in <code>.env</code> only — "
     + "<code>.env.example</code> gets placeholders.";
   b.appendChild(t);
 
@@ -1442,9 +1524,17 @@ function buildFiles(){
 function showFile(){
   var f = files[activeFile];
   $("outname").textContent = f.name;
-  $("outbody").textContent = f.body;
+  $("outbody").textContent = state.showSecrets ? f.body : maskBody(f.body);
   var tabs = $("filetabs").children;
   for(var i=0;i<tabs.length;i++) tabs[i].classList.toggle("on", i===activeFile);
+  var tog = $("revealbtn");
+  if(tog){
+    var hidden = secretValues().length;
+    tog.textContent = state.showSecrets ? "Hide secrets" : "Show secrets";
+    tog.style.display = hidden ? "" : "none";
+  }
+  var note = $("masknote");
+  if(note) note.style.display = (!state.showSecrets && secretValues().length) ? "" : "none";
 }
 function download(name, body){
   var blob = new Blob([body], {type:"text/plain;charset=utf-8"});
@@ -1462,6 +1552,7 @@ $("dlone").onclick = function(){ download(files[activeFile].name, files[activeFi
 $("dlall").onclick = function(){
   files.forEach(function(f,i){ setTimeout(function(){ download(f.name, f.body); }, i*350); });
 };
+$("revealbtn").onclick = function(){ state.showSecrets = !state.showSecrets; showFile(); };
 $("regen").onclick = function(){ genSecrets(); buildFiles(); };
 $("next").onclick = function(){ if(step < STEPS.length-1) go(step+1); };
 $("back").onclick = function(){ go(step-1); };
