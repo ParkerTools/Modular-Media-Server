@@ -17,7 +17,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Fraunces:opsz,wght@9..144,700&display=swap">
 <style>
-:root{--blue:#006C87;--teal:#00AFB9;--cream:#FDFCDC;--peach:#FED9B7;--coral:#F07167;--ink:#15333b;--muted:#4a626b;--white:#fffef7;--line:#cfe3e4}
+:root{--on-accent:#FDFCDC;--surface:#fffef7;--tint-teal:#eaf8f7;--tint-peach:#fff6ee;--tint-soft:#f5fbfa;
+  --warn-bg:#fff0e3;--tip-bg:#e4f5f4;--line-teal:#a9dde0;--line-peach:#f4d3b6;
+  --code-fg:#0e5a63;--code-bg:#15333b;--code-txt:#fdfcdc;--code-cm:#8fb3ae;
+  --pill-teal-bg:#d3f0ef;--pill-coral-bg:#ffe0dc;--pill-peach-fg:#744b32;--pill-coral-fg:#96382f;
+  --ok:#2f7d5e;--bad:#b0463c;--warnfg:#a06a2c;--blue-hover:#005b73;
+  --shadow:rgba(21,51,59,.045);--blob-a:var(--peach);--blob-b:rgba(0,175,185,.20);
+  --blue:#006C87;--teal:#00AFB9;--cream:#FDFCDC;--peach:#FED9B7;--coral:#F07167;--ink:#15333b;--muted:#4a626b;--white:#fffef7;--line:#cfe3e4}
 *{box-sizing:border-box}html{scroll-behavior:smooth}
 body{margin:0;color:var(--ink);font-family:"DM Sans",sans-serif;
   background-color:var(--cream);
@@ -45,7 +51,7 @@ h1,h2,h3{font-family:Fraunces,serif;letter-spacing:-.045em;line-height:1.05}
 h1{font-size:clamp(44px,7vw,72px);max-width:840px;margin:18px 0}
 .hero p{font-size:19px;line-height:1.7;color:var(--muted);max-width:700px}
 p,li{color:var(--muted);line-height:1.75}ul,ol{padding-left:22px}li{margin-bottom:5px}
-code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.87em;background:#eaf8f7;padding:2px 6px;border-radius:6px;color:#0e5a63;word-break:break-word}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.87em;background:var(--tint-teal);padding:2px 6px;border-radius:6px;color:var(--code-fg);word-break:break-word}
 pre{background:#15333b;color:#fdfcdc;padding:17px;border-radius:14px;overflow:auto;line-height:1.7;font-size:12.5px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;margin:14px 0}
 pre .cm{color:#8fb3ae}pre .hl{color:var(--peach)}
 .layout{display:grid;grid-template-columns:230px minmax(0,1fr);gap:50px;padding:8px 0 90px}
@@ -59,19 +65,19 @@ h2{font-size:36px;margin:8px 0 14px}h3{font-size:23px;margin:32px 0 10px}
 h4{font-family:"DM Sans";font-size:16px;font-weight:700;letter-spacing:-.02em;color:var(--ink);margin:22px 0 7px}
 .lead{font-size:16.5px;color:var(--muted);line-height:1.75;max-width:690px;margin-bottom:20px}
 .card{background:var(--white);border:1px solid var(--line);border-radius:20px;padding:22px;margin:18px 0;box-shadow:0 1px 2px rgba(21,51,59,.04),0 6px 18px rgba(21,51,59,.045)}
-.card.teal{background:#eaf8f7;border-color:#a9dde0}.card.peach{background:#fff6ee;border-color:#f4d3b6}
+.card.teal{background:var(--tint-teal);border-color:var(--line-teal)}.card.peach{background:var(--tint-peach);border-color:var(--line-peach)}
 .card strong{color:var(--ink)}
-.warning{border-left:5px solid var(--coral);background:#fff0e3;padding:15px 17px;border-radius:0 14px 14px 0;margin:16px 0;font-size:14.5px;line-height:1.7}
-.tip{border-left:5px solid var(--teal);background:#e4f5f4;padding:15px 17px;border-radius:0 14px 14px 0;margin:16px 0;font-size:14.5px;line-height:1.7}
+.warning{border-left:5px solid var(--coral);background:var(--warn-bg);padding:15px 17px;border-radius:0 14px 14px 0;margin:16px 0;font-size:14.5px;line-height:1.7}
+.tip{border-left:5px solid var(--teal);background:var(--tip-bg);padding:15px 17px;border-radius:0 14px 14px 0;margin:16px 0;font-size:14.5px;line-height:1.7}
 .warning strong,.tip strong{color:var(--ink)}
 .tbl{background:var(--white);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin:16px 0;box-shadow:0 1px 2px rgba(21,51,59,.04)}
 .tbl table{width:100%;border-collapse:collapse;font-size:13.5px}
-.tbl th{text-align:left;padding:12px 15px;font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);background:#eaf8f7;font-weight:700}
+.tbl th{text-align:left;padding:12px 15px;font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);background:var(--tint-teal);font-weight:700}
 .tbl td{padding:11px 15px;border-top:1px solid var(--line);color:var(--muted);vertical-align:top}
 .tbl td:first-child{font-weight:700;color:var(--ink);white-space:nowrap}
-.yes{color:#2f7d5e;font-weight:700}.no{color:#b0463c;font-weight:700}.part{color:#a06a2c;font-weight:700}
+.yes{color:var(--ok);font-weight:700}.no{color:var(--bad);font-weight:700}.part{color:var(--warnfg);font-weight:700}
 details.app{background:var(--white);border:1px solid var(--line);border-radius:18px;margin-bottom:10px;overflow:hidden;box-shadow:0 1px 2px rgba(21,51,59,.04),0 6px 18px rgba(21,51,59,.04)}
-details.app[open]{border-color:#a9dde0}
+details.app[open]{border-color:var(--line-teal)}
 details.app summary{cursor:pointer;padding:17px 46px 17px 20px;list-style:none;position:relative;display:flex;align-items:baseline;gap:11px;flex-wrap:wrap}
 details.app summary::-webkit-details-marker{display:none}
 details.app summary:after{content:"";position:absolute;right:20px;top:23px;width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);transition:.2s}
@@ -79,20 +85,20 @@ details.app[open] summary:after{transform:rotate(-135deg);top:26px}
 details.app summary b{font-size:17px;letter-spacing:-.02em;color:var(--ink)}
 details.app summary .d{font-size:13.5px;color:var(--muted);flex:1;min-width:170px}
 .pill{display:inline-block;font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;text-transform:uppercase;letter-spacing:.06em}
-.pill.first{background:#d3f0ef;color:#0e5a63}.pill.after{background:var(--peach);color:#744b32}
+.pill.first{background:var(--pill-teal-bg);color:var(--code-fg)}.pill.after{background:var(--peach);color:var(--pill-peach-fg)}
 .abody{padding:0 20px 20px;border-top:1px solid var(--line);padding-top:16px}
 .abody p,.abody li{font-size:14.5px}
 .steps{counter-reset:st;list-style:none;padding:0;margin:14px 0}
 .steps>li{counter-increment:st;position:relative;padding:0 0 14px 36px;font-size:14.5px;line-height:1.7}
-.steps>li:before{content:counter(st);position:absolute;left:0;top:1px;width:24px;height:24px;border-radius:50%;background:#eaf8f7;border:1px solid #a9dde0;color:var(--blue);font-size:12px;font-weight:700;display:grid;place-items:center}
+.steps>li:before{content:counter(st);position:absolute;left:0;top:1px;width:24px;height:24px;border-radius:50%;background:var(--tint-teal);border:1px solid var(--line-teal);color:var(--blue);font-size:12px;font-weight:700;display:grid;place-items:center}
 .steps ul{margin:7px 0 0}
-.fields{background:#f5fbfa;border:1px solid var(--line);border-radius:13px;padding:5px 16px;margin:12px 0}
+.fields{background:var(--tint-soft);border:1px solid var(--line);border-radius:13px;padding:5px 16px;margin:12px 0}
 .fields dl{margin:0;display:grid;grid-template-columns:minmax(130px,auto) 1fr;gap:0 14px}
 .fields dt{font-weight:700;color:var(--ink);font-size:13.5px;padding:8px 0;border-bottom:1px solid #e2eeed}
 .fields dd{margin:0;font-size:13.5px;color:var(--muted);padding:8px 0;border-bottom:1px solid #e2eeed}
 .fields dl>dt:last-of-type,.fields dl>dd:last-of-type{border-bottom:0}
 .btn{display:inline-block;border-radius:999px;padding:12px 20px;font-weight:700;font-size:14.5px;background:var(--blue);color:#fff}
-.btn:hover{background:#005b73;color:#fff;text-decoration:none}
+.btn:hover{background:var(--blue-hover);color:#fff;text-decoration:none}
 .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
 .btn.ghost:hover{border-color:var(--teal);color:var(--blue);background:transparent}
 footer{border-top:1px solid var(--line);padding:25px 0;color:var(--muted);font-size:13px}
@@ -108,12 +114,153 @@ h2{font-size:29px}.hero:before{display:none}
 }
 @media(max-width:520px){.tbl{overflow-x:auto}}
 @media print{body{background-image:none}}
+
+/* ── dark theme ─────────────────────────────────────────────────────
+   Same hues, inverted. Every pairing here clears WCAG AA.            */
+html[data-theme="dark"]{
+  --cream:#0d1a1f;--ink:#eef7f5;--muted:#c3d6d9;--white:#132a31;--surface:#132a31;
+  --line:#23434c;--blue:#6ec9d6;--blue-hover:#8fdae5;--teal:#00AFB9;
+  --tint-teal:#12313a;--tint-peach:#2e2118;--tint-soft:#102a31;
+  --warn-bg:#33201c;--tip-bg:#12313a;--line-teal:#2c5560;--line-peach:#4a3526;
+  --code-fg:#8fdae5;--code-bg:#08151a;--code-txt:#dfeef0;--code-cm:#7fa8a4;
+  --pill-teal-bg:#164048;--pill-coral-bg:#43231f;--pill-peach-fg:#e8c09a;--pill-coral-fg:#f6a89f;
+  --ok:#6cc79b;--bad:#f2857a;--warnfg:#e0b06a;
+  --shadow:rgba(0,0,0,.30);--blob-a:rgba(254,217,183,.13);--blob-b:rgba(0,175,185,.10);
+  color-scheme:dark;
+}
+html[data-theme="dark"] body{
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23g)' opacity='0.32'/%3E%3C/svg%3E"),
+    radial-gradient(ellipse 900px 620px at 8% 2%,rgba(0,175,185,.09),transparent 62%),
+    radial-gradient(ellipse 760px 540px at 95% 14%,rgba(254,217,183,.07),transparent 64%),
+    radial-gradient(ellipse 820px 600px at 78% 62%,rgba(240,113,103,.06),transparent 62%),
+    radial-gradient(ellipse 900px 640px at 15% 88%,rgba(110,201,214,.06),transparent 62%);
+  background-blend-mode:overlay,normal,normal,normal,normal;
+}
+html[data-theme="dark"] .hero:after{background:var(--blob-a)}
+html[data-theme="dark"] .hero:before{background:var(--blob-b)}
+html[data-theme="dark"] .generator{background:#0f2830}
+html[data-theme="dark"] .btn{background:var(--blue);color:#08151a}
+html[data-theme="dark"] .btn:hover{background:var(--blue-hover);color:#08151a}
+html[data-theme="dark"] .generator .btn{background:var(--blue);color:#08151a}
+html[data-theme="dark"] pre{border:1px solid var(--line)}
+html[data-theme="dark"] img{opacity:.92}
+
+/* ── shared chrome ──────────────────────────────────────────────────── */
+.navlinks a[aria-current="page"]{color:var(--blue);font-weight:700;position:relative}
+.navlinks a[aria-current="page"]:after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:2px;background:var(--blue);border-radius:2px}
+.navtools{display:flex;align-items:center;gap:10px}
+.themebtn{background:none;border:1px solid var(--line);border-radius:999px;width:34px;height:34px;
+  cursor:pointer;color:var(--muted);display:grid;place-items:center;padding:0;flex-shrink:0;transition:.15s}
+.themebtn:hover{border-color:var(--teal);color:var(--blue)}
+.themebtn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round}
+html[data-theme="dark"] .themebtn .i-sun{display:block}
+html[data-theme="dark"] .themebtn .i-moon{display:none}
+.themebtn .i-sun{display:none}
+.themebtn .i-moon{display:block}
+
+/* next / previous pager */
+.pager{display:grid;gap:12px;margin:56px 0 10px;padding-top:30px;border-top:1px solid var(--line)}
+@media(min-width:760px){.pager{grid-template-columns:1fr 1fr}}
+.pager a{display:block;background:var(--surface);border:1px solid var(--line);border-radius:18px;
+  padding:17px 20px;text-decoration:none;transition:.15s}
+.pager a:hover{border-color:var(--teal);transform:translateY(-1px);text-decoration:none}
+.pager .dir{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);display:block;margin-bottom:5px}
+.pager .ttl{font-family:Fraunces,serif;font-size:19px;letter-spacing:-.03em;color:var(--blue);display:block;margin-bottom:3px}
+.pager .sub{font-size:13.5px;color:var(--muted);line-height:1.5}
+.pager .prev{text-align:left}
+@media(min-width:760px){.pager .next{text-align:right}}
+
+/* site footer */
+.sitefoot{border-top:1px solid var(--line);margin-top:20px;padding:38px 0 30px}
+.footgrid{display:grid;gap:26px;margin-bottom:26px}
+@media(min-width:720px){.footgrid{grid-template-columns:1.4fr 1fr 1fr 1fr}}
+.footbrand .fb{font-family:Fraunces,serif;font-size:20px;letter-spacing:-.03em;color:var(--ink)}
+.footbrand p{font-size:13.5px;margin:8px 0 0;max-width:270px;line-height:1.6}
+.footcol b{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:10px}
+.footcol a{display:block;font-size:14px;padding:4px 0;color:var(--muted)}
+.footcol a:hover{color:var(--blue)}
+.footbase{border-top:1px solid var(--line);padding-top:20px;font-size:12.5px;color:var(--muted);line-height:1.7}
+
+/* The theme toggle now sits beside the menu button, so the dropdown must
+   clear both and the tools row must stay visible on small screens. */
+@media(max-width:900px){
+  .navtools{gap:8px}
+  .navlinks{top:70px}
+  .navlinks a[aria-current="page"]:after{display:none}
+  .navlinks a[aria-current="page"]{background:var(--tint-teal)}
+}
+
+/* surfaces that were still hardcoded light */
+html[data-theme="dark"] details.qa[open]{background:#16333b}
+html[data-theme="dark"] .tbl tr:nth-child(even) td{background:rgba(255,255,255,.022)}
+html[data-theme="dark"] pre{background:var(--code-bg)}
+html[data-theme="dark"] .sbox:before{border-color:var(--muted)}
+html[data-theme="dark"] .sbox:after{background:var(--muted)}
+html[data-theme="dark"] .genout{background:#08151a}
+html[data-theme="dark"] .outwrap,html[data-theme="dark"] .outbar{background:#08151a}
+html[data-theme="dark"] .outbar{border-bottom:1px solid var(--line)}
+html[data-theme="dark"] .qs-step pre,html[data-theme="dark"] .dcard pre,
+html[data-theme="dark"] .stp pre{background:var(--code-bg)}
+html[data-theme="dark"] .chip.on,html[data-theme="dark"] .stepbtn.on,
+html[data-theme="dark"] .pbtn.on{color:#08151a}
+html[data-theme="dark"] .qs-step:before,html[data-theme="dark"] .stp:before,
+html[data-theme="dark"] .steps>li:before{color:#08151a}
+html[data-theme="dark"] .dbadge{color:#08151a}
+html[data-theme="dark"] .secretval{background:var(--tint-teal);color:var(--ink)}
+html[data-theme="dark"] .util,html[data-theme="dark"] .mod,html[data-theme="dark"] .opt,
+html[data-theme="dark"] .pick,html[data-theme="dark"] .price,html[data-theme="dark"] .prov,
+html[data-theme="dark"] .aidcard,html[data-theme="dark"] .mini,html[data-theme="dark"] .dcard,
+html[data-theme="dark"] details.app,html[data-theme="dark"] details.m,
+html[data-theme="dark"] .side,html[data-theme="dark"] .qs-done,
+html[data-theme="dark"] .qs-need,html[data-theme="dark"] .spec div,
+html[data-theme="dark"] .fields,html[data-theme="dark"] .flow span,
+html[data-theme="dark"] .stacklist li{background:var(--surface);border-color:var(--line)}
+html[data-theme="dark"] .mod.on,html[data-theme="dark"] .tg.on,
+html[data-theme="dark"] .qs-next a,html[data-theme="dark"] .aidcard.teal,
+html[data-theme="dark"] .dcard-lead{background:var(--tint-teal);border-color:var(--line-teal)}
+html[data-theme="dark"] .mod.auto,html[data-theme="dark"] .dcard:nth-child(3){background:var(--tint-peach);border-color:var(--line-peach)}
+html[data-theme="dark"] .cyc>.card:nth-of-type(3n+2){background:var(--tint-teal);border-color:var(--line-teal)}
+html[data-theme="dark"] .cyc>.card:nth-of-type(3n){background:var(--tint-peach);border-color:var(--line-peach)}
+html[data-theme="dark"] .genfacts div{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.13)}
+html[data-theme="dark"] .head{background:var(--tint-teal);border-color:var(--line-teal)}
+
+/* Pills keep a fixed light background, so their dark-mode surface must be
+   set explicitly or the label becomes invisible against it. */
+html[data-theme="dark"] .tag,
+html[data-theme="dark"] .pill,
+html[data-theme="dark"] .pill.mod,
+html[data-theme="dark"] .pill.after,
+html[data-theme="dark"] .v-ok,
+html[data-theme="dark"] .vi.warn,
+html[data-theme="dark"] .mod .flag.auto,
+html[data-theme="dark"] .hw-badge{
+  background:#4a3526;color:#f0cfa8;border-color:#5d452f}
+html[data-theme="dark"] .pill.easy,
+html[data-theme="dark"] .pill.first,
+html[data-theme="dark"] .pill.teal,
+html[data-theme="dark"] .v-best,
+html[data-theme="dark"] .t-cyan{background:#164048;color:#9fe0e6}
+html[data-theme="dark"] .pill.adv,
+html[data-theme="dark"] .pill.w,
+html[data-theme="dark"] .v-meh,
+html[data-theme="dark"] .mod .flag,
+html[data-theme="dark"] .tag.w{background:#43231f;color:#f8b4ab}
+html[data-theme="dark"] .stepbtn .n{background:#164048;color:#9fe0e6}
+html[data-theme="dark"] .stepbtn.on .n{background:rgba(0,0,0,.28);color:#08151a}
+html[data-theme="dark"] .dsteps li:before{background:var(--surface);color:var(--blue);border-color:var(--line-teal)}
 </style>
+<script>
+(function(){
+  var t;
+  try{ t=localStorage.getItem('mms-theme'); }catch(e){}
+  if(!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme',t);
+})();
+</script>
 </head>
 <body>
-<div class="wrap"><nav><a class="brand" href="index.html">modular<span>.</span>media</a>
-<div class="navlinks"><a href="index.html">Home</a><a href="guide.html">Guide</a><a href="platforms.html">Platforms</a><a href="generator.html">Generator</a><a href="setup.html">App setup</a><a href="access.html">Access</a><a href="documentation.html">Docs</a><a href="faq.html">Help</a></div>
-<button class="navbtn" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button></nav></div>
+<div class="wrap"><nav><a class="brand" href="index.html">modular<span>.</span>media</a><div class="navlinks"><a href="index.html">Home</a><a href="guide.html">Guide</a><a href="platforms.html">Platforms</a><a href="generator.html">Generator</a><a href="setup.html" aria-current="page">App setup</a><a href="access.html">Access</a><a href="hardware.html">Hardware</a><a href="documentation.html">Docs</a><a href="faq.html">Help</a></div><div class="navtools"><button class="themebtn" id="themebtn" aria-label="Switch between light and dark"><svg class="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><svg class="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button><button class="navbtn" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button></div></nav></div>
 
 <section class="hero"><div class="wrap"><div class="kicker">App setup</div>
 <h1>Now make them talk to each other.</h1>
@@ -783,7 +930,7 @@ app.immich:///oauth-callback   <span class="cm"># the mobile app</span></pre>
 </main>
 </div></div>
 
-<footer><div class="wrap">Modular Media Server · <a href="index.html">Home</a> · <a href="guide.html">Guide</a> · <a href="generator.html">Generator</a> · <a href="documentation.html">Docs</a> · <a href="faq.html">Help</a> · Start small. Add what you need. Understand what you're running.</div></footer>
+
 
 <script>
 (function(){
@@ -814,6 +961,38 @@ app.immich:///oauth-callback   <span class="cm"># the mobile app</span></pre>
     var el=document.querySelector(location.hash);
     if(el&&el.tagName==='DETAILS') el.open=true;
   }
+})();
+</script>
+<div class="wrap"><div class="pager"><a class="prev" href="generator.html"><span class="dir">← Previous</span><span class="ttl">Generator</span><span class="sub">Build your Compose files</span></a><a class="next" href="access.html"><span class="dir">Next →</span><span class="ttl">Access</span><span class="sub">Remote access and single sign-on</span></a></div></div>
+<footer class="sitefoot"><div class="wrap">
+<div class="footgrid">
+<div class="footbrand"><div class="fb">modular<span style="color:var(--coral)">.</span>media</div>
+<p>A friendly guide and Compose generator for building the self-hosted server you actually want.</p></div>
+<div class="footcol"><b>Getting started</b>
+<a href="index.html#quickstart">Quickstart</a><a href="guide.html">Setup guide</a>
+<a href="platforms.html">Platform guides</a><a href="hardware.html">Hardware &amp; cost</a></div>
+<div class="footcol"><b>Building</b>
+<a href="generator.html">Compose generator</a><a href="setup.html">App setup</a>
+<a href="access.html">Access &amp; accounts</a><a href="install.sh">install.sh</a></div>
+<div class="footcol"><b>Reference</b>
+<a href="documentation.html">Documentation</a><a href="faq.html">Troubleshooting</a>
+<a href="documentation.html#legal">Legal &amp; security</a>
+<a href="https://github.com/parkertools/Modular-Media-Server" target="_blank" rel="noopener">GitHub</a></div>
+</div>
+<div class="footbase">Start small. Add what you need. Understand what you're running. ·
+Every application here is a separate open-source project owned by its own developers.
+You are responsible for ensuring anything you download, store or share is legally obtained.</div>
+</div></footer>
+<script>
+(function(){
+  /* Applied before paint by the inline head script; this only wires the button. */
+  var btn=document.getElementById('themebtn');
+  if(!btn) return;
+  btn.addEventListener('click',function(){
+    var next=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',next);
+    try{ localStorage.setItem('mms-theme',next); }catch(e){}
+  });
 })();
 </script>
 </body></html>
