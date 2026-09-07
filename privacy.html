@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Privacy &amp; disclosures · Modular Media Server</title>
+<meta name="description" content="What this site stores, what it sends elsewhere, and how the affiliate links work. Short, because there is not much to say.">
+<link rel="canonical" href="https://parkertools.github.io/Modular-Media-Server/privacy.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Modular Media Server">
+<meta property="og:title" content="Privacy &amp; disclosures · Modular Media Server">
+<meta property="og:description" content="What this site stores, what it sends elsewhere, and how the affiliate links work.">
+<meta property="og:url" content="https://parkertools.github.io/Modular-Media-Server/privacy.html">
+<meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#006C87">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23006C87'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23FDFCDC'/%3E%3Ccircle cx='16' cy='16' r='2.5' fill='%23F07167'/%3E%3C/svg%3E">
+<script>
+(function(){
+  var t;
+  try{ t=localStorage.getItem('mms-theme'); }catch(e){}
+  if(!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme',t);
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Fraunces:opsz,wght@9..144,700&display=swap">
+<style>
+:root{--on-accent:#FDFCDC;--surface:#fffef7;--tint-teal:#eaf8f7;--tint-peach:#fff6ee;--tint-soft:#f5fbfa;
+  --warn-bg:#fff0e3;--tip-bg:#e4f5f4;--line-teal:#a9dde0;--line-peach:#f4d3b6;
+  --code-fg:#0e5a63;--code-bg:#15333b;--code-txt:#fdfcdc;--code-cm:#8fb3ae;
+  --pill-teal-bg:#d3f0ef;--pill-coral-bg:#ffe0dc;--pill-peach-fg:#744b32;--pill-coral-fg:#96382f;
+  --ok:#2f7d5e;--bad:#b0463c;--warnfg:#a06a2c;--blue-hover:#005b73;
+  --shadow:rgba(21,51,59,.045);--blob-a:var(--peach);--blob-b:rgba(0,175,185,.20);
+  --blue:#006C87;--teal:#00AFB9;--cream:#FDFCDC;--peach:#FED9B7;--coral:#F07167;--ink:#15333b;--muted:#4a626b;--white:#fffef7;--line:#cfe3e4}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;color:var(--ink);font-family:"DM Sans",sans-serif;
+  background-color:var(--cream);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23g)' opacity='0.5'/%3E%3C/svg%3E"),
+    radial-gradient(ellipse 900px 620px at 8% 2%,rgba(0,175,185,.10),transparent 62%),
+    radial-gradient(ellipse 760px 540px at 95% 14%,rgba(254,217,183,.26),transparent 64%),
+    radial-gradient(ellipse 820px 600px at 78% 62%,rgba(240,113,103,.08),transparent 62%),
+    radial-gradient(ellipse 900px 640px at 15% 88%,rgba(0,108,135,.07),transparent 62%);
+  background-repeat:repeat,no-repeat,no-repeat,no-repeat,no-repeat;
+  background-size:220px 220px,auto,auto,auto,auto;
+  background-attachment:fixed;background-blend-mode:soft-light,normal,normal,normal,normal}
+a{color:var(--blue);text-decoration:none}a:hover{color:var(--coral);text-decoration:underline}
+.wrap{max-width:1160px;margin:auto;padding:0 24px}
+nav{height:82px;display:flex;align-items:center;justify-content:space-between;position:relative}
+.brand{font-weight:700;font-size:18px;letter-spacing:-.04em;color:var(--ink)}.brand span{color:var(--coral)}
+.navlinks{display:flex;gap:20px;color:var(--muted);font-size:14px}.navlinks a{color:var(--muted)}.navlinks a:hover{color:var(--blue)}
+.navtools{display:flex;align-items:center;gap:10px}
+.themebtn{background:none;border:1px solid var(--line);border-radius:999px;width:34px;height:34px;cursor:pointer;color:var(--muted);display:grid;place-items:center;padding:0;flex-shrink:0}
+.themebtn:hover{border-color:var(--teal);color:var(--blue)}
+.themebtn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round}
+html[data-theme="dark"] .themebtn .i-sun{display:block}html[data-theme="dark"] .themebtn .i-moon{display:none}
+.themebtn .i-sun{display:none}.themebtn .i-moon{display:block}
+.navbtn{display:none;background:none;border:1px solid var(--line);border-radius:10px;padding:8px 11px;cursor:pointer;font:inherit;color:var(--ink);line-height:1}
+.navbtn span{display:block;width:17px;height:2px;background:var(--ink);border-radius:2px;margin:3px 0}
+h1,h2,h3{font-family:Fraunces,serif;letter-spacing:-.045em;line-height:1.05}
+.hero{padding:70px 0 40px;position:relative;overflow:hidden;--hero2:rgba(0,175,185,.20)}
+.hero:after{content:"";position:absolute;width:240px;height:160px;background:var(--blob-a);border-radius:54% 46% 60% 40%;right:-64px;top:32px;transform:rotate(-7deg);z-index:-1}
+.hero:before{content:"";position:absolute;width:200px;height:200px;border-radius:52% 48% 44% 56%;background:var(--blob-b);right:126px;top:-38px;z-index:-2}
+.kicker{text-transform:uppercase;letter-spacing:.15em;font-size:12px;font-weight:700;color:var(--blue)}
+h1{font-size:clamp(40px,6vw,62px);max-width:800px;margin:16px 0}
+.hero p{font-size:18px;line-height:1.7;color:var(--muted);max-width:660px}
+p,li{color:var(--muted);line-height:1.75}ul{padding-left:22px}li{margin-bottom:6px}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.87em;background:var(--tint-teal);padding:2px 6px;border-radius:6px;color:var(--code-fg)}
+main{padding-bottom:40px}
+section{margin-bottom:40px;scroll-margin-top:22px}
+h2{font-size:30px;margin:6px 0 12px}
+.updated{font-size:13px;color:var(--muted);margin-bottom:26px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:22px;margin:16px 0;box-shadow:0 1px 2px rgba(21,51,59,.04),0 6px 18px var(--shadow)}
+.card.teal{background:var(--tint-teal);border-color:var(--line-teal)}
+.card.peach{background:var(--tint-peach);border-color:var(--line-peach)}
+.card strong{color:var(--ink)}
+.tbl{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin:16px 0}
+.tbl table{width:100%;border-collapse:collapse;font-size:14px}
+.tbl th{text-align:left;padding:12px 15px;font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);background:var(--tint-teal);font-weight:700}
+.tbl td{padding:12px 15px;border-top:1px solid var(--line);color:var(--muted);vertical-align:top}
+.tbl td:first-child{font-weight:700;color:var(--ink);white-space:nowrap}
+.pager{display:grid;gap:12px;margin:40px 0 10px;padding-top:26px;border-top:1px solid var(--line)}
+.pager a{display:block;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px 19px;text-decoration:none}
+.pager a:hover{border-color:var(--teal);text-decoration:none}
+.pager .dir{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);display:block;margin-bottom:4px}
+.pager .ttl{font-family:Fraunces,serif;font-size:18px;color:var(--blue);display:block}
+.sitefoot{border-top:1px solid var(--line);margin-top:16px;padding:34px 0 28px}
+.footbase{font-size:12.5px;color:var(--muted);line-height:1.7}
+.skiplink{position:absolute;left:-9999px;top:0;z-index:999;background:var(--blue);color:#fff;padding:12px 18px;border-radius:0 0 12px 0;font-weight:700}
+.skiplink:focus{left:0;color:#fff;text-decoration:none}
+html[data-theme="dark"] .skiplink,html[data-theme="dark"] .skiplink:focus{color:#08151a}
+:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+html[data-theme="dark"]{--cream:#0d1a1f;--ink:#eef7f5;--muted:#c3d6d9;--white:#132a31;--surface:#132a31;
+  --line:#23434c;--blue:#6ec9d6;--blue-hover:#8fdae5;--tint-teal:#12313a;--tint-peach:#2e2118;
+  --tint-soft:#102a31;--warn-bg:#33201c;--tip-bg:#12313a;--line-teal:#2c5560;--line-peach:#4a3526;
+  --code-fg:#8fdae5;--code-bg:#08151a;--shadow:rgba(0,0,0,.30);--blob-a:rgba(254,217,183,.13);
+  --blob-b:rgba(0,175,185,.10);color-scheme:dark}
+html[data-theme="dark"] body{background-blend-mode:overlay,normal,normal,normal,normal}
+@media(max-width:900px){
+  .navbtn{display:block}
+  .navlinks{display:none;position:absolute;top:70px;right:0;left:0;background:var(--surface);border:1px solid var(--line);border-radius:16px;flex-direction:column;gap:0;padding:8px;z-index:60}
+  .navopen .navlinks{display:flex}
+  .navlinks a{padding:11px 13px;border-radius:10px;font-size:15px}
+  .hero:before{display:none}
+}
+@media(min-width:760px){.pager{grid-template-columns:1fr 1fr}.pager .next{text-align:right}}
+@media(min-width:1500px){.wrap{max-width:1320px}html{font-size:17px}}
+@media(prefers-reduced-motion:reduce){*{transition-duration:.01ms!important;scroll-behavior:auto!important}}
+@media print{body{background-image:none}}
+</style>
+</head>
+<body>
+<a class="skiplink" href="#main">Skip to content</a>
+<div class="wrap"><nav><a class="brand" href="index.html">modular<span>.</span>media</a>
+<div class="navlinks"><a href="index.html">Home</a><a href="guide.html">Guide</a><a href="platforms.html">Platforms</a><a href="generator.html">Generator</a><a href="setup.html">App setup</a><a href="access.html">Access</a><a href="hardware.html">Hardware</a><a href="documentation.html">Docs</a><a href="faq.html">Help</a></div>
+<div class="navtools">
+<button class="themebtn" id="themebtn" aria-label="Switch between light and dark">
+<svg class="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+<svg class="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+</button>
+<button class="navbtn" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+</div></nav></div>
+
+<section class="hero"><div class="wrap"><div class="kicker">Privacy &amp; disclosures</div>
+<h1>What this site does with your data.</h1>
+<p>Almost nothing, which makes this short. There are no accounts, no analytics, no tracking pixels, and nothing you type into the generator ever leaves your browser.</p></div></section>
+
+<main id="main"><div class="wrap">
+
+<p class="updated">Last updated: September 2026</p>
+
+<section id="collect">
+<h2>What is collected</h2>
+<div class="card teal">
+<strong>Nothing, by this site.</strong>
+<p style="margin:10px 0 0">There is no server-side code here. These are static files on GitHub Pages. There is no database, no contact form, no account, no newsletter, no comment system, and no analytics of any kind — no Google Analytics, no Plausible, nothing.</p>
+</div>
+<p>Two things are worth being specific about, because they are the only exceptions.</p>
+</section>
+
+<section id="generator">
+<h2>The Compose generator</h2>
+<div class="card">
+<strong>Everything you type stays in your browser.</strong>
+<p style="margin:10px 0 0">The generator runs entirely as JavaScript on the page you are looking at. Your domain, storage paths, VPN credentials and generated secrets are held in memory while the page is open and are <strong>never transmitted anywhere</strong>. There is no server to send them to.</p>
+<p style="margin:10px 0 0">Secrets are produced by <code>crypto.getRandomValues</code>, your browser's own cryptographic random source. Closing or refreshing the tab discards everything. Nothing is saved between visits.</p>
+</div>
+<p>You can verify this rather than take my word for it: open your browser's developer tools, switch to the Network tab, and use the generator. You will see no outbound requests beyond the fonts.</p>
+</section>
+
+<section id="storage">
+<h2>What is stored in your browser</h2>
+<p>Two small preferences, using <code>localStorage</code>. Both stay on your device, are readable only by this site, and are never sent anywhere.</p>
+<div class="tbl"><table>
+<thead><tr><th>Key</th><th>What it holds</th><th>Why</th></tr></thead>
+<tbody>
+<tr><td><code>mms-theme</code></td><td><code>light</code> or <code>dark</code></td><td>Remembers your theme so the site does not flip back each visit</td></tr>
+<tr><td><code>mms-amz-region</code></td><td>An Amazon store, e.g. <code>com</code></td><td>Remembers which regional store you chose on the hardware page</td></tr>
+</tbody></table></div>
+<p>Neither is a cookie, neither identifies you, and clearing your browser data removes both with no consequence beyond losing those two preferences.</p>
+</section>
+
+<section id="third-party">
+<h2>Third parties</h2>
+<p>Three, and only one of them happens automatically.</p>
+<div class="tbl"><table>
+<thead><tr><th>Who</th><th>When</th><th>What they can see</th></tr></thead>
+<tbody>
+<tr><td>Google Fonts</td><td>Every page load</td><td>Your IP address and browser, because the fonts are requested from their servers</td></tr>
+<tr><td>GitHub Pages</td><td>Every page load</td><td>Standard web server logs, as the host of this site</td></tr>
+<tr><td>Amazon</td><td>Only if you click an affiliate link</td><td>Whatever Amazon normally collects once you are on their site</td></tr>
+</tbody></table></div>
+<div class="card peach">
+<strong>On Google Fonts.</strong>
+<p style="margin:10px 0 0">Fonts are loaded from Google's servers, which means Google receives your IP address on each page load. This is common but it is still a third-party request, and you should know it happens. Self-hosting the font files would remove it — that is a change worth making if it matters to you.</p>
+</div>
+</section>
+
+<section id="affiliate">
+<h2>Affiliate disclosure</h2>
+<div class="card">
+<strong>As an Amazon Associate I earn from qualifying purchases.</strong>
+<p style="margin:10px 0 0">The hardware page contains Amazon affiliate links. If you buy something after clicking one, this project receives a small commission and you pay exactly the same price. Modular Media Server is a participant in the Amazon Services LLC Associates Program, an affiliate advertising program designed to provide a means for sites to earn advertising fees by advertising and linking to Amazon.</p>
+</div>
+<p>Two things follow from that, and both are commitments rather than legal boilerplate:</p>
+<ul>
+<li><strong style="color:var(--ink)">Commission never determines a recommendation.</strong> The hardware page's own cost comparison argues for a used office PC over anything new, and the affiliate section says plainly that a roughly $150 used mini PC runs everything in this project. Advice that talks you into overspending would be worth less than the commission.</li>
+<li><strong style="color:var(--ink)">Affiliate links are labelled.</strong> Each one is marked <em>paid link</em> and carries <code>rel="nofollow sponsored"</code>. Only the US store is an affiliate link; other regions are plain links that earn nothing, and the page says so when you switch to them.</li>
+</ul>
+<p>Some VPN and VPS providers named elsewhere on the site operate affiliate programmes. <strong>None of those links are affiliate links at present.</strong> If that changes, the link will say so where it appears.</p>
+</section>
+
+<section id="rights">
+<h2>Your choices</h2>
+<ul>
+<li><strong style="color:var(--ink)">Block the fonts.</strong> The site remains fully functional with a fallback typeface.</li>
+<li><strong style="color:var(--ink)">Clear the two stored preferences</strong> at any time through your browser's site data settings.</li>
+<li><strong style="color:var(--ink)">Avoid the affiliate links</strong> by searching Amazon yourself. The hardware page tells you exactly what specifications to look for, so the links are a convenience rather than a requirement.</li>
+<li><strong style="color:var(--ink)">Read the source.</strong> Every page is static HTML in a <a href="https://github.com/parkertools/Modular-Media-Server" target="_blank" rel="noopener">public repository</a>. Nothing here is hidden from you.</li>
+</ul>
+<p>Since no personal data is collected, there is nothing to request access to, correct or delete — but if you have a question, open an issue on the repository.</p>
+</section>
+
+<section id="changes">
+<h2>Changes</h2>
+<p>If this policy changes, the date at the top changes with it, and the edit will be visible in the repository's commit history.</p>
+<div class="card teal">
+<strong>Not legal advice.</strong>
+<p style="margin:10px 0 0">This page describes plainly what the site does. It is written to be accurate rather than to be a legal document, and it is not a substitute for advice from someone qualified to give it.</p>
+</div>
+</section>
+
+<div class="pager">
+<a class="prev" href="hardware.html"><span class="dir">← Back to</span><span class="ttl">Hardware &amp; cost</span></a>
+<a class="next" href="index.html"><span class="dir">Or start over</span><span class="ttl">Home</span></a>
+</div>
+
+</div></main>
+
+<footer class="sitefoot"><div class="wrap"><div class="footbase">
+Modular Media Server · <a href="index.html">Home</a> · <a href="documentation.html">Docs</a> · <a href="faq.html">Help</a> · <a href="privacy.html">Privacy</a><br>
+Start small. Add what you need. Understand what you're running. ·
+Every application here is a separate open-source project owned by its own developers.
+You are responsible for ensuring anything you download, store or share is legally obtained. ·
+As an Amazon Associate I earn from qualifying purchases.
+</div></div></footer>
+
+<script>
+(function(){
+  var b=document.querySelector('.navbtn'), n=document.querySelector('nav');
+  if(b&&n){
+    b.addEventListener('click',function(){
+      var open=n.classList.toggle('navopen');
+      b.setAttribute('aria-expanded',open?'true':'false');
+    });
+    n.addEventListener('click',function(e){ if(e.target.tagName==='A') n.classList.remove('navopen'); });
+    document.addEventListener('click',function(e){ if(!n.contains(e.target)) n.classList.remove('navopen'); });
+    document.addEventListener('keydown',function(e){ if(e.key==='Escape') n.classList.remove('navopen'); });
+  }
+  var t=document.getElementById('themebtn');
+  if(t) t.addEventListener('click',function(){
+    var next=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',next);
+    try{ localStorage.setItem('mms-theme',next); }catch(e){}
+  });
+})();
+</script>
+</body></html>
