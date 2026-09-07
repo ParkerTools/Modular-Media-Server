@@ -479,7 +479,7 @@ html[data-theme="dark"] .pick-go a,html[data-theme="dark"] .pick-go a:hover{colo
 <option value="de">Amazon.de — Germany</option>
 <option value="com.au">Amazon.com.au — Australia</option>
 </select>
-<span class="storenote">Links update to your region.</span>
+<span class="storenote" id="storenote">Links update to your region.</span>
 </div>
 
 <div class="picks" id="amz-picks"></div>
@@ -638,8 +638,8 @@ You are responsible for ensuring anything you download, store or share is legall
      but nothing breaks and nothing misattributes.
      Amazon requires a separate approval per marketplace.              */
   var AMAZON_TAGS = {
-    "com":    "parkertoolsme-20",   /* e.g. yourtag-20  */
-    "co.uk":  "",   /* e.g. yourtag-21  */
+    "com":    "parkertoolsme-20",   /* US — approved */
+    "co.uk":  "",                   /* not approved; links go untagged */
     "ca":     "",
     "de":     "",
     "com.au": ""
@@ -746,9 +746,21 @@ You are responsible for ensuring anything you download, store or share is legall
       region = sel.value;
       try{ localStorage.setItem("mms-amz-region", region); }catch(e){}
       render();
+      note();
     });
   }
+  /* Only the US store is an approved Associates marketplace, so say so
+     rather than implying every regional link is an affiliate link. */
+  function note(){
+    var n = document.getElementById("storenote");
+    if(!n) return;
+    n.textContent = AMAZON_TAGS[region]
+      ? "Links update to your region. This one is an affiliate link."
+      : "Links update to your region \u2014 this store is not an affiliate link, so it earns nothing.";
+  }
+
   render();
+  note();
 })();
 </script>
 </body></html>
