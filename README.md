@@ -81,6 +81,71 @@ install.sh            CLI equivalent of the generator
 Static HTML with no build step. Every page is self-contained; the only external requests are
 Google Fonts.
 
+## Project status
+
+| Phase | State | Notes |
+|---|---|---|
+| 1 · Documentation | Done | Docker/Compose intros, Arcane, storage, permissions, networking, per-module reference, legal notices |
+| 2 · Compose files | Done | Generated on demand rather than kept static — the generator and `install.sh` emit identical output, checked by CI |
+| 3 · Generator | Done | 19 modules, dependency resolution, storage layouts, credentials, secrets, validation, ZIP download |
+| 4 · Hardware & hosting | Done | Requirements, device guidance, self-hosting, VPS comparison, costs, buying guidance |
+| 5 · Utilities | Partly | Documented and linked on the hardware page; no per-utility setup guides |
+
+### Deliberate departures from the original plan
+
+Three things in the original outline were not built as written. Each was a decision, not an omission.
+
+| Planned | Built instead | Why |
+|---|---|---|
+| Drag-and-drop module picker | Click to add or remove | Dragging is poor on phones and unusable by keyboard or screen reader. Clicking works everywhere. |
+| API key fields in the generator | Documented in `setup.html` | The \*arr apps generate their own API keys on first run — no value exists to collect beforehand. |
+| Password length / charset options | Fixed 32 random bytes | These are machine credentials nobody types. Options only create a way to make them weaker. |
+
+### Not built yet
+
+- **Split stack output** — the generator writes one `docker-compose.yml`. Splitting into `media.yml`,
+  `downloads.yml` and so on would suit people who restart one group without the others.
+- **Optional integrations** — required and recommended dependencies are modelled; genuinely optional
+  pairings like Kometa alongside Jellyfin are documented but not offered in the generator.
+- **Per-utility setup guides** — utilities link to their own projects rather than having walkthroughs.
+- **Self-hosted fonts** — typefaces load from Google, which is a third-party request on every page.
+
+## Amazon affiliate links
+
+`hardware.html` has a hardware picks section using Amazon Associates links. **It ships with
+no tracking IDs**, so links work but earn nothing until you add yours.
+
+Edit the `AMAZON_TAGS` map near the bottom of `hardware.html`:
+
+```js
+var AMAZON_TAGS = {
+  "com":    "parkertoolsme-20",   // US — approved
+  "co.uk":  "",                   // add if you get UK approval
+  "ca":     "",
+  "de":     "",
+  "com.au": ""
+};
+```
+
+Each marketplace needs its own Associates approval and its own tag. A region left blank
+links to Amazon without a tag — no earnings, but nothing breaks.
+
+**Compliance notes**, because Amazon terminates for material breach with no warning:
+
+- The required statement — *As an Amazon Associate I earn from qualifying purchases* — appears
+  above the links and in every page footer. Do not remove it.
+- **No prices are displayed anywhere near these links, on purpose.** Amazon prohibits static
+  prices; showing them requires their API with frequent refresh. The links go to live listings
+  instead.
+- **No product images**, for the same reason — images must come through Amazon's API, not be
+  downloaded and self-hosted.
+- Links carry `rel="nofollow sponsored"` and a visible *paid link* label.
+- You also need a privacy policy on the site to satisfy the Operating Agreement.
+- Amazon closes accounts that make no qualifying sales within 180 days of approval.
+
+The picks are searches rather than specific products, so links do not rot as models go out
+of stock.
+
 ## Contributing
 
 Issues and pull requests are welcome. The CI workflow validates generated Compose files, checks
