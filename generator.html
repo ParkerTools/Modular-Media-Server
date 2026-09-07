@@ -399,6 +399,12 @@ html[data-theme="dark"] .skiplink{color:#08151a}
     transition-duration:.01ms!important;scroll-behavior:auto!important}
   .pager a:hover,.util:hover,.qs-next a:hover{transform:none}
 }
+
+.hint-error{color:var(--pill-coral-fg)}
+.hint-ok{color:var(--ok)}
+html[data-theme="dark"] .hint-error{color:#f8b4ab}
+html[data-theme="dark"] .hint-ok{color:#6cc79b}
+.f input.bad{border-color:var(--coral);background:var(--warn-bg)}
 </style>
 <script>
 (function(){
@@ -899,6 +905,54 @@ var PRESETS = {
 // Never proxy these publicly, whatever the user picks.
 var NEVER_PROXY = ["arcane","qbittorrent","sonarr","radarr","lidarr","bazarr","jackett","tubearchivist","archivebox"];
 
+
+/* Domain validation. Deliberately structural rather than a list of valid
+   TLDs — new ones appear constantly and any hardcoded list goes stale.
+   What we can check for certain is the shape, and the cases where a public
+   certificate authority will definitely refuse to issue.                  */
+var RESERVED_TLDS = ["local","localhost","internal","home","lan","intranet",
+                     "private","corp","test","invalid","example","onion","arpa"];
+
+function checkDomain(raw){
+  var d = (raw || "").trim().toLowerCase();
+  if(!d) return {level:"empty", msg:"A domain is required — Caddy cannot obtain certificates without one."};
+
+  if(/^\d{1,3}(\.\d{1,3}){3}$/.test(d) || d.indexOf(":") !== -1)
+    return {level:"error", msg:"That is an IP address. Certificate authorities do not issue certificates for IPs — you need a domain name."};
+
+  if(d.indexOf(".") === -1)
+    return {level:"error", msg:"That is a single name with no dot. A public certificate needs a real domain such as <code>example.com</code>."};
+
+  if(d.length > 253)
+    return {level:"error", msg:"That is longer than a domain name is allowed to be."};
+
+  var labels = d.split(".");
+  if(labels.some(function(l){ return l.length === 0; }))
+    return {level:"error", msg:"There is an empty part in there — check for a leading, trailing or doubled dot."};
+  if(labels.some(function(l){ return l.length > 63; }))
+    return {level:"error", msg:"One part of that name is longer than 63 characters, which is not allowed."};
+
+  var labelOk = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/;
+  for(var i=0;i<labels.length;i++){
+    if(!labelOk.test(labels[i]))
+      return {level:"error", msg:"<code>" + labels[i] + "</code> is not a valid part of a domain. Use letters, numbers and hyphens, not starting or ending with a hyphen."};
+  }
+
+  var tld = labels[labels.length-1];
+  if(/^\d+$/.test(tld))
+    return {level:"error", msg:"A domain cannot end in numbers."};
+  if(!/^([a-z]{2,63}|xn--[a-z0-9-]{2,59})$/.test(tld))
+    return {level:"error", msg:"<code>." + tld + "</code> does not look like a valid top-level domain."};
+
+  if(RESERVED_TLDS.indexOf(tld) !== -1)
+    return {level:"error", msg:"<code>." + tld + "</code> is reserved for private networks, so no public authority will issue a certificate for it. Use a domain you own, or reach the server over Tailscale instead."};
+
+  if(labels.length === 2)
+    return {level:"ok", msg:"Services will be published as subdomains — <code>jellyfin." + d + "</code> and so on."};
+
+  return {level:"ok", msg:"Valid. Each service gets its own name under <code>" + d + "</code>."};
+}
+
 function resolve(sel){
   var out = sel.slice(), added = [], guard = 0;
   while(guard++ < 20){
@@ -1182,7 +1236,9 @@ function validate(state){
     }
   }
   if(sel.indexOf("caddy") !== -1){
-    if(!state.domain) err("No domain set","Caddy cannot obtain certificates without one.");
+    var dc = checkDomain(state.domain);
+    if(dc.level === "empty") err("No domain set", "Caddy cannot obtain certificates without one.");
+    else if(dc.level === "error") err("Domain will not work", dc.msg.replace(/<[^>]+>/g, ""));
     else ok("Domain set to " + state.domain, "DNS must already point at this machine.");
   }
   if(sel.indexOf("pocket-id") !== -1){
@@ -1224,7 +1280,7 @@ function buildAll(state){
   return files;
 }
 
-return {CATS:CATS, MODULES:MODULES, PRESETS:PRESETS, resolve:resolve, validate:validate,
+return {CATS:CATS, MODULES:MODULES, PRESETS:PRESETS, resolve:resolve, validate:validate, checkDomain:checkDomain,
         buildAll:buildAll, buildCompose:buildCompose, buildEnv:buildEnv,
         buildCaddyfile:buildCaddyfile, buildReadme:buildReadme,
         collectSecrets:collectSecrets, collectManual:collectManual, serviceUrl:serviceUrl};
@@ -1436,6 +1492,24 @@ function renderStorage(){
 
 /* Updates just the domain-dependent text, leaving the input untouched
    so the caret and focus survive typing. */
+
+/* Live domain feedback. Patches the hint text only — never re-renders the
+   pane, because that would destroy the input and drop focus mid-word. */
+function showDomainCheck(input){
+  var h = $("domhint");
+  if(!h) return;
+  var r = CORE.checkDomain(state.domain);
+  if(r.level === "empty"){
+    h.className = "hint";
+    h.innerHTML = "Just the domain, no <code>https://</code>. It must already point at this machine.";
+    if(input) input.classList.remove("bad");
+    return;
+  }
+  h.className = "hint hint-" + r.level;
+  h.innerHTML = (r.level === "error" ? "\u26a0 " : "\u2713 ") + r.msg;
+  if(input) input.classList.toggle("bad", r.level === "error");
+}
+
 function updateDomainPreview(){
   var d = state.domain || "example.com";
   var dns = $("dnsbox");
@@ -1489,16 +1563,20 @@ function renderConn(){
     i.oninput = function(){
       state.domain = i.value.replace(/^https?:\/\//,"").replace(/\s+/g,"").replace(/\/+$/,"");
       updateDomainPreview();
+      showDomainCheck(i);
     };
     // Tidy up only once they leave the field, so typing is never fought.
     i.onblur = function(){
+      state.domain = state.domain.toLowerCase();
       i.value = state.domain;
       updateDomainPreview();
+      showDomainCheck(i);
     };
     f.appendChild(i);
-    var h = el("div","hint");
+    var h = el("div","hint"); h.id = "domhint";
     h.innerHTML = "Just the domain, no <code>https://</code>. It must already point at this machine.";
     f.appendChild(h); d.appendChild(f); b.appendChild(d);
+    showDomainCheck(i);
 
     var names = [];
     state.selected.forEach(function(id){
