@@ -1,424 +1,819 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Modular Media Server</title>
-<meta name="description" content="Build the server you actually want. A friendly guide and Compose generator for self-hosting your own media stack with Docker.">
-<link rel="canonical" href="https://parkertools.github.io/Modular-Media-Server/">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>App setup · Modular Media Server</title>
+<meta name="description" content="Click-by-click first-run configuration for every app: storage paths, wiring qBittorrent to Sonarr and Radarr, Jellyfin and Jellyseerr, Uptime Kuma alerts, and Pocket ID single sign-on.">
+<link rel="canonical" href="https://parkertools.github.io/Modular-Media-Server/setup.html">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Modular Media Server">
-<meta property="og:title" content="Modular Media Server">
-<meta property="og:description" content="Build the server you actually want. A friendly guide and Compose generator for self-hosting your own media stack with Docker.">
-<meta property="og:url" content="https://parkertools.github.io/Modular-Media-Server/">
+<meta property="og:title" content="App setup · Modular Media Server">
+<meta property="og:description" content="Click-by-click first-run configuration for every app: storage paths, wiring the *arr stack, Uptime Kuma alerts, and Pocket ID single sign-on.">
+<meta property="og:url" content="https://parkertools.github.io/Modular-Media-Server/setup.html">
 <meta name="twitter:card" content="summary">
 <meta name="theme-color" content="#006C87">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23006C87'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23FDFCDC'/%3E%3Ccircle cx='16' cy='16' r='2.5' fill='%23F07167'/%3E%3C/svg%3E">
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Fraunces:opsz,wght@9..144,700&display=swap">
 <style>
 :root{--blue:#006C87;--teal:#00AFB9;--cream:#FDFCDC;--peach:#FED9B7;--coral:#F07167;--ink:#15333b;--muted:#4a626b;--white:#fffef7;--line:#cfe3e4}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--cream);color:var(--ink);font-family:"DM Sans",sans-serif}a{text-decoration:none;color:inherit}.wrap{max-width:1160px;margin:auto;padding:0 24px}
-nav{height:82px;display:flex;align-items:center;justify-content:space-between}.brand{font-weight:700;font-size:18px;letter-spacing:-.04em}.brand span{color:var(--coral)}.navlinks{display:flex;gap:25px;color:var(--muted);font-size:14px}.navlinks a:hover{color:var(--blue)}
-.hero{padding:90px 0 105px;position:relative;overflow:hidden}.hero:after{content:"";position:absolute;width:280px;height:180px;background:var(--peach);border-radius:54% 46% 60% 40%;right:-70px;top:30px;transform:rotate(8deg);z-index:-1}.kicker{text-transform:uppercase;letter-spacing:.15em;font-size:12px;font-weight:700;color:var(--blue)}
-h1,h2,h3{font-family:Fraunces,serif;letter-spacing:-.045em;line-height:1.03}h1{font-size:clamp(55px,8vw,94px);max-width:850px;margin:18px 0 25px}.hero p,.lead{color:var(--muted);line-height:1.7}.hero p{font-size:20px;max-width:650px}
-.buttons{display:flex;gap:12px;margin-top:30px;flex-wrap:wrap}.btn{display:inline-block;border-radius:999px;padding:13px 22px;font-weight:700;font-size:15px;background:var(--blue);color:#fff;text-decoration:none;transition:.15s}
-.btn:hover{background:#005b73;color:#fff;text-decoration:none}
-.btn.alt{background:transparent;border:1px solid var(--line);color:var(--ink)}
-.btn.alt:hover{border-color:var(--teal);color:var(--blue);background:transparent}
-/* On the blue band the normal button colours disappear, so invert them. */
-.generator .btn{background:var(--cream);color:#0b3540}
-.generator .btn:hover{background:#fff;color:#0b3540}
-.generator .btn.alt{background:transparent;border:1px solid rgba(253,252,220,.55);color:var(--cream)}
-.generator .btn.alt:hover{border-color:var(--cream);background:rgba(253,252,220,.12);color:var(--cream)}
-.buttons{display:flex;gap:12px;flex-wrap:wrap}.btn.alt{background:transparent;border:1px solid var(--line);color:var(--ink)}.btn.alt:hover{border-color:var(--teal);color:var(--blue)}
-.section{padding:80px 0;border-top:1px solid var(--line)}h2{font-size:52px;margin:10px 0 18px}.lead{font-size:17px;max-width:680px}
-.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:35px}.card{background:var(--white);border:1px solid var(--line);padding:25px;border-radius:20px}.num{font:31px Fraunces;color:var(--coral)}.card h3{font:700 18px "DM Sans";letter-spacing:-.02em;margin:15px 0 8px}.card p{font-size:14px;color:var(--muted);line-height:1.65;margin:0}
-.apps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:35px}.app{background:var(--white);border:1px solid var(--line);padding:23px;border-radius:20px;display:flex;flex-direction:column;min-height:190px}.app:nth-child(3n+2){background:#eaf8f7}.app:nth-child(3n){background:#fff1e4}.app-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.app h3{font:700 20px "DM Sans";letter-spacing:-.03em;margin:0}.tag{font-size:10px;text-transform:uppercase;letter-spacing:.1em;font-weight:700;padding:6px 8px;border-radius:999px;background:var(--peach);color:#744b32;white-space:nowrap}.app p{font-size:14px;color:var(--muted);line-height:1.6;margin:14px 0 18px}.source{margin-top:auto;display:flex;gap:8px;flex-wrap:wrap}.source a{font-size:12px;font-weight:700;color:var(--blue);border-bottom:1px solid #9bcbd2}.source a:hover{color:var(--coral);text-decoration:underline}
-.generator{background:var(--blue);color:var(--cream);padding:85px 0}.generator .lead{color:#d8f1f2}.generator h2{color:var(--cream)}.ghead{display:flex;justify-content:space-between;font-weight:700;padding:6px;border-bottom:1px solid var(--line)}.bar{height:100%;width:14%;background:var(--coral);transition:.45s}
-.body{display:grid;grid-template-columns:185px 1fr;min-height:390px}.side{border-right:1px solid var(--line);padding:8px}.main{padding:10px 25px;animation:in .3s ease}@keyframes in{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}.main h3{font-size:34px;margin:4px 0 8px}.main p{font-size:14px;color:var(--muted)}
-.option:hover{transform:translateY(-2px);border-color:#91cdd1}.option b{display:block}.option span{font-size:12px;color:var(--muted)}
-.note{background:#fff0e3;border-left:4px solid var(--coral);padding:13px 15px;color:var(--muted);font-size:13px;line-height:1.55}
-.about{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}.blob{background:var(--peach);border-radius:50% 45% 52% 43%;min-height:280px;display:grid;place-items:center;text-align:center;padding:35px;transform:rotate(-3deg)}.blob p{font:30px/1.25 Fraunces;max-width:350px;color:#653f32}.legal{font-size:12px;color:var(--muted);line-height:1.7;margin-top:45px}footer{border-top:1px solid var(--line);padding:25px 0;color:var(--muted);font-size:13px}
-@media(max-width:850px){.grid4{grid-template-columns:1fr 1fr}.apps{grid-template-columns:1fr 1fr}.about{grid-template-columns:1fr}.body{grid-template-columns:1fr}.side{border-right:0;border-bottom:1px solid var(--line);display:flex;overflow:auto}}
-@media(max-width:520px){.grid4,.apps,h2{font-size:42px}.hero{padding-top:55px}}
-
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;color:var(--ink);font-family:"DM Sans",sans-serif;
+  background-color:var(--cream);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23g)' opacity='0.5'/%3E%3C/svg%3E"),
+    radial-gradient(ellipse 900px 620px at 8% 2%,rgba(0,175,185,.10),transparent 62%),
+    radial-gradient(ellipse 760px 540px at 95% 14%,rgba(254,217,183,.26),transparent 64%),
+    radial-gradient(ellipse 820px 600px at 78% 62%,rgba(240,113,103,.08),transparent 62%),
+    radial-gradient(ellipse 900px 640px at 15% 88%,rgba(0,108,135,.07),transparent 62%);
+  background-repeat:repeat,no-repeat,no-repeat,no-repeat,no-repeat;
+  background-size:220px 220px,auto,auto,auto,auto;
+  background-attachment:fixed;background-blend-mode:soft-light,normal,normal,normal,normal}
+a{color:var(--blue);text-decoration:none}a:hover{color:var(--coral);text-decoration:underline}
+.wrap{max-width:1160px;margin:auto;padding:0 24px}
+nav{height:82px;display:flex;align-items:center;justify-content:space-between;position:relative}
+.brand{font-weight:700;font-size:18px;letter-spacing:-.04em;color:var(--ink)}.brand span{color:var(--coral)}
+.navlinks{display:flex;gap:20px;color:var(--muted);font-size:14px}.navlinks a{color:var(--muted)}.navlinks a:hover{color:var(--blue)}
 .navbtn{display:none;background:none;border:1px solid var(--line);border-radius:10px;padding:8px 11px;cursor:pointer;font:inherit;color:var(--ink);line-height:1}
 .navbtn span{display:block;width:17px;height:2px;background:var(--ink);border-radius:2px;margin:3px 0;transition:.2s}
-.navopen .navbtn span:nth-child(1){transform:translateY(5px) rotate(45deg)}
-.navopen .navbtn span:nth-child(2){opacity:0}
-.navopen .navbtn span:nth-child(3){transform:translateY(-5px) rotate(-45deg)}
+h1,h2,h3{font-family:Fraunces,serif;letter-spacing:-.045em;line-height:1.05}
+.hero{padding:74px 0 50px;position:relative;overflow:hidden;--hero2:rgba(0,175,185,.20)}
+.hero:after{content:"";position:absolute;width:250px;height:168px;background:var(--peach);border-radius:54% 46% 60% 40%;right:-66px;top:34px;transform:rotate(-8deg);z-index:-1}
+.hero:before{content:"";position:absolute;width:210px;height:210px;border-radius:52% 48% 44% 56%;background:var(--hero2);right:130px;top:-40px;z-index:-2}
+.kicker{text-transform:uppercase;letter-spacing:.15em;font-size:12px;font-weight:700;color:var(--blue)}
+h1{font-size:clamp(44px,7vw,72px);max-width:840px;margin:18px 0}
+.hero p{font-size:19px;line-height:1.7;color:var(--muted);max-width:700px}
+p,li{color:var(--muted);line-height:1.75}ul,ol{padding-left:22px}li{margin-bottom:5px}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.87em;background:#eaf8f7;padding:2px 6px;border-radius:6px;color:#0e5a63;word-break:break-word}
+pre{background:#15333b;color:#fdfcdc;padding:17px;border-radius:14px;overflow:auto;line-height:1.7;font-size:12.5px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;margin:14px 0}
+pre .cm{color:#8fb3ae}pre .hl{color:var(--peach)}
+.layout{display:grid;grid-template-columns:230px minmax(0,1fr);gap:50px;padding:8px 0 90px}
+.toc{position:sticky;top:22px;height:max-content;max-height:calc(100vh - 44px);overflow:auto}
+.toc strong{display:block;margin-bottom:11px;font-size:14px;color:var(--ink)}
+.toc a{display:block;padding:5px 0;color:var(--muted);font-size:13.5px;line-height:1.4}
+.toc a:hover{color:var(--blue)}.toc a.on{color:var(--blue);font-weight:700}
+.toc hr{border:0;border-top:1px solid var(--line);margin:12px 0}
+section{scroll-margin-top:22px;margin-bottom:58px}
+h2{font-size:36px;margin:8px 0 14px}h3{font-size:23px;margin:32px 0 10px}
+h4{font-family:"DM Sans";font-size:16px;font-weight:700;letter-spacing:-.02em;color:var(--ink);margin:22px 0 7px}
+.lead{font-size:16.5px;color:var(--muted);line-height:1.75;max-width:690px;margin-bottom:20px}
+.card{background:var(--white);border:1px solid var(--line);border-radius:20px;padding:22px;margin:18px 0;box-shadow:0 1px 2px rgba(21,51,59,.04),0 6px 18px rgba(21,51,59,.045)}
+.card.teal{background:#eaf8f7;border-color:#a9dde0}.card.peach{background:#fff6ee;border-color:#f4d3b6}
+.card strong{color:var(--ink)}
+.warning{border-left:5px solid var(--coral);background:#fff0e3;padding:15px 17px;border-radius:0 14px 14px 0;margin:16px 0;font-size:14.5px;line-height:1.7}
+.tip{border-left:5px solid var(--teal);background:#e4f5f4;padding:15px 17px;border-radius:0 14px 14px 0;margin:16px 0;font-size:14.5px;line-height:1.7}
+.warning strong,.tip strong{color:var(--ink)}
+.tbl{background:var(--white);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin:16px 0;box-shadow:0 1px 2px rgba(21,51,59,.04)}
+.tbl table{width:100%;border-collapse:collapse;font-size:13.5px}
+.tbl th{text-align:left;padding:12px 15px;font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);background:#eaf8f7;font-weight:700}
+.tbl td{padding:11px 15px;border-top:1px solid var(--line);color:var(--muted);vertical-align:top}
+.tbl td:first-child{font-weight:700;color:var(--ink);white-space:nowrap}
+.yes{color:#2f7d5e;font-weight:700}.no{color:#b0463c;font-weight:700}.part{color:#a06a2c;font-weight:700}
+details.app{background:var(--white);border:1px solid var(--line);border-radius:18px;margin-bottom:10px;overflow:hidden;box-shadow:0 1px 2px rgba(21,51,59,.04),0 6px 18px rgba(21,51,59,.04)}
+details.app[open]{border-color:#a9dde0}
+details.app summary{cursor:pointer;padding:17px 46px 17px 20px;list-style:none;position:relative;display:flex;align-items:baseline;gap:11px;flex-wrap:wrap}
+details.app summary::-webkit-details-marker{display:none}
+details.app summary:after{content:"";position:absolute;right:20px;top:23px;width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);transition:.2s}
+details.app[open] summary:after{transform:rotate(-135deg);top:26px}
+details.app summary b{font-size:17px;letter-spacing:-.02em;color:var(--ink)}
+details.app summary .d{font-size:13.5px;color:var(--muted);flex:1;min-width:170px}
+.pill{display:inline-block;font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;text-transform:uppercase;letter-spacing:.06em}
+.pill.first{background:#d3f0ef;color:#0e5a63}.pill.after{background:var(--peach);color:#744b32}
+.abody{padding:0 20px 20px;border-top:1px solid var(--line);padding-top:16px}
+.abody p,.abody li{font-size:14.5px}
+.steps{counter-reset:st;list-style:none;padding:0;margin:14px 0}
+.steps>li{counter-increment:st;position:relative;padding:0 0 14px 36px;font-size:14.5px;line-height:1.7}
+.steps>li:before{content:counter(st);position:absolute;left:0;top:1px;width:24px;height:24px;border-radius:50%;background:#eaf8f7;border:1px solid #a9dde0;color:var(--blue);font-size:12px;font-weight:700;display:grid;place-items:center}
+.steps ul{margin:7px 0 0}
+.fields{background:#f5fbfa;border:1px solid var(--line);border-radius:13px;padding:5px 16px;margin:12px 0}
+.fields dl{margin:0;display:grid;grid-template-columns:minmax(130px,auto) 1fr;gap:0 14px}
+.fields dt{font-weight:700;color:var(--ink);font-size:13.5px;padding:8px 0;border-bottom:1px solid #e2eeed}
+.fields dd{margin:0;font-size:13.5px;color:var(--muted);padding:8px 0;border-bottom:1px solid #e2eeed}
+.fields dl>dt:last-of-type,.fields dl>dd:last-of-type{border-bottom:0}
+.btn{display:inline-block;border-radius:999px;padding:12px 20px;font-weight:700;font-size:14.5px;background:var(--blue);color:#fff}
+.btn:hover{background:#005b73;color:#fff;text-decoration:none}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+.btn.ghost:hover{border-color:var(--teal);color:var(--blue);background:transparent}
+footer{border-top:1px solid var(--line);padding:25px 0;color:var(--muted);font-size:13px}
 @media(max-width:900px){
 .navbtn{display:block}
-nav{position:relative}
 .navlinks{display:none;position:absolute;top:66px;right:0;left:0;background:var(--white);border:1px solid var(--line);border-radius:16px;flex-direction:column;gap:0;padding:8px;z-index:60;box-shadow:0 10px 30px rgba(21,51,59,.09)}
 .navopen .navlinks{display:flex}
 .navlinks a{padding:11px 13px;border-radius:10px;font-size:15px}
-.navlinks a:hover{background:#eaf8f7;text-decoration:none}
+.layout{grid-template-columns:1fr;gap:0}.toc{position:static;max-height:none;margin-bottom:32px}
+h2{font-size:29px}.hero:before{display:none}
+.fields dl{grid-template-columns:1fr}
+.fields dt{border-bottom:0;padding-bottom:0}
 }
-
-/* ── colour system ─────────────────────────────────────────────── */
-/* Tinted section shells break up long cream pages with rhythm. */
-.tinted{background:#eaf8f7;border:1px solid #cbe8e7;border-radius:26px;padding:38px 34px;margin-bottom:62px}
-.tinted-peach{background:#fff6ee;border:1px solid #f6d5b8;border-radius:26px;padding:38px 34px;margin-bottom:62px}
-.tinted h2,.tinted-peach h2{margin-top:0}
-
-/* Cards cycle through tints instead of all-white. */
-.cyc>.card:nth-of-type(3n+2){background:#eaf8f7;border-color:#bfe3e2}
-.cyc>.card:nth-of-type(3n){background:#fff6ee;border-color:#f4d3b6}
-
-/* Second hero blob adds depth behind the first. */
-.hero:before{content:"";position:absolute;width:210px;height:210px;border-radius:52% 48% 44% 56%;
-  background:var(--hero2,rgba(0,175,185,.20));right:130px;top:-40px;z-index:-2}
-@media(max-width:900px){.hero:before{display:none}
-.tinted,.tinted-peach{padding:28px 20px;border-radius:20px}}
-
-/* A section that becomes a panel drops its own rule line and vertical padding. */
-.section.tinted,.section.tinted-peach{border-top:0;padding:40px 34px;margin:46px 0 56px}
-@media(max-width:900px){.section.tinted,.section.tinted-peach{padding:28px 20px}}
-
-.genfacts{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:34px 0 30px}
-.genfacts div{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.20);border-radius:18px;padding:20px}
-.genfacts b{display:block;font-family:Fraunces,serif;font-size:38px;line-height:1;color:var(--cream);margin-bottom:8px}
-.genfacts span{font-size:13.5px;color:#cfeaf0;line-height:1.55}
-.genout{background:#0d2830;border-radius:20px;overflow:hidden;border:1px solid rgba(255,255,255,.14)}
-.genout-bar{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:rgba(255,255,255,.06);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;color:#9fd3dc}
-.genout-tag{color:var(--peach)}
-.genout pre{margin:0;padding:20px;background:none;color:#e8f4f2;font-size:12.5px;line-height:1.7;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
-.genout pre .cmt{color:#7fa8a4}
-@media(max-width:800px){.genfacts{grid-template-columns:1fr}}
-
-/* ── page texture ──────────────────────────────────────────────────
-   Tunable: --grain (speckle strength) and --bloom (colour wash).
-   Everything sits BEHIND content — cards and panels have their own
-   opaque backgrounds, so text contrast is never softened by it.     */
-:root{--grain:.06;--bloom:1}
-body{
-  background-color:var(--cream);
-  background-image:
-    /* chromatic speckle — fine paper/film tooth */
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23g)' opacity='0.5'/%3E%3C/svg%3E"),
-    /* soft colour blooms drifting in from the edges */
-    radial-gradient(ellipse 900px 620px at 8% 2%,rgba(0,175,185,calc(.10*var(--bloom))),transparent 62%),
-    radial-gradient(ellipse 760px 540px at 95% 14%,rgba(254,217,183,calc(.26*var(--bloom))),transparent 64%),
-    radial-gradient(ellipse 820px 600px at 78% 62%,rgba(240,113,103,calc(.08*var(--bloom))),transparent 62%),
-    radial-gradient(ellipse 900px 640px at 15% 88%,rgba(0,108,135,calc(.07*var(--bloom))),transparent 62%);
-  background-repeat:repeat,no-repeat,no-repeat,no-repeat,no-repeat;
-  background-size:220px 220px,auto,auto,auto,auto;
-  background-attachment:fixed,fixed,fixed,fixed,fixed;
-}
-/* The grain layer is drawn at low opacity via its own alpha; this keeps
-   it from muddying the blooms underneath. */
-body{background-blend-mode:soft-light,normal,normal,normal,normal}
-
-/* Cards lift off the textured page rather than melting into it. */
-.card,.mini,.tbl,.util,.mod,.side,.opt,.pick,.price,.prov,.aidcard,.stp pre,
-details.qa,details.m,.shell,.genout{box-shadow:0 1px 2px rgba(21,51,59,.04),0 6px 18px rgba(21,51,59,.045)}
-
-@media(max-width:900px){
-  /* fixed attachment is costly to repaint on mobile scroll */
-  body{background-attachment:scroll,scroll,scroll,scroll,scroll;--bloom:.7}
-}
+@media(max-width:520px){.tbl{overflow-x:auto}}
 @media print{body{background-image:none}}
-
-/* ── front page quickstart ─────────────────────────────────────── */
-.quickstart{padding:78px 0;border-top:1px solid var(--line)}
-.quickstart h2{font-family:Fraunces,serif;font-size:clamp(32px,4.4vw,46px);letter-spacing:-.045em;margin:14px 0;max-width:760px;line-height:1.05}
-.qs-need{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:15px 18px;margin:24px 0 34px;font-size:14.5px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.qs-need b{color:var(--ink)}
-.qs{counter-reset:q;list-style:none;padding:0;margin:0}
-.qs-step{counter-increment:q;position:relative;padding:0 0 34px 62px;border-left:2px solid var(--line);margin-left:19px}
-.qs-step:last-of-type{border-left-color:transparent;padding-bottom:8px}
-.qs-step:before{content:counter(q);position:absolute;left:-20px;top:-6px;width:39px;height:39px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;font-weight:700;font-size:15px}
-.qs-step h3{font-family:Fraunces,serif;font-size:23px;letter-spacing:-.035em;margin:0 0 9px;color:var(--ink)}
-.qs-step p{font-size:15px;margin:0 0 12px}
-.qs-step ul{margin:0 0 12px;padding-left:20px}
-.qs-step li{font-size:14.5px;margin-bottom:4px}
-.qs-step pre{background:#15333b;color:#fdfcdc;padding:16px 18px;border-radius:14px;font-size:12.5px;line-height:1.7;overflow:auto;margin:0 0 13px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
-.qs-step pre .cm{color:#8fb3ae}
-.qs-step pre .hl{color:var(--peach)}
-.qs-warn{border-left:4px solid var(--coral);background:#fff0e3;padding:13px 16px;border-radius:0 13px 13px 0;font-size:14px;line-height:1.65;margin:0 0 13px}
-.qs-note{border-left:4px solid var(--teal);background:#e4f5f4;padding:13px 16px;border-radius:0 13px 13px 0;font-size:14px;line-height:1.65;margin:0 0 13px}
-.qs-warn b,.qs-note b{color:var(--ink)}
-.qs-done{background:var(--white);border:1px solid var(--line);border-radius:24px;padding:30px;margin-top:14px}
-.qs-done h3{font-family:Fraunces,serif;font-size:27px;letter-spacing:-.04em;margin:0 0 8px;color:var(--ink)}
-.qs-done>p{font-size:15.5px;margin:0 0 20px}
-.qs-next{display:grid;gap:11px}
-.qs-next a{display:block;background:#eaf8f7;border:1px solid #bfe3e2;border-radius:15px;padding:15px 17px;text-decoration:none;transition:.14s}
-.qs-next a:hover{border-color:var(--teal);transform:translateY(-1px);text-decoration:none}
-.qs-next b{display:block;font-size:15px;color:var(--blue);margin-bottom:3px}
-.qs-next span{font-size:13.5px;color:var(--muted);line-height:1.5}
-@media(min-width:860px){.qs-next{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:560px){.qs-step{padding-left:48px}}
-
-/* collapsed steps keep the section scannable */
-.qs-step details{margin:0}
-.qs-step summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:12px;padding:2px 0 6px}
-.qs-step summary::-webkit-details-marker{display:none}
-.qs-title{font-family:Fraunces,serif;font-size:23px;letter-spacing:-.035em;color:var(--ink);line-height:1.15}
-.qs-step summary:hover .qs-title{color:var(--blue)}
-.qs-toggle{margin-left:auto;flex-shrink:0;width:9px;height:9px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);transition:.2s;margin-right:4px}
-.qs-step details[open] .qs-toggle{transform:rotate(-135deg)}
-.qs-body{padding-top:8px}
-.qs-step details[open]:before{content:""}
-.qs-meta{display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin:0 0 22px;font-size:13.5px;color:var(--muted)}
-.qs-meta b{color:var(--ink)}
-.qs-expand{font-family:inherit;font-size:13px;font-weight:700;background:none;border:1px solid var(--line);border-radius:999px;padding:7px 14px;color:var(--muted);cursor:pointer}
-.qs-expand:hover{border-color:var(--teal);color:var(--blue)}
-.qs-signpost{margin-top:20px;font-size:15px;background:var(--white);border:1px solid var(--line);border-radius:14px;padding:14px 17px;display:inline-block}
-.qs-cli{background:#eaf8f7;border:1px solid #bfe3e2;border-radius:16px;padding:15px 18px;margin:0 0 26px;font-size:14.5px;line-height:1.7}
-.qs-cli b{color:var(--ink)}
 </style>
 </head>
 <body>
-<div class="wrap"><nav><div class="brand">modular<span>.</span>media</div><div class="navlinks"><a href="#quickstart">Quickstart</a><a href="guide.html">Guide</a><a href="platforms.html">Platforms</a><a href="#how">How it works</a><a href="#apps">Apps</a><a href="generator.html">Generator</a><a href="setup.html">App setup</a><a href="access.html">Access</a><a href="documentation.html">Documentation</a><a href="hardware.html">Hardware</a><a href="faq.html">Help</a><a href="#safety">Safety</a></div><button class="navbtn" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button></nav></div>
+<div class="wrap"><nav><a class="brand" href="index.html">modular<span>.</span>media</a>
+<div class="navlinks"><a href="index.html">Home</a><a href="guide.html">Guide</a><a href="platforms.html">Platforms</a><a href="generator.html">Generator</a><a href="setup.html">App setup</a><a href="access.html">Access</a><a href="documentation.html">Docs</a><a href="faq.html">Help</a></div>
+<button class="navbtn" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button></nav></div>
 
-<section class="hero"><div class="wrap"><div class="kicker">A calmer way to self-host</div><h1>Build the server you actually want.</h1><p>Modular Media Server is a friendly guide and Compose generator for putting together your own little corner of the internet. Start with one thing. Add another when you need it.</p><div class="buttons"><a class="btn" href="generator.html">Build a stack</a><a class="btn alt" href="#quickstart">Follow the quickstart</a></div></div></section>
+<section class="hero"><div class="wrap"><div class="kicker">App setup</div>
+<h1>Now make them talk to each other.</h1>
+<p>Your stack is running, and every app is sitting there empty. This is the click-by-click part: where each one stores things, how they connect, and the handful of details that cause nearly every problem.</p></div></section>
 
-<section class="section" id="how"><div class="wrap"><div class="kicker">No giant mystery box</div><h2>Take it one piece at a time.</h2><p class="lead">Pick the services you want and the generator handles the boring connections between them, while still showing you what is happening.</p><div class="grid4">
-<div class="card"><div class="num">01</div><h3>Pick your pieces</h3><p>Choose media, photos, monitoring, downloads, archives and more.</p></div>
-<div class="card"><div class="num">02</div><h3>We'll sort the plumbing</h3><p>Required dependencies are added automatically and explained.</p></div>
-<div class="card"><div class="num">03</div><h3>Tell us where things live</h3><p>Set your storage roots once instead of wrestling with volume mappings.</p></div>
-<div class="card"><div class="num">04</div><h3>Take the files home</h3><p>Get Compose, environment files, secrets and a README ready to review.</p></div>
-</div><p class="qs-signpost">New to this? There is a <a href="#quickstart">step-by-step walkthrough</a> further down that gets you from an empty machine to a working server.</p></div></section>
+<div class="wrap"><div class="layout">
+<aside class="toc" id="toc">
+<strong>On this page</strong>
+<a href="#rules">The two rules</a>
+<a href="#order">What order to do this in</a>
+<hr>
+<a href="#qbittorrent">qBittorrent</a>
+<a href="#jackett">Jackett</a>
+<a href="#sonarr">Sonarr</a>
+<a href="#radarr">Radarr</a>
+<a href="#lidarr">Lidarr</a>
+<a href="#bazarr">Bazarr</a>
+<hr>
+<a href="#jellyfin">Jellyfin</a>
+<a href="#jellyseerr">Jellyseerr</a>
+<a href="#immich">Immich</a>
+<a href="#kima">Kima</a>
+<a href="#archive">Archiving apps</a>
+<hr>
+<a href="#kuma">Uptime Kuma</a>
+<a href="#kuma-discord">Discord alerts</a>
+<a href="#kuma-telegram">Telegram alerts</a>
+<hr>
+<a href="#pocketid">Pocket ID</a>
+<a href="#pid-clients">Adding a client</a>
+<a href="#pid-immich">Immich SSO</a>
+<a href="#pid-arcane">Arcane SSO</a>
+<a href="#pid-jellyfin">Jellyfin SSO</a>
+<a href="#pid-rest">Everything else</a>
+<a href="#pid-users">Users and groups</a>
+<hr>
+<a href="faq.html">Troubleshooting →</a>
+</aside>
 
-<section class="section" id="apps"><div class="wrap"><div class="kicker">The toolbox</div><h2>Meet the apps.</h2><p class="lead">These are the projects Modular Media Server is designed to help you understand and combine. Each one has its own project, documentation and license; the links below point back to the original sources.</p><div class="apps">
-<div class="app"><div class="app-top"><h3>Arcane</h3><span class="tag">Management</span></div><p>A friendly Docker management platform for viewing, managing and working with Compose projects.</p><div class="source"><a href="https://getarcane.app/" target="_blank" rel="noopener">Website</a><a href="https://github.com/getarcaneapp/arcane" target="_blank" rel="noopener">Source</a></div></div>
-<div class="app"><div class="app-top"><h3>Jellyfin</h3><span class="tag">Media</span></div><p>A self-hosted media server for organizing and streaming your movies, shows, music and other media.</p><div class="source"><a href="https://jellyfin.org/" target="_blank" rel="noopener">Website</a><a href="https://github.com/jellyfin/jellyfin" target="_blank" rel="noopener">Source</a></div></div>
-<div class="app"><div class="app-top"><h3>Jellyseerr</h3><span class="tag">Requests</span></div><p>A request and discovery interface that connects your media server with services such as Sonarr and Radarr.</p><div class="source"><a href="https://docs.jellyseerr.dev/" target="_blank" rel="noopener">Docs</a><a href="https://github.com/CTXP/jellyseerr" target="_blank" rel="noopener">Source</a></div></div>
-<div class="app"><div class="app-top"><h3>Sonarr</h3><span class="tag">TV</span></div><p>Automates the management of TV libraries by monitoring for releases, importing files and keeping names organized.</p><div class="source"><a href="https://sonarr.tv/" target="_blank" rel="noopener">Website</a><a href="https://github.com/Sonarr/Sonarr" target="_blank" rel="noopener">Source</a></div></div>
-<div class="app"><div class="app-top"><h3>Radarr</h3><span class="tag">Movies</span></div><p>Automates movie collection management, including monitoring, importing, renaming and quality upgrades.</p><div class="source"><a href="https://radarr.video/" target="_blank" rel="noopener">Website</a><a href="https://github.com/Radarr/Radarr" target="_blank" rel="noopener">Source</a></div></div>
-<div class="app"><div class="app-top"><h3>Lidarr</h3><span class="tag">Music</span></div><p>A music collection manager that monitors artists and helps organize and upgrade your library.</p><div class="source"><a href="https://lidarr.audio/" target="_blank" rel="noopener">Website</a><a href="https://github.com/Lidarr/Lidarr" target="_blank" rel="noopener">Source</a></div></div>
-<div class="app"><div class="app-top"><h3>Gluetun</h3><span class="tag">Networking</span></div><p>A lightweight VPN client container supporting multiple providers, OpenVPN and WireGuard.</p><div class="source"><a href="https://github.com/qdm12/gluetun" target="_blank" rel="noopener">Source</a><a href="https://github.com/qdm12/gluetun-wiki" target="_blank" rel="noopener">Wiki</a></div></div>
-<div class="app"><div class="app-top"><h3>qBittorrent</h3><span class="tag">Downloads</span></div><p>A full-featured BitTorrent client with a web interface, commonly paired with a VPN container for isolated download traffic.</p><div class="source"><a href="https://www.qbittorrent.org/" target="_blank" rel="noopener">Website</a><a href="https://github.com/qbittorrent/qBittorrent" target="_blank" rel="noopener">Source</a></div></div>
-<div class="app"><div class="app-top"><h3>Jackett</h3><span class="tag">Indexing</span></div><p>A proxy and translation layer that provides a standardized API between applications and torrent trackers.</p><div class="source"><a href="https://github.com/Jackett/Jackett" target="_blank" rel="noopener">Source</a></div></div>
-<div class="app"><div class="app-top"><h3>Bazarr</h3><span class="tag">Subtitles</span></div><p>A companion to Sonarr and Radarr that manages subtitle downloads according to your language preferences.</p><div class="source"><a href="https://www.bazarr.media/" target="_blank" rel="noopener">Website</a><a href="https://github.com/morpheus65535/bazarr" target="_blank" rel="noopener">Source</a></div></div>
-<div class="app"><div class="app-top"><h3>Immich</h3><span class="tag">Photos</span></div><p>A high-performance self-hosted photo and video management system for backing up, viewing, organizing and sharing your library.</p><div class="source"><a href="https://immich.app/" target="_blank" rel="noopener">Website</a><a href="https://github.com/immich-app/immich" target="_blank" rel="noopener">Source</a></div></div>
-<div class="app"><div class="app-top"><h3>Kima</h3><span class="tag">Music</span></div><p>A self-hosted audio streaming platform built around your own music library, with playlist import, podcasts, a Subsonic API for native apps, and integrations including Lidarr and Audiobookshelf.</p><div class="source"><a href="https://github.com/Chevron7Locked/kima-hub" target="_blank" rel="noopener">Source</a><a href="https://hub.docker.com/r/chevron7locked/kima" target="_blank" rel="noopener">Docker Hub</a></div></div>
-<div class="app"><div class="app-top"><h3>Uptime Kuma</h3><span class="tag">Monitoring</span></div><p>An easy-to-use self-hosted monitoring tool for services, hosts, containers, certificates and more.</p><div class="source"><a href="https://uptimekuma.org/" target="_blank" rel="noopener">Website</a><a href="https://github.com/louislam/uptime-kuma" target="_blank" rel="noopener">Source</a></div></div>
-<div class="app"><div class="app-top"><h3>ArchiveBox</h3><span class="tag">Archives</span></div><p>A self-hosted web archiving tool that preserves pages and other web content in durable, local formats.</p><div class="source"><a href="https://docs.archivebox.io/" target="_blank" rel="noopener">Docs</a><a href="https://github.com/ArchiveBox/ArchiveBox" target="_blank" rel="noopener">Source</a></div></div>
-<div class="app"><div class="app-top"><h3>Tube Archivist</h3><span class="tag">Archives</span></div><p>A self-hosted YouTube media server for downloading, organizing and watching your personal video archive.</p><div class="source"><a href="https://www.tubearchivist.com/" target="_blank" rel="noopener">Website</a><a href="https://github.com/tubearchivist/tubearchivist" target="_blank" rel="noopener">Source</a><a href="https://docs.tubearchivist.com/" target="_blank" rel="noopener">Docs</a></div></div>
-</div></div></section>
+<main>
 
-<section class="generator" id="generator"><div class="wrap">
-<div class="kicker" style="color:var(--peach)">The useful bit</div>
-<h2>Let's build something.</h2>
-<p class="lead">Pick the services you want. Dependencies get resolved for you, secrets are generated in your browser, and you leave with a complete set of files ready to deploy.</p>
-<div class="buttons" style="margin-top:20px"><a class="btn" href="generator.html">Open the generator</a><a class="btn alt" href="guide.html">Read the setup guide first</a></div>
+<!-- RULES -->
+<section id="rules">
+<div class="kicker">Before you start</div>
+<h2>The two rules</h2>
+<p class="lead">Almost every configuration problem in this stack comes back to one of these. Learn them now and most of what follows is obvious.</p>
 
-<div class="genfacts">
-<div><b>18</b><span>modules across media, downloads, photos, monitoring, connection and authentication</span></div>
-<div><b>6</b><span>files written — Compose, .env, .env.example, .gitignore, Caddyfile, README</span></div>
-<div><b>0</b><span>data sent anywhere; everything runs locally in your browser</span></div>
+<div class="card teal">
+<strong>1. Apps find each other by container name, never localhost</strong>
+<p style="margin:10px 0 0">Inside a container, <code>localhost</code> means <em>that container</em>. Sonarr looking at <code>127.0.0.1:8080</code> is looking inside itself. Use the service name from your Compose file: <code>jellyfin</code>, <code>sonarr</code>, <code>radarr</code>.</p>
 </div>
 
-<div class="genout">
-<div class="genout-bar"><span>docker-compose.yml</span><span class="genout-tag">generated for you</span></div>
-<pre>services:
-  jellyfin:
-    image: jellyfin/jellyfin:latest
-    ports:
-      - "8096:8096"
-    volumes:
-      - ${CONFIG_ROOT}/jellyfin/config:/config
-      - ${DATA_ROOT}/media:/media:ro
-
-  <span class="cmt"># qBittorrent is tied to Gluetun's network.</span>
-  <span class="cmt"># If the VPN drops, it loses its connection too.</span>
-  qbittorrent:
-    network_mode: "service:gluetun"</pre>
-</div>
-</div></section>
-
-<section class="quickstart" id="quickstart"><div class="wrap">
-<div class="kicker">Start here</div>
-<h2>Your first server, in about half an hour.</h2>
-<p class="lead">Three services, end to end: Arcane to manage everything, Jellyfin to watch things, and Uptime Kuma to tell you on Discord when something breaks. Nothing here assumes you have done this before.</p>
-
-<div class="qs-need">
-<b>You need:</b> a machine that stays on — a mini PC, an old laptop, a NAS or a VPS — with Docker installed.
-<a href="platforms.html">Docker setup for Windows, macOS, Linux or NAS →</a>
+<div class="warning">
+<strong>The exception that catches everyone: qBittorrent.</strong> Because it runs with <code>network_mode: service:gluetun</code> it has no network identity of its own — it lives inside Gluetun's network. So other apps must connect to <code>gluetun</code>, not <code>qbittorrent</code>. Same for Jackett when it is behind the VPN.
 </div>
 
-<div class="qs-cli">
-<b>About the command line.</b> Step one is the only place you have to type commands, and they are all copy-and-paste.
-Once Arcane is running, everything after it — including every service you add later — is done by clicking in a browser.
-If that is still more than you want, a Synology or QNAP NAS can create the Arcane container from its own app store
-with no terminal at all.
+<div class="card teal">
+<strong>2. Every app must see the same file at the same path</strong>
+<p style="margin:10px 0 0">If qBittorrent saves to <code>/data/downloads/x.mkv</code>, Sonarr must see that exact path. When they disagree, downloads finish and then never import. With the shared storage layout every app mounts one <code>/data</code> and this is free.</p>
 </div>
 
-<div class="qs-meta"><span><b>7 steps</b> · about 30 minutes</span><button class="qs-expand" id="qsx">Expand all</button></div>
-<ol class="qs">
+<div class="tbl"><table>
+<thead><tr><th>Connecting to</th><th>Host</th><th>Port</th></tr></thead>
+<tbody>
+<tr><td>qBittorrent (behind VPN)</td><td><code>gluetun</code></td><td>8080</td></tr>
+<tr><td>qBittorrent (no VPN)</td><td><code>qbittorrent</code></td><td>8080</td></tr>
+<tr><td>Jackett (behind VPN)</td><td><code>gluetun</code></td><td>9117</td></tr>
+<tr><td>Jackett (no VPN)</td><td><code>jackett</code></td><td>9117</td></tr>
+<tr><td>Sonarr</td><td><code>sonarr</code></td><td>8989</td></tr>
+<tr><td>Radarr</td><td><code>radarr</code></td><td>7878</td></tr>
+<tr><td>Lidarr</td><td><code>lidarr</code></td><td>8686</td></tr>
+<tr><td>Jellyfin</td><td><code>jellyfin</code></td><td>8096</td></tr>
+</tbody></table></div>
+</section>
 
-<li class="qs-step"><details open><summary><span class="qs-title">Install Arcane</span><span class="qs-toggle"></span></summary><div class="qs-body">
-<p>Arcane is the web interface you will use for everything after this. It needs two secrets of its own — run this twice and keep both lines:</p>
-<pre>openssl rand -base64 32</pre>
-<p>Make a folder for your stacks, and one inside it for Arcane:</p>
-<pre>sudo mkdir -p /opt/stacks/arcane
-cd /opt/stacks/arcane
-nano docker-compose.yml</pre>
-<p>Paste this in, replacing both secrets:</p>
-<pre>services:
-  arcane:
-    image: ghcr.io/getarcaneapp/arcane:latest
-    container_name: arcane
-    ports:
-      - "3552:3552"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - arcane-data:/app/data
-      <span class="cm"># same path on both sides — this matters</span>
-      - /opt/stacks:/opt/stacks
-    environment:
-      - APP_URL=http://localhost:3552
-      - PUID=1000
-      - PGID=1000
-      - ENCRYPTION_KEY=<span class="hl">your-first-secret</span>
-      - JWT_SECRET=<span class="hl">your-second-secret</span>
-    restart: unless-stopped
+<!-- ORDER -->
+<section id="order">
+<h2>What order to do this in</h2>
+<p class="lead">Each app needs something from the one before it — usually an API key. Going in this order means never doubling back.</p>
+<ol class="steps">
+<li><b>qBittorrent</b> — set its password and save paths. Nothing else works until this does.</li>
+<li><b>Jackett</b> — add indexers, collect the API key.</li>
+<li><b>Sonarr, Radarr, Lidarr</b> — point each at qBittorrent and Jackett, set root folders.</li>
+<li><b>Bazarr</b> — needs Sonarr's and Radarr's API keys.</li>
+<li><b>Jellyfin</b> — create libraries over the folders the *arr apps now fill.</li>
+<li><b>Jellyseerr</b> — needs Jellyfin, then Sonarr and Radarr.</li>
+<li><b>Uptime Kuma</b> — monitor everything above, then set up alerts.</li>
+<li><b>Pocket ID</b> — last, once the apps it protects are working.</li>
+</ol>
+<div class="tip"><strong>Every *arr app hides its API key in the same place:</strong> <b>Settings → General → API Key</b>. You will copy these between apps constantly, so keep a scratch note open.</div>
+</section>
 
-volumes:
-  arcane-data:</pre>
-<pre>docker compose up -d</pre>
-<p>Open <code>http://your-server-ip:3552</code> and create your admin account. <b>That is the last command you have to type.</b></p>
-<div class="qs-warn">Arcane can control your whole machine through the Docker socket. Keep it on your home network — never forward port 3552 to the internet.</div>
-</div></details></li>
+<!-- QBITTORRENT -->
+<section id="qbittorrent">
+<div class="kicker">Downloads</div>
+<h2>qBittorrent</h2>
+<p class="lead">The download client. Configure this first — Sonarr and Radarr cannot be finished without it.</p>
 
-<li class="qs-step"><details><summary><span class="qs-title">Point Arcane at your stacks folder</span><span class="qs-toggle"></span></summary><div class="qs-body">
-<p>In Arcane, open <b>Settings</b> and set the projects directory to <code>/opt/stacks</code> — the same path you mounted above.</p>
-<p>Any folder in there containing a <code>docker-compose.yml</code> now appears under <b>Projects</b>. Arcane itself will already be listed, because you put it there.</p>
-<div class="qs-note">Matching paths inside and outside the container is the detail people get wrong. <code>/opt/stacks:/opt/stacks</code> works; <code>/opt/stacks:/app/data/projects</code> quietly breaks relative paths.</div>
-</div></details></li>
+<details class="app" open><summary><b>First run</b><span class="pill first">Do this first</span><span class="d">Find the temporary password and change it</span></summary>
+<div class="abody">
+<p>Recent versions no longer ship a fixed default password. One is generated on first start and written to the log:</p>
+<pre>docker compose logs qbittorrent | grep -i password</pre>
+<p>In Arcane, open the qBittorrent container and read its logs — the line is near the top.</p>
+<ol class="steps">
+<li>Open <code>http://your-server:8080</code> and sign in as <code>admin</code> with that password.</li>
+<li>Go to <b>Tools → Options → Web UI</b>.</li>
+<li>Set a real username and password under <b>Authentication</b>.</li>
+<li>Tick <b>Bypass authentication for clients on localhost</b> only if you understand it. Leave it off otherwise.</li>
+</ol>
+<div class="warning"><strong>Change the password even on a home network.</strong> qBittorrent's web interface can add torrents and write files anywhere it can reach.</div>
+</div></details>
 
-<li class="qs-step"><details><summary><span class="qs-title">Create a project for Jellyfin</span><span class="qs-toggle"></span></summary><div class="qs-body">
-<p>In Arcane, go to <b>Projects → New Project</b>, call it <code>jellyfin</code>, and paste this as the Compose file:</p>
-<pre>services:
-  jellyfin:
-    image: jellyfin/jellyfin:latest
-    container_name: jellyfin
-    user: "1000:1000"
-    ports:
-      - "8096:8096"
-    volumes:
-      - /opt/stacks/jellyfin/config:/config
-      - /opt/stacks/jellyfin/cache:/cache
-      - <span class="hl">/srv/media</span>:/media:ro
-    environment:
-      - TZ=<span class="hl">Europe/London</span>
-    restart: unless-stopped</pre>
-<p>Change <code>/srv/media</code> to wherever your films and shows live, and set your timezone. Press <b>Deploy</b>. The first run downloads a few hundred megabytes.</p>
-<div class="qs-note"><code>:ro</code> means read-only. Jellyfin has no reason to modify your files, so it is not allowed to.</div>
-</div></details></li>
+<details class="app"><summary><b>Save paths</b><span class="d">Where downloads land, and why it matters</span></summary>
+<div class="abody">
+<p>Under <b>Tools → Options → Downloads</b>:</p>
+<div class="fields"><dl>
+<dt>Default Save Path</dt><dd><code>/data/downloads/complete</code></dd>
+<dt>Keep incomplete torrents in</dt><dd>tick, then <code>/data/downloads/incomplete</code></dd>
+<dt>Copy .torrent files</dt><dd>off — the *arr apps manage this</dd>
+<dt>Pre-allocate disk space</dt><dd>on, if you have room; avoids fragmentation</dd>
+</dl></div>
+<p>These are paths <em>inside the container</em>. With the shared layout, <code>/data</code> is your <code>DATA_ROOT</code>, so <code>/data/downloads</code> is really <code>/srv/data/downloads</code> on the host.</p>
+<div class="warning"><strong>Keeping incomplete downloads in a separate folder is not cosmetic.</strong> Without it, Sonarr can see a half-finished file and try to import it, producing a corrupt episode that then needs deleting and re-downloading.</div>
+</div></details>
 
-<li class="qs-step"><details><summary><span class="qs-title">Set up a Jellyfin library</span><span class="qs-toggle"></span></summary><div class="qs-body">
-<p>Open <code>http://your-server-ip:8096</code>. Create your user account, then when it asks for a media library:</p>
+<details class="app"><summary><b>Categories</b><span class="pill after">Set up by the *arr apps</span><span class="d">Keeps TV, films and music apart</span></summary>
+<div class="abody">
+<p>Categories put each app's downloads in their own subfolder and let each app see only its own work. You do not need to create them by hand — when you connect Sonarr, it creates <code>tv-sonarr</code> for you, Radarr creates <code>radarr</code>, Lidarr creates <code>lidarr</code>.</p>
+<p>To check afterwards, look at the left sidebar in qBittorrent. If a category is missing, the connection from that app is not working.</p>
+<h4>Seeding and cleanup</h4>
+<p>Under <b>Tools → Options → BitTorrent</b> you can set a share ratio and what happens when it is reached. Pausing rather than deleting is the safe default — hardlinked files are safe to remove, but if you are not using hardlinks, deleting the torrent deletes the file your library points at.</p>
+</div></details>
+</section>
+
+<!-- JACKETT -->
+<section id="jackett">
+<h2>Jackett</h2>
+<p class="lead">Turns many different tracker APIs into one format the *arr apps understand. It has no accounts and no library — it is plumbing.</p>
+
+<details class="app"><summary><b>Adding indexers</b><span class="d">And collecting what Sonarr needs</span></summary>
+<div class="abody">
+<ol class="steps">
+<li>Open <code>http://your-server:9117</code>.</li>
+<li>Press <b>Add Indexer</b>, search, and add the ones you use. Public indexers need nothing; private ones need your account details.</li>
+<li>Press <b>Test</b> on each. A failure here will also fail in Sonarr, so fix it now.</li>
+<li>For each working indexer, press <b>Copy Torznab Feed</b> and keep the URL.</li>
+<li>Copy the <b>API Key</b> from the top right of the page. It is the same for every indexer.</li>
+</ol>
+<div class="tip"><strong>The Torznab URL Sonarr wants</strong> looks like <code>http://gluetun:9117/api/v2.0/indexers/&lt;indexer-id&gt;/results/torznab/</code> when Jackett is behind the VPN. Jackett's copy button gives you a <code>localhost</code> version — swap the host for <code>gluetun</code> (or <code>jackett</code> if you are not using a VPN).</div>
+<div class="warning"><strong>You are responsible for which indexers you use</strong> and whether accessing them is lawful where you live.</div>
+</div></details>
+</section>
+
+<!-- SONARR -->
+<section id="sonarr">
+<div class="kicker">Automation</div>
+<h2>Sonarr</h2>
+<p class="lead">TV automation, and the template for Radarr and Lidarr — they are the same app with different libraries. Do this one carefully and the other two take two minutes each.</p>
+
+<details class="app" open><summary><b>1 · Root folder</b><span class="pill first">Start here</span><span class="d">Where finished episodes go</span></summary>
+<div class="abody">
+<p><b>Settings → Media Management</b>, scroll to <b>Root Folders</b>, press <b>Add Root Folder</b>:</p>
+<div class="fields"><dl>
+<dt>Path</dt><dd><code>/data/media/tv</code> (shared layout) or <code>/tv</code> (split layout)</dd>
+</dl></div>
+<p>On the same page, turn on <b>Rename Episodes</b>. Sonarr will then name files the way Jellyfin expects, which fixes most artwork problems before they happen.</p>
+<div class="tip"><strong>If the folder does not appear in the browser</strong>, the volume is not mounted. Check what Sonarr can actually see — in Arcane open the container console and run <code>ls /data</code>.</div>
+</div></details>
+
+<details class="app"><summary><b>2 · Download client</b><span class="d">Connecting to qBittorrent</span></summary>
+<div class="abody">
+<p><b>Settings → Download Clients → + → qBittorrent</b>:</p>
+<div class="fields"><dl>
+<dt>Name</dt><dd>qBittorrent</dd>
+<dt>Host</dt><dd><code>gluetun</code> — <b>not</b> <code>qbittorrent</code>, and never <code>localhost</code></dd>
+<dt>Port</dt><dd><code>8080</code></dd>
+<dt>Username / Password</dt><dd>what you set in qBittorrent</dd>
+<dt>Category</dt><dd><code>tv-sonarr</code></dd>
+<dt>Use SSL</dt><dd>off</dd>
+</dl></div>
+<p>Press <b>Test</b>. A green tick means the connection works. Then <b>Save</b>.</p>
+<div class="warning"><strong>If Test fails</strong>, it is almost always the host. Prove the name resolves before changing anything else — in Arcane's Sonarr console, run <code>ping -c2 gluetun</code>. If that works, the problem is the port or the password instead.</div>
+</div></details>
+
+<details class="app"><summary><b>3 · Indexers</b><span class="d">Pointing at Jackett</span></summary>
+<div class="abody">
+<p><b>Settings → Indexers → + → Torznab → Custom</b>. Do this once per indexer you added in Jackett:</p>
+<div class="fields"><dl>
+<dt>Name</dt><dd>whatever the indexer is called</dd>
+<dt>URL</dt><dd>the Torznab feed, with the host changed to <code>gluetun</code></dd>
+<dt>API Key</dt><dd>Jackett's API key</dd>
+<dt>Categories</dt><dd>leave default unless you know otherwise</dd>
+</dl></div>
+<p>Press <b>Test</b>, then <b>Save</b>.</p>
+</div></details>
+
+<details class="app"><summary><b>4 · Quality profile</b><span class="d">Deciding what "good enough" means</span></summary>
+<div class="abody">
+<p><b>Settings → Profiles</b>. The defaults work, but two adjustments save trouble:</p>
 <ul>
-<li>Content type: <b>Movies</b> — make a second library later for Shows, since separate types matter for metadata</li>
-<li>Display name: <b>Films</b></li>
-<li>Folder: <code>/media/movies</code> — the path <em>inside</em> the container, not the host path</li>
+<li><b>Cap the quality.</b> A 1080p profile is the sensible default for most hardware. 4K files are enormous and will force Jellyfin to transcode on almost any client.</li>
+<li><b>Set a size limit.</b> Under the profile, a maximum size per episode stops a single release filling your disk.</li>
 </ul>
-<p>Finish the wizard, then run <b>Scan All Libraries</b> from the dashboard.</p>
-<div class="qs-warn">If the library comes up empty, the mount is wrong rather than Jellyfin. Check what it can actually see: in Arcane open the Jellyfin container, use the console, and run <code>ls /media</code>. Nothing listed means the volume path in step 3 does not match your real folder.</div>
-<p>Naming decides whether artwork matches. <code>The Thing (1982).mkv</code> works; <code>film.final.copy.mkv</code> rarely does.</p>
-</div></details></li>
+</div></details>
 
-<li class="qs-step"><details><summary><span class="qs-title">Add Uptime Kuma</span><span class="qs-toggle"></span></summary><div class="qs-body">
-<p>Another Arcane project, this one called <code>uptime-kuma</code>:</p>
-<pre>services:
-  uptime-kuma:
-    image: louislam/uptime-kuma:1
-    container_name: uptime-kuma
-    ports:
-      - "3001:3001"
-    volumes:
-      - /opt/stacks/uptime-kuma/data:/app/data
-      <span class="cm"># lets Kuma watch containers, not just web pages</span>
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    environment:
-      - TZ=<span class="hl">Europe/London</span>
-    restart: unless-stopped</pre>
-<p>Deploy it, then open <code>http://your-server-ip:3001</code> and create an account.</p>
-<div class="qs-note">The socket mount is read-only and only needed for container monitors. If you would rather not grant it, leave that line out and use the HTTP monitor in the next step — it answers the more useful question anyway.</div>
-</div></details></li>
+<details class="app"><summary><b>5 · Your API key</b><span class="d">Needed by Bazarr and Jellyseerr</span></summary>
+<div class="abody">
+<p><b>Settings → General → Security → API Key</b>. Copy it — Bazarr and Jellyseerr both need it.</p>
+<h4>If downloads finish but never import</h4>
+<p>Sonarr and qBittorrent disagree about paths. Compare what each one sees:</p>
+<pre>docker compose exec qbittorrent ls /data/downloads
+docker compose exec sonarr ls /data/downloads</pre>
+<p>Different listings mean different mounts. The proper fix is matching volumes; the patch is <b>Settings → Download Clients → Remote Path Mappings</b>, telling Sonarr that the client's path is really its own.</p>
+</div></details>
+</section>
 
-<li class="qs-step"><details><summary><span class="qs-title">Watch the Jellyfin container</span><span class="qs-toggle"></span></summary><div class="qs-body">
-<p>First tell Kuma about Docker. Go to <b>Profile → Settings → Docker Hosts → Add Docker Host</b>:</p>
+<!-- RADARR -->
+<section id="radarr">
+<h2>Radarr</h2>
+<p class="lead">Identical to Sonarr, with three values changed.</p>
+<div class="fields"><dl>
+<dt>Root folder</dt><dd><code>/data/media/movies</code></dd>
+<dt>Download category</dt><dd><code>radarr</code></dd>
+<dt>Rename setting</dt><dd><b>Rename Movies</b>, on</dd>
+</dl></div>
+<p>Everything else — download client host <code>gluetun</code> port 8080, Torznab indexers from Jackett, API key under Settings → General — works exactly as described for <a href="#sonarr">Sonarr</a>.</p>
+<div class="tip"><strong>Quality matters more here.</strong> A 4K remux film can be 60&nbsp;GB and will transcode badly on modest hardware. Unless you have a reason, cap at 1080p.</div>
+</section>
+
+<!-- LIDARR -->
+<section id="lidarr">
+<h2>Lidarr</h2>
+<p class="lead">Same again for music, with the usual caveat that music metadata is messier than film and TV.</p>
+<div class="fields"><dl>
+<dt>Root folder</dt><dd><code>/data/media/music</code></dd>
+<dt>Download category</dt><dd><code>lidarr</code></dd>
+<dt>Metadata profile</dt><dd>Standard, unless you want every single and remix</dd>
+</dl></div>
+<p>Download client and indexers are configured exactly as for Sonarr. Expect more manual matching — Lidarr relies on MusicBrainz, so if an artist is wrong there it will be wrong here.</p>
+<div class="tip"><strong>If you are running Kima</strong>, it can drive Lidarr from its own interface. Kima needs Lidarr's URL (<code>http://lidarr:8686</code>) and API key — see <a href="#kima">Kima</a> below.</div>
+</section>
+
+<!-- BAZARR -->
+<section id="bazarr">
+<h2>Bazarr</h2>
+<p class="lead">Fetches subtitles for the libraries Sonarr and Radarr already manage. It needs their API keys, so do this after both are working.</p>
+
+<details class="app"><summary><b>Connecting to Sonarr and Radarr</b><span class="d">Two forms, same shape</span></summary>
+<div class="abody">
+<p><b>Settings → Sonarr</b>, toggle it on:</p>
+<div class="fields"><dl>
+<dt>Address</dt><dd><code>sonarr</code></dd>
+<dt>Port</dt><dd><code>8989</code></dd>
+<dt>API Key</dt><dd>from Sonarr's Settings → General</dd>
+<dt>SSL</dt><dd>off</dd>
+</dl></div>
+<p>Then <b>Settings → Radarr</b> with <code>radarr</code> and port <code>7878</code>. Press <b>Test</b> on each, then save and restart Bazarr when it asks.</p>
+<div class="warning"><strong>Bazarr must see the same paths as Sonarr and Radarr.</strong> If it uses different mounts it will look for your files in the wrong place and quietly find nothing. Its volumes should point at the same media folders.</div>
+</div></details>
+
+<details class="app"><summary><b>Languages and providers</b><span class="d">What to fetch, and from where</span></summary>
+<div class="abody">
+<ol class="steps">
+<li><b>Settings → Languages</b> — create a profile, add the languages you want, and set it as the default for series and movies.</li>
+<li><b>Settings → Providers</b> — add subtitle sources. Most need a free account; create one and enter the details.</li>
+<li><b>Settings → Subtitles</b> — turn on <b>Use embedded subtitles</b> so Bazarr does not fetch what your files already contain.</li>
+</ol>
+<div class="tip"><strong>Out of sync subtitles</strong> usually mean the subtitle was matched to a different release of the same episode. Bazarr can shift timing, but fetching one matching your file's release group is the real fix.</div>
+</div></details>
+</section>
+
+<!-- JELLYFIN -->
+<section id="jellyfin">
+<div class="kicker">Watching</div>
+<h2>Jellyfin</h2>
+<p class="lead">Where everything above ends up. Libraries are the main thing to get right, and the mistake is always the same one.</p>
+
+<details class="app" open><summary><b>Libraries</b><span class="pill first">The important bit</span><span class="d">Use container paths, and split by type</span></summary>
+<div class="abody">
+<p><b>Dashboard → Libraries → Add Media Library</b>:</p>
+<div class="fields"><dl>
+<dt>Content type</dt><dd><b>Movies</b> — make a separate library for Shows</dd>
+<dt>Display name</dt><dd>Films</dd>
+<dt>Folder</dt><dd><code>/media/movies</code> — the path <em>inside</em> the container</dd>
+</dl></div>
+<p>Repeat with content type <b>Shows</b> and folder <code>/media/tv</code>, and <b>Music</b> for <code>/media/music</code>.</p>
+<div class="warning"><strong>One library per content type.</strong> Pointing a single library at a folder containing both films and TV produces wrong metadata for everything in it, and it is tedious to unpick afterwards.</div>
+<h4>If a library comes up empty</h4>
+<p>The mount is wrong, not Jellyfin. Check what it can actually see:</p>
+<pre>docker compose exec jellyfin ls /media</pre>
+<p>Nothing listed means the volume path in your Compose file does not match your real folder.</p>
+</div></details>
+
+<details class="app"><summary><b>Users</b><span class="d">Giving the household accounts</span></summary>
+<div class="abody">
+<p><b>Dashboard → Users → +</b>. For each person:</p>
 <ul>
-<li>Friendly name: <b>Local</b></li>
-<li>Connection type: <b>Socket</b></li>
-<li>Path: <code>/var/run/docker.sock</code></li>
+<li>Set which libraries they can see under <b>Library Access</b>.</li>
+<li>Turn off <b>Allow media playback that requires transcoding</b> for casual users if your server is CPU-limited — the difference between one device quietly overloading the machine and it politely refusing.</li>
+<li>Leave administrative permissions off unless they need them.</li>
 </ul>
-<p>Save, then <b>Add New Monitor</b>:</p>
-<ul>
-<li>Monitor type: <b>Docker Container</b></li>
-<li>Friendly name: <b>Jellyfin container</b></li>
-<li>Container name: <code>jellyfin</code></li>
-<li>Docker host: the one you just created</li>
-</ul>
-<div class="qs-note"><b>Add an HTTP monitor as well.</b> A container can be running while the app inside it is wedged. Choose type <b>HTTP(s)</b> and URL <code>http://jellyfin:8096</code> — using the container name, because inside Docker <code>localhost</code> means Kuma itself. Between the two you learn both that it exists and that it works.</div>
-</div></details></li>
+<div class="tip"><strong>Keep one local admin account with a password</strong> even if you later add single sign-on. If an SSO plugin breaks after an update, that account is how you get back in.</div>
+</div></details>
 
-<li class="qs-step"><details><summary><span class="qs-title">Get told on Discord</span><span class="qs-toggle"></span></summary><div class="qs-body">
-<p>In Discord, open the channel you want alerts in, then <b>Edit Channel → Integrations → Webhooks → New Webhook</b>. Name it, then <b>Copy Webhook URL</b>.</p>
-<p>Back in Uptime Kuma, edit your monitor and choose <b>Setup Notification</b>:</p>
-<ul>
-<li>Notification type: <b>Discord</b></li>
-<li>Friendly name: <b>Discord</b></li>
-<li>Discord webhook URL: paste it</li>
-<li>Tick <b>Default enabled</b> so new monitors use it automatically</li>
-</ul>
-<p>Press <b>Test</b> — a message should land in the channel within a second or two. If it does not, the webhook URL is wrong; nothing else in the chain produces that result.</p>
-<div class="qs-warn">A webhook URL is a password. Anyone who has it can post to your channel, so keep it out of screenshots and out of git.</div>
-</div></details></li>
+<details class="app"><summary><b>Transcoding</b><span class="d">Only if you need it</span></summary>
+<div class="abody">
+<p><b>Dashboard → Playback → Transcoding</b>. On native Linux with an Intel chip, set hardware acceleration to <b>Intel QuickSync</b> and enable the codecs your hardware supports. This requires the device mapping in your Compose file:</p>
+<pre>devices:
+  - /dev/dri:/dev/dri</pre>
+<div class="warning"><strong>Not available on Docker Desktop.</strong> On Windows and macOS the virtual machine cannot reach the GPU, so transcoding is CPU-only — realistically one stream. Storing files your devices can play directly is the practical answer there.</div>
+</div></details>
+</section>
 
+<!-- JELLYSEERR -->
+<section id="jellyseerr">
+<h2>Jellyseerr</h2>
+<p class="lead">The request front end. It signs people in against Jellyfin and hands approved requests to Sonarr and Radarr, so it needs all three configured first.</p>
+
+<details class="app" open><summary><b>Setup wizard</b><span class="pill first">Runs once</span><span class="d">Jellyfin, then the *arr apps</span></summary>
+<div class="abody">
+<ol class="steps">
+<li>Open <code>http://your-server:5055</code>. Choose <b>Sign in with Jellyfin</b>.</li>
+<li>Jellyfin URL: <code>http://jellyfin:8096</code>. Sign in with your Jellyfin <em>admin</em> account — this becomes the Jellyseerr owner.</li>
+<li>It offers to sync your Jellyfin libraries. Tick the ones people should be able to request from, and run the scan.</li>
+<li>Next it asks for Radarr and Sonarr. Add both.</li>
+</ol>
+<h4>Adding Radarr</h4>
+<div class="fields"><dl>
+<dt>Hostname</dt><dd><code>radarr</code></dd>
+<dt>Port</dt><dd><code>7878</code></dd>
+<dt>API Key</dt><dd>from Radarr's Settings → General</dd>
+<dt>Quality Profile</dt><dd>the profile you set up in Radarr</dd>
+<dt>Root Folder</dt><dd><code>/data/media/movies</code></dd>
+<dt>Default server</dt><dd>on</dd>
+</dl></div>
+<p>Sonarr is the same with <code>sonarr</code>, port <code>8989</code>, and root folder <code>/data/media/tv</code>. Sonarr also asks for a <b>Language Profile</b> — pick your default.</p>
+<div class="tip"><strong>Test each connection before saving.</strong> If Jellyseerr cannot reach Radarr, requests will be accepted and then silently do nothing, which is a confusing thing to debug later.</div>
+</div></details>
+
+<details class="app"><summary><b>Users and quotas</b><span class="d">Letting the household in without losing your disk</span></summary>
+<div class="abody">
+<ol class="steps">
+<li><b>Settings → Users</b> → <b>Import Users from Jellyfin</b>. Everyone with a Jellyfin account appears.</li>
+<li>Set <b>Global Movie Request Limit</b> and <b>Global Series Request Limit</b> — something like 5 per week is sane.</li>
+<li>Decide on auto-approval. Leaving it off means requests wait for you; turning it on for trusted users saves you being a bottleneck.</li>
+</ol>
+<div class="warning"><strong>Quotas are worth setting before you share the link.</strong> An enthusiastic new user can request an entire franchise in an afternoon and fill a disk overnight.</div>
+</div></details>
+</section>
+
+<!-- IMMICH -->
+<section id="immich">
+<h2>Immich</h2>
+<p class="lead">Independent of the media chain. The main setup is the mobile app, since phone backup is the point.</p>
+
+<details class="app"><summary><b>First run and mobile backup</b><span class="d">Admin account, then your phone</span></summary>
+<div class="abody">
+<ol class="steps">
+<li>Open <code>http://your-server:2283</code> and create the admin account. The first account is the administrator.</li>
+<li><b>Administration → Settings → Storage Template</b> — turn it on if you want files organised by date on disk rather than by upload id. Decide this before uploading much; changing it later means moving everything.</li>
+<li>Install the Immich app on your phone, and enter the server URL. On the same network that is <code>http://your-server:2283</code>; from outside you will need <a href="access.html">remote access</a> first.</li>
+<li>In the app, <b>Backup</b> → choose which albums to back up → enable background backup.</li>
+</ol>
+<div class="warning"><strong>Back up the database, not just the photos.</strong> The files alone are not your library — albums, faces and metadata live in Postgres. Losing it means keeping every image but losing all the organisation.</div>
+<div class="tip"><strong>First import is slow, and that is normal.</strong> Thumbnails and face recognition for a large library take hours. Watch <b>Administration → Jobs</b> to see progress rather than assuming it has hung.</div>
+</div></details>
+</section>
+
+<!-- KIMA -->
+<section id="kima">
+<h2>Kima</h2>
+<p class="lead">Music streaming over the library Lidarr manages, with its own apps via the Subsonic API.</p>
+
+<details class="app"><summary><b>Setup and Lidarr link</b><span class="d">Library, then automation</span></summary>
+<div class="abody">
+<ol class="steps">
+<li>Open <code>http://your-server:3030</code> and create your account.</li>
+<li>Point it at your music. Inside the container that is <code>/music</code>, which maps to your media folder's <code>music</code> directory.</li>
+<li>Let it scan. Audio analysis is CPU-heavy and takes a while on a large library.</li>
+<li>To connect Lidarr, give Kima the URL <code>http://lidarr:8686</code> and Lidarr's API key from Settings → General.</li>
+</ol>
+<h4>Native apps</h4>
+<p>Kima implements the OpenSubsonic API, so apps like Symfonium, Amperfy and DSub can connect to it directly. Point them at your Kima URL with your Kima username and password.</p>
+<div class="warning"><strong>Kima's built-in Soulseek downloader is not behind the VPN.</strong> Unlike qBittorrent it runs on the normal network, because it also has to serve your library. If you enter Soulseek credentials, that peer-to-peer traffic uses your ordinary connection. Leaving the integration unconfigured avoids the question entirely.</div>
+</div></details>
+</section>
+
+<!-- ARCHIVE -->
+<section id="archive">
+<h2>Archiving apps</h2>
+
+<details class="app"><summary><b>ArchiveBox</b><span class="d">Saving web pages</span></summary>
+<div class="abody">
+<p>Open <code>http://your-server:8000</code> and sign in with <code>admin</code> and the generated password from your <code>.env</code>.</p>
+<p>Add URLs through <b>Add</b>, or import bookmarks and RSS feeds. Each snapshot keeps several formats at once — HTML, PDF, screenshot and more — so storage grows faster than people expect.</p>
+<div class="warning"><strong>Public access is off by default</strong> in the generated config (<code>PUBLIC_INDEX</code>, <code>PUBLIC_SNAPSHOTS</code>, <code>PUBLIC_ADD_VIEW</code>). Turn those on only deliberately.</div>
+</div></details>
+
+<details class="app"><summary><b>Tube Archivist</b><span class="d">Archiving YouTube channels</span></summary>
+<div class="abody">
+<p>Open <code>http://your-server:8001</code> and sign in with <code>admin</code> and the <code>TA_PASSWORD</code> from your <code>.env</code>.</p>
+<ol class="steps">
+<li><b>Settings → Application</b> — set your download quality and format.</li>
+<li><b>Subscriptions</b> — add channel URLs.</li>
+<li><b>Downloads</b> — run a scan, then start the download queue.</li>
+</ol>
+<div class="tip"><strong>If it will not start</strong>, it is usually Elasticsearch — either memory limits or <code>vm.max_map_count</code> being too low on the host. On ARM machines its Elasticsearch image has limited support, which is the one module likely to disappoint on a Raspberry Pi.</div>
+</div></details>
+</section>
+
+<!-- UPTIME KUMA -->
+<section id="kuma">
+<div class="kicker">Monitoring</div>
+<h2>Uptime Kuma</h2>
+<p class="lead">Watches everything else and tells you when it stops. Worth setting up early — it is the app that tells you when the others need attention.</p>
+
+<details class="app" open><summary><b>HTTP monitors</b><span class="pill first">Start here</span><span class="d">The most useful check, and it needs no permissions</span></summary>
+<div class="abody">
+<p>Open <code>http://your-server:3001</code>, create your account, then <b>Add New Monitor</b>:</p>
+<div class="fields"><dl>
+<dt>Monitor Type</dt><dd><b>HTTP(s)</b></dd>
+<dt>Friendly Name</dt><dd>Jellyfin</dd>
+<dt>URL</dt><dd><code>http://jellyfin:8096</code> — the container name, not localhost</dd>
+<dt>Heartbeat Interval</dt><dd>60 seconds is plenty</dd>
+<dt>Retries</dt><dd>2 or 3, so a brief blip does not page you</dd>
+</dl></div>
+<p>Repeat for each service you care about:</p>
+<div class="tbl"><table>
+<thead><tr><th>Service</th><th>URL</th></tr></thead>
+<tbody>
+<tr><td>Jellyfin</td><td><code>http://jellyfin:8096</code></td></tr>
+<tr><td>Jellyseerr</td><td><code>http://jellyseerr:5055</code></td></tr>
+<tr><td>Sonarr</td><td><code>http://sonarr:8989</code></td></tr>
+<tr><td>Radarr</td><td><code>http://radarr:7878</code></td></tr>
+<tr><td>Immich</td><td><code>http://immich-server:2283</code></td></tr>
+<tr><td>qBittorrent</td><td><code>http://gluetun:8080</code></td></tr>
+</tbody></table></div>
+<div class="tip"><strong>Why the container name?</strong> Inside Docker, <code>localhost</code> means Uptime Kuma itself. Using container names also means you are testing the internal path rather than your router, so a monitor failing tells you something real.</div>
+</div></details>
+
+<details class="app"><summary><b>Docker container monitors</b><span class="d">Needs the socket mounted</span></summary>
+<div class="abody">
+<p>An HTTP monitor tells you the app is answering. A container monitor tells you the container is running. They fail in different ways, so both are useful.</p>
+<p>First check your Compose file has the socket mounted — in the generated stack this line is commented out by default:</p>
+<pre>volumes:
+  - /var/run/docker.sock:/var/run/docker.sock:ro</pre>
+<p>Then in Uptime Kuma, <b>Profile → Settings → Docker Hosts → Add Docker Host</b>:</p>
+<div class="fields"><dl>
+<dt>Friendly Name</dt><dd>Local</dd>
+<dt>Connection Type</dt><dd><b>Socket</b></dd>
+<dt>Docker Daemon</dt><dd><code>/var/run/docker.sock</code></dd>
+</dl></div>
+<p>Save, then <b>Add New Monitor</b> with type <b>Docker Container</b>, container name <code>jellyfin</code>, and the Docker host you just made.</p>
+<div class="warning"><strong>The socket is a powerful thing to hand out</strong>, even read-only. If you would rather not, HTTP monitors answer the more useful question anyway — whether the app actually works.</div>
+</div></details>
+
+<details class="app"><summary><b>Status page</b><span class="d">Optional, and safe to share</span></summary>
+<div class="abody">
+<p><b>Status Pages → New Status Page</b>. Add the monitors you want visible, and Kuma gives you a clean public page.</p>
+<p>This is the one part of Uptime Kuma that is reasonable to expose publicly — it shows only up or down, not your admin interface. If your household keeps asking whether the server is down, this answers it for them.</p>
+</div></details>
+</section>
+
+<!-- DISCORD -->
+<section id="kuma-discord">
+<h2>Discord alerts</h2>
+<p class="lead">The quickest notification to set up, and the one most people want.</p>
+<ol class="steps">
+<li>In Discord, open the channel you want alerts in. You need <b>Manage Webhooks</b> permission, so your own server is easiest.</li>
+<li><b>Edit Channel → Integrations → Webhooks → New Webhook</b>.</li>
+<li>Give it a name — <b>Server alerts</b> — and optionally an avatar. Press <b>Copy Webhook URL</b>.</li>
+<li>In Uptime Kuma, edit any monitor and press <b>Setup Notification</b>.</li>
+</ol>
+<div class="fields"><dl>
+<dt>Notification Type</dt><dd><b>Discord</b></dd>
+<dt>Friendly Name</dt><dd>Discord</dd>
+<dt>Discord Webhook URL</dt><dd>paste it</dd>
+<dt>Bot Display Name</dt><dd>optional</dd>
+<dt>Default enabled</dt><dd>tick, so new monitors use it automatically</dd>
+<dt>Apply on all existing monitors</dt><dd>tick, to cover what you already made</dd>
+</dl></div>
+<p>Press <b>Test</b>. A message should land in the channel within a second or two. If it does not, the webhook URL is wrong — nothing else in the chain produces that result.</p>
+<div class="warning"><strong>A webhook URL is a password.</strong> Anyone who has it can post to your channel. Keep it out of screenshots, and out of git.</div>
+</section>
+
+<!-- TELEGRAM -->
+<section id="kuma-telegram">
+<h2>Telegram alerts</h2>
+<p class="lead">A little more setup than Discord, but it reaches your phone properly and does not need a Discord account.</p>
+<ol class="steps">
+<li>In Telegram, search for <b>@BotFather</b> and start a chat.</li>
+<li>Send <code>/newbot</code>. It asks for a display name, then a username ending in <code>bot</code>.</li>
+<li>BotFather replies with a <b>token</b> — a long string like <code>123456789:AAG...</code>. That token is a password; treat it like one.</li>
+<li>Now start a chat with <em>your new bot</em> and send it any message. A bot cannot message you first, so without this step nothing will arrive.</li>
+<li>In Uptime Kuma, <b>Setup Notification → Telegram</b>, paste the bot token, then press <b>Auto Get</b> beside the Chat ID field. It reads the message you just sent and fills the ID in.</li>
+</ol>
+<div class="fields"><dl>
+<dt>Notification Type</dt><dd><b>Telegram</b></dd>
+<dt>Bot Token</dt><dd>from BotFather</dd>
+<dt>Chat ID</dt><dd>press <b>Auto Get</b> after messaging your bot</dd>
+<dt>Send silently</dt><dd>optional — notifies without a sound</dd>
+<dt>Default enabled</dt><dd>tick</dd>
+</dl></div>
+<p>Press <b>Test</b>. If Auto Get finds nothing, you have not messaged the bot yet — that is the step everyone misses.</p>
+<div class="tip"><strong>For a group instead of a direct message</strong>, add the bot to the group, send a message there, then press Auto Get. Group chat IDs are negative numbers, which is normal.</div>
+</section>
+
+<!-- POCKET ID -->
+<section id="pocketid">
+<div class="kicker">Single sign-on</div>
+<h2>Pocket ID</h2>
+<p class="lead">One passkey login across the apps that support it. This section is long because the honest answer is more complicated than "set up SSO and you are done" — the coverage is real but partial, and it is better to know that before you start.</p>
+
+<div class="card peach">
+<strong>What this actually gets you</strong>
+<div class="tbl" style="margin:12px 0 0"><table>
+<thead><tr><th>App</th><th>Support</th><th>Reality</th></tr></thead>
+<tbody>
+<tr><td>Immich</td><td><span class="yes">Native</span></td><td>Works fully, mobile app included</td></tr>
+<tr><td>Arcane</td><td><span class="yes">Native</span></td><td>Supported directly</td></tr>
+<tr><td>Jellyfin</td><td><span class="part">Plugin</span></td><td>Web browser or Quick Connect only</td></tr>
+<tr><td>Sonarr, Radarr, Lidarr</td><td><span class="no">None</span></td><td>Their own single login</td></tr>
+<tr><td>Bazarr, qBittorrent</td><td><span class="no">None</span></td><td>Their own login</td></tr>
+<tr><td>Uptime Kuma</td><td><span class="no">None</span></td><td>Its own accounts</td></tr>
+<tr><td>ArchiveBox, Tube Archivist</td><td><span class="no">None</span></td><td>Their own accounts</td></tr>
+</tbody></table></div>
+<p style="margin:12px 0 0">Realistically that is one login for <b>Immich, Arcane and Jellyfin in a browser</b>. Genuinely useful if those are the apps other people touch. Not stack-wide SSO.</p>
+</div>
+
+<div class="warning"><strong>Before anything else: Pocket ID needs HTTPS on a real domain.</strong> Passkeys are only allowed on a secure origin — this is a browser rule, not a setting, and no configuration works around it. Finish <a href="access.html">remote access</a> first so <code>https://id.example.com</code> resolves with a valid certificate.</div>
+
+<details class="app" open><summary><b>First run</b><span class="pill first">Start here</span><span class="d">Admin account and your first passkey</span></summary>
+<div class="abody">
+<ol class="steps">
+<li>Visit <code>https://id.example.com</code>. On first run it presents a setup wizard.</li>
+<li>Create the admin account and register a passkey when prompted — your phone, laptop, or a hardware key.</li>
+<li><b>Register a second passkey on a different device immediately.</b></li>
+</ol>
+<div class="warning"><strong>This is the single most important step on this page.</strong> One passkey on one device means losing that device locks you out of every connected app at once. A second passkey — a laptop, or a hardware key in a drawer — costs a minute now.</div>
+<h4>If you are locked out anyway</h4>
+<p>Pocket ID's CLI can issue a one-time login link:</p>
+<pre>docker compose exec pocket-id \
+  /app/pocket-id one-time-access-token admin</pre>
+<p>That prints a URL valid once, for a short window. Open it and register a new passkey.</p>
+</div></details>
+
+<details class="app" id="pid-clients"><summary><b>Adding an OIDC client</b><span class="d">The same five steps for every app</span></summary>
+<div class="abody">
+<p>Every app you connect needs a client entry in Pocket ID. The process never changes:</p>
+<ol class="steps">
+<li><b>Administration → OIDC Clients → Add OIDC Client</b>.</li>
+<li>Name it after the app.</li>
+<li>Enter that app's <b>callback URL</b> — each app documents its own, and the ones you need are below.</li>
+<li>Save. Pocket ID shows a <b>Client ID</b> and a <b>Client Secret</b>. <b>The secret is shown once</b> — copy it now.</li>
+<li>Paste both into the app, along with the issuer URL.</li>
+</ol>
+<p>Most apps only need the issuer and will discover everything else themselves:</p>
+<pre>https://id.example.com/.well-known/openid-configuration</pre>
+<div class="tip"><strong>Keep the client secret somewhere safe</strong> — your password manager, not a note file in the stack folder. If you lose it you can regenerate it in Pocket ID, but you then have to update the app too.</div>
+</div></details>
+
+<details class="app" id="pid-immich"><summary><b>Immich</b><span class="pill first">Best supported</span><span class="d">Full SSO including the mobile app</span></summary>
+<div class="abody">
+<p>The one where SSO is most worth having, since Immich is the app family members use daily.</p>
+<h4>In Pocket ID</h4>
+<p>Create a client named Immich with these callback URLs — all three:</p>
+<pre>https://photos.example.com/auth/login
+https://photos.example.com/user-settings
+app.immich:///oauth-callback   <span class="cm"># the mobile app</span></pre>
+<h4>In Immich</h4>
+<p><b>Administration → Settings → OAuth</b>:</p>
+<div class="fields"><dl>
+<dt>Issuer URL</dt><dd><code>https://id.example.com/.well-known/openid-configuration</code></dd>
+<dt>Client ID</dt><dd>from Pocket ID</dd>
+<dt>Client Secret</dt><dd>from Pocket ID</dd>
+<dt>Scope</dt><dd><code>openid email profile</code></dd>
+<dt>Button Text</dt><dd>Sign in with Pocket ID</dd>
+<dt>Auto Register</dt><dd>on — creates accounts on first login</dd>
+</dl></div>
+<div class="warning"><strong>Do not disable password login until you have tested it.</strong> Immich can hide the password form entirely. Do that only once OIDC login has worked in a private browser window — otherwise a misconfiguration locks you out of your own photo library.</div>
+<div class="tip"><strong>The mobile callback matters.</strong> Without <code>app.immich:///oauth-callback</code> registered, SSO works in the browser and fails on phones, which is a confusing way to find out.</div>
+</div></details>
+
+<details class="app" id="pid-arcane"><summary><b>Arcane</b><span class="d">Native OIDC support</span></summary>
+<div class="abody">
+<p>Arcane supports OIDC directly. Create a client in Pocket ID with Arcane's callback URL, then enter the issuer URL, client ID and secret in Arcane's authentication settings.</p>
+<div class="warning"><strong>Keep a local admin account on Arcane too.</strong> Arcane holds the Docker socket — if SSO breaks and it is your only way in, you have lost the tool you would use to fix it.</div>
+<div class="tip"><strong>Arcane should not be public at all</strong>, SSO or not. Reach it over Tailscale or your LAN. Single sign-on is convenience here, not a reason to expose it.</div>
+</div></details>
+
+<details class="app" id="pid-jellyfin"><summary><b>Jellyfin</b><span class="pill after">Read before starting</span><span class="d">Community plugin, with a real limitation</span></summary>
+<div class="abody">
+<p>Jellyfin has no native OpenID Connect support. There is a community SSO plugin, and it works — but it carries a limitation that matters enormously for a media server.</p>
+<div class="warning"><strong>The plugin only authenticates through the web interface or Quick Connect.</strong> Native apps — Swiftfin, Jellyfin for Android and Android TV, Roku, Kodi — cannot use the SSO redirect flow directly. In practice, anyone watching on a TV still needs a normal Jellyfin username and password.</div>
+<p>Native OIDC is being built upstream, but the discussion points at Jellyfin 13.0 at the earliest, and it will not reach current servers. Until then this is the situation.</p>
+
+<h4>Which plugin</h4>
+<p>The original <code>9p4/jellyfin-plugin-sso</code> was <b>archived in May 2026</b> and is unmaintained. The actively maintained fork keeps the same plugin ID, so it is an in-place upgrade if you already had the old one — and unlike the original it has a proper admin configuration UI rather than API-only setup.</p>
+<div class="fields"><dl>
+<dt>Repository URL</dt><dd><code>https://raw.githubusercontent.com/K0lin/jellyfin-plugin-sso/manifest-release/manifest.json</code></dd>
+<dt>Requires</dt><dd>Jellyfin 10.8+, 10.11.11 or newer recommended</dd>
+</dl></div>
+<div class="warning"><strong>Other forks exist, and at least one is explicitly pre-alpha and not for production use.</strong> Check what you are installing before adding any third-party repository to Jellyfin — a plugin repository can install code on your server.</div>
+
+<h4>Installing</h4>
+<ol class="steps">
+<li><b>Administration → Plugins → Repositories → Add</b>, and paste the repository URL above.</li>
+<li><b>Administration → Plugins → Catalog</b>, find <b>SSO Authentication</b>, install it.</li>
+<li>Restart Jellyfin.</li>
+<li>In Pocket ID, create a client whose callback URL follows the plugin's pattern. The provider name at the end is yours to choose, and must match on both sides:
+<pre>https://jellyfin.example.com/sso/OID/redirect/<span class="hl">pocketid</span></pre></li>
+<li>In <b>Plugins → SSO Authentication → Settings</b>, add an OIDC provider with your issuer URL, client ID and secret. Enable it, and set folder access.</li>
+<li><b>Restart Jellyfin again</b> — configuration changes do not take effect until you do.</li>
 </ol>
 
-<div class="qs-done">
-<h3>That is a working server.</h3>
-<p>Jellyfin is serving your library, Arcane manages it without a terminal, and you find out on Discord if it stops. Everything after this is optional.</p>
-<div class="qs-next">
-<a href="generator.html"><b>Add more services →</b><span>Sonarr, Radarr, Immich and the rest, with dependencies resolved for you</span></a>
-<a href="access.html"><b>Reach it from outside →</b><span>Tailscale, a reverse proxy, or passkey single sign-on</span></a>
-<a href="faq.html"><b>Something broken? →</b><span>The four commands that diagnose most problems</span></a>
-</div>
-</div>
-</div></section>
-<section class="section" id="safety"><div class="wrap"><div class="about"><div><div class="kicker">A small but important thing</div><h2>Self-hosting comes with responsibility.</h2><p class="lead">This project helps you run software. It does not give you permission to download, archive, copy or distribute media you do not have the right to use.</p><div class="note"><strong>Torrents are also a security concern.</strong><br>Files can come from untrusted sources and may contain malware, ransomware, trojans, cryptominers or malicious scripts. A VPN can protect network privacy; it cannot make a malicious file safe.</div></div><div class="blob"><p>Own your server.<br>Know what's running on it.</p></div></div><div class="legal"><strong>Copyright:</strong> Only obtain, store, archive and share content you are legally permitted to use. This project does not provide or endorse piracy. <strong>Security:</strong> Keep your host, Docker engine, images and applications updated; do not blindly execute downloaded programs or scripts; use sensible firewall and network controls; and keep backups. This is general information, not legal or security advice.</div></div></section>
-<footer><div class="wrap">Modular Media Server · <a href="documentation.html">Documentation</a> · <a href="hardware.html">Hardware</a> · <a href="platforms.html">Platforms</a> · Start small. Add what you need. Understand what you're running.</div></footer>
+<h4>Adding the login button</h4>
+<p>The button is not added automatically. Edit <code>config/web/config.json</code>:</p>
+<pre>{
+  "customLinks": [
+    { "name": "Sign in with SSO",
+      "url": "/sso/OID/start/<span class="hl">pocketid</span>",
+      "icon": "lock" }
+  ]
+}</pre>
+<div class="tip"><strong>Test in a private browser window.</strong> Your existing session will mask problems and make a broken setup look like it works.</div>
+</div></details>
 
+<details class="app" id="pid-rest"><summary><b>Everything else</b><span class="d">What to do about apps with no OIDC</span></summary>
+<div class="abody">
+<p>Sonarr, Radarr, Lidarr, Bazarr, qBittorrent, Uptime Kuma, ArchiveBox and Tube Archivist have no OpenID Connect support. You have three honest options.</p>
+<h4>Keep them private — recommended</h4>
+<p>Do not publish them. Reach them over Tailscale or your LAN, and let their own login be a second layer rather than the only one. For administrative tools you touch occasionally, this is the right engineering answer for a home setup.</p>
+<h4>Forward authentication</h4>
+<p>A proxy component checks authentication before passing a request on, putting a login in front of apps that cannot do it themselves.</p>
+<div class="warning"><strong>Pocket ID cannot do this on its own.</strong> It is an identity provider, not a gateway — it cannot sit in front of Sonarr and demand a login. That needs an additional component such as oauth2-proxy, or a proxy with an auth module. More moving parts, and worth being deliberate about.</div>
+<h4>Just use their own logins</h4>
+<p>A strong unique password on each, in a password manager. Unglamorous, and completely fine.</p>
+</div></details>
+
+<details class="app" id="pid-users"><summary><b>Users and groups</b><span class="d">Adding people, and removing them properly</span></summary>
+<div class="abody">
+<h4>Adding someone</h4>
+<ol class="steps">
+<li>In Pocket ID, <b>Users → Add User</b>.</li>
+<li>Send them a one-time link so they register their own passkey on their own device. You never handle a credential for them.</li>
+<li>Create groups if you want them — <code>media-users</code> and <code>media-admins</code> is plenty for a household. Apps that read group claims can map them to their own permissions.</li>
+</ol>
+<h4>Removing someone</h4>
+<p>Because accounts live in several systems, offboarding is a checklist rather than one button:</p>
+<ul>
+<li>Delete or disable them in Pocket ID — stops SSO logins immediately.</li>
+<li>Delete their Jellyfin user separately.</li>
+<li>Remove them from Jellyseerr so pending requests do not linger.</li>
+<li>Decide what happens to their Immich library before deleting that account, since it removes their photos.</li>
+<li>Revoke active Jellyfin sessions, or a signed-in device keeps playing.</li>
+</ul>
+<div class="warning"><strong>Deleting the Pocket ID account is not enough on its own.</strong> Anyone with a Jellyfin password and a TV app never touches Pocket ID, and will carry on watching indefinitely. This surprises people.</div>
+</div></details>
+
+<div class="card">
+<strong>Still stuck?</strong>
+<p style="margin:10px 0 0">Bring the log line. The <a href="faq.html">troubleshooting page</a> starts with the four commands that identify most problems, and has searchable answers for the specific ones — including the connection failures this page is designed to prevent.</p>
+<p style="margin-top:16px"><a class="btn ghost" href="faq.html">Troubleshooting</a> &nbsp; <a class="btn ghost" href="documentation.html">Module reference</a> &nbsp; <a class="btn ghost" href="access.html">Remote access</a></p>
+</div>
+</section>
+
+</main>
+</div></div>
+
+<footer><div class="wrap">Modular Media Server · <a href="index.html">Home</a> · <a href="guide.html">Guide</a> · <a href="generator.html">Generator</a> · <a href="documentation.html">Docs</a> · <a href="faq.html">Help</a> · Start small. Add what you need. Understand what you're running.</div></footer>
 
 <script>
 (function(){
   var b=document.querySelector('.navbtn'), n=document.querySelector('nav');
-  if(!b||!n) return;
-  b.addEventListener('click',function(){
-    var open=n.classList.toggle('navopen');
-    b.setAttribute('aria-expanded',open?'true':'false');
+  if(b&&n){
+    b.addEventListener('click',function(){
+      var open=n.classList.toggle('navopen');
+      b.setAttribute('aria-expanded',open?'true':'false');
+    });
+    n.addEventListener('click',function(e){ if(e.target.tagName==='A') n.classList.remove('navopen'); });
+    document.addEventListener('click',function(e){ if(!n.contains(e.target)) n.classList.remove('navopen'); });
+    document.addEventListener('keydown',function(e){ if(e.key==='Escape') n.classList.remove('navopen'); });
+  }
+  var links=[].slice.call(document.querySelectorAll('.toc a[href^="#"]'));
+  var targets=links.map(function(a){ return document.getElementById(a.getAttribute('href').slice(1)); });
+  function sync(){
+    var y=window.scrollY+96,best=-1;
+    targets.forEach(function(t,i){ if(t&&t.offsetTop<=y) best=i; });
+    links.forEach(function(a,i){ a.classList.toggle('on',i===best); });
+  }
+  var tick=false;
+  window.addEventListener('scroll',function(){
+    if(tick) return; tick=true;
+    requestAnimationFrame(function(){ sync(); tick=false; });
   });
-  n.addEventListener('click',function(e){
-    if(e.target.tagName==='A') n.classList.remove('navopen');
-  });
-  document.addEventListener('click',function(e){
-    if(!n.contains(e.target)) n.classList.remove('navopen');
-  });
-  document.addEventListener('keydown',function(e){
-    if(e.key==='Escape') n.classList.remove('navopen');
-  });
+  sync();
+  if(location.hash){
+    var el=document.querySelector(location.hash);
+    if(el&&el.tagName==='DETAILS') el.open=true;
+  }
 })();
 </script>
-<script>
-(function(){
-  var b=document.getElementById('qsx');
-  if(!b) return;
-  b.addEventListener('click',function(){
-    var d=document.querySelectorAll('.qs-step details'),
-        opening=b.textContent.indexOf('Expand')===0;
-    d.forEach(function(x){ x.open=opening; });
-    b.textContent = opening ? 'Collapse all' : 'Expand all';
-  });
-})();
-</script>
-</body>
-</html>
+</body></html>
