@@ -345,6 +345,7 @@ html[data-theme="dark"] .skiplink{color:#08151a}
 <a href="#kuma-discord">Discord alerts</a>
 <a href="#kuma-telegram">Telegram alerts</a>
 <hr>
+<a href="#cloudflared">Cloudflare Tunnel</a>
 <a href="#pocketid">Pocket ID</a>
 <a href="#pid-clients">Adding a client</a>
 <a href="#pid-immich">Immich SSO</a>
@@ -822,6 +823,84 @@ docker compose exec sonarr ls /data/downloads</pre>
 </dl></div>
 <p>Press <b>Test</b>. If Auto Get finds nothing, you have not messaged the bot yet — that is the step everyone misses.</p>
 <div class="tip"><strong>For a group instead of a direct message</strong>, add the bot to the group, send a message there, then press Auto Get. Group chat IDs are negative numbers, which is normal.</div>
+</section>
+
+
+<section id="cloudflared">
+<div class="kicker">Connection</div>
+<h2>Cloudflare Tunnel</h2>
+<p class="lead">Reaches your services from anywhere without opening a single port. An outbound connection from your server to Cloudflare does the work, which also means it works behind CGNAT where port forwarding is impossible.</p>
+
+<div class="card peach">
+<strong>Read this before you put Jellyfin on it</strong>
+<p style="margin:10px 0 0">The advice you will find everywhere is that streaming media through a tunnel violates <b>Section 2.8</b> of Cloudflare's terms. That section was <b>removed in 2023</b> — so that specific claim is out of date.</p>
+<p style="margin:10px 0 0">What replaced it is narrower but still relevant: the content restriction moved into Cloudflare's CDN-specific terms, and their own announcement says customers may serve video and large files through the CDN <em>so long as that content is hosted by a Cloudflare service</em> such as Stream, Images or R2. Video hosted on your own server is not.</p>
+<p style="margin:10px 0 0">So the honest position is that it is <b>neither clearly prohibited nor clearly allowed</b>. Plenty of people run Jellyfin through a tunnel without incident; others report throttling or a blocked subdomain. If your access matters, read Cloudflare's current terms yourself rather than trusting any guide, including this one.</p>
+</div>
+
+<div class="warning"><strong>Two things that are not about the terms at all.</strong>
+<ul style="margin:10px 0 0">
+<li><b>Cloudflare terminates TLS.</b> Traffic is encrypted to Cloudflare, decrypted there, then re-encrypted to your server. They can see it. That is how the protection works, but it is not end-to-end.</li>
+<li><b>The free plan caps requests at 100&nbsp;MB.</b> This quietly breaks larger Immich photo and video uploads through the tunnel — the app will simply fail on big files.</li>
+</ul></div>
+
+<div class="card teal">
+<strong>What it is genuinely good at</strong>
+<p style="margin:10px 0 0">Lightweight, text-based interfaces: Jellyseerr for requests, a status page, dashboards. Small payloads, no bandwidth concerns, no terms ambiguity. For Jellyfin and Immich, <a href="access.html">Tailscale</a> avoids every one of the issues above — nothing is public at all.</p>
+</div>
+
+<details class="app" open><summary><b>Creating the tunnel</b><span class="pill first">Start here</span><span class="d">All of this happens on Cloudflare's side</span></summary>
+<div class="abody">
+<p>You need a domain whose DNS is managed by Cloudflare. The free plan is enough.</p>
+<ol class="steps">
+<li>Go to the <b>Cloudflare Zero Trust</b> dashboard.</li>
+<li><b>Networks → Tunnels → Create a tunnel</b>, and choose <b>Cloudflared</b> as the type.</li>
+<li>Name it — <code>home-server</code> is fine — and save.</li>
+<li>Cloudflare shows you install commands for various platforms. <b>You do not need them.</b> You only want the <b>token</b> — the long string beginning <code>eyJ</code> inside the command it displays.</li>
+<li>Paste that token into the generator's Connection step, or into <code>CLOUDFLARE_TUNNEL_TOKEN</code> in your <code>.env</code>.</li>
+</ol>
+<div class="warning"><strong>That token is a credential.</strong> Anyone holding it can run a tunnel into your Cloudflare account. Keep it out of screenshots and out of git — the generated <code>.gitignore</code> already excludes <code>.env</code>.</div>
+</div></details>
+
+<details class="app"><summary><b>Starting it</b><span class="d">No ports, no certificates, no router changes</span></summary>
+<div class="abody">
+<pre>docker compose up -d cloudflared
+docker compose logs -f cloudflared</pre>
+<p>You are looking for <code>Registered tunnel connection</code>, usually four of them to different Cloudflare locations. The tunnel then shows as <b>Healthy</b> in the dashboard.</p>
+<p>Nothing was opened on your router, and no certificate was issued on your side — Cloudflare handles HTTPS at their edge.</p>
+<div class="tip"><strong>If it will not connect</strong>, the token is almost always the cause — truncated on copy, or from a deleted tunnel. The log says so plainly.</div>
+</div></details>
+
+<details class="app"><summary><b>Routing services</b><span class="d">Done in the dashboard, not in your files</span></summary>
+<div class="abody">
+<p>This is the part that surprises people: <b>your Compose file contains no routing at all.</b> Which hostname reaches which service is configured entirely in Cloudflare.</p>
+<p>In the tunnel's <b>Public Hostname</b> tab, add an entry per service:</p>
+<div class="fields"><dl>
+<dt>Subdomain</dt><dd><code>requests</code></dd>
+<dt>Domain</dt><dd>your domain</dd>
+<dt>Service type</dt><dd><b>HTTP</b></dd>
+<dt>URL</dt><dd><code>jellyseerr:5055</code></dd>
+</dl></div>
+<p>Use the <b>container name</b>, not <code>localhost</code>. cloudflared runs in a container on the same Docker network, so <code>localhost</code> would mean cloudflared itself — the same rule as everywhere else in this stack.</p>
+<div class="tbl"><table>
+<thead><tr><th>Service</th><th>Tunnel URL</th><th>Sensible?</th></tr></thead>
+<tbody>
+<tr><td>Jellyseerr</td><td><code>jellyseerr:5055</code></td><td><span class="yes">Good fit</span></td></tr>
+<tr><td>Uptime Kuma status</td><td><code>uptime-kuma:3001</code></td><td><span class="yes">Good fit</span></td></tr>
+<tr><td>Jellyfin</td><td><code>jellyfin:8096</code></td><td><span class="part">See the terms note above</span></td></tr>
+<tr><td>Immich</td><td><code>immich-server:2283</code></td><td><span class="part">100 MB upload cap</span></td></tr>
+<tr><td>Arcane, qBittorrent, *arr apps</td><td>—</td><td><span class="no">Never</span></td></tr>
+</tbody></table></div>
+<p>DNS records are created for you automatically — there is nothing to add by hand.</p>
+</div></details>
+
+<details class="app"><summary><b>Adding a login in front</b><span class="d">Cloudflare Access, optional</span></summary>
+<div class="abody">
+<p>A tunnel publishes a service to the whole internet. Anything without solid authentication of its own should have a login in front of it.</p>
+<p>Under <b>Access → Applications</b>, add a self-hosted application for the hostname, then a policy — allow specific email addresses, or a whole domain. Cloudflare then requires a one-time code before the request ever reaches your server.</p>
+<div class="tip"><strong>This is the piece that makes a tunnel reasonable</strong> for anything more sensitive than a status page. It also means a service with weak built-in auth is not directly exposed.</div>
+<div class="warning"><strong>It still does not make the administrative tools safe to publish.</strong> Arcane holds the Docker socket; qBittorrent can write files anywhere. Keep those on Tailscale or your LAN regardless.</div>
+</div></details>
 </section>
 
 <!-- POCKET ID -->
