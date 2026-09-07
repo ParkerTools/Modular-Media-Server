@@ -19,28 +19,34 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Fraunces:opsz,wght@9..144,700&display=swap">
 <style>
-:root{--blue:#006C87;--teal:#00AFB9;--cream:#FDFCDC;--peach:#FED9B7;--coral:#F07167;--ink:#15333b;--muted:#4a626b;--white:#fffef7;--line:#cfe3e4}
+:root{--on-accent:#FDFCDC;--surface:#fffef7;--tint-teal:#eaf8f7;--tint-peach:#fff6ee;--tint-soft:#f5fbfa;
+  --warn-bg:#fff0e3;--tip-bg:#e4f5f4;--line-teal:#a9dde0;--line-peach:#f4d3b6;
+  --code-fg:#0e5a63;--code-bg:#15333b;--code-txt:#fdfcdc;--code-cm:#8fb3ae;
+  --pill-teal-bg:#d3f0ef;--pill-coral-bg:#ffe0dc;--pill-peach-fg:#744b32;--pill-coral-fg:#96382f;
+  --ok:#2f7d5e;--bad:#b0463c;--warnfg:#a06a2c;--blue-hover:#005b73;
+  --shadow:rgba(21,51,59,.045);--blob-a:var(--peach);--blob-b:rgba(0,175,185,.20);
+  --blue:#006C87;--teal:#00AFB9;--cream:#FDFCDC;--peach:#FED9B7;--coral:#F07167;--ink:#15333b;--muted:#4a626b;--white:#fffef7;--line:#cfe3e4}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--cream);color:var(--ink);font-family:"DM Sans",sans-serif}a{text-decoration:none;color:inherit}.wrap{max-width:1160px;margin:auto;padding:0 24px}
 nav{height:82px;display:flex;align-items:center;justify-content:space-between}.brand{font-weight:700;font-size:18px;letter-spacing:-.04em}.brand span{color:var(--coral)}.navlinks{display:flex;gap:25px;color:var(--muted);font-size:14px}.navlinks a:hover{color:var(--blue)}
 .hero{padding:90px 0 105px;position:relative;overflow:hidden}.hero:after{content:"";position:absolute;width:280px;height:180px;background:var(--peach);border-radius:54% 46% 60% 40%;right:-70px;top:30px;transform:rotate(8deg);z-index:-1}.kicker{text-transform:uppercase;letter-spacing:.15em;font-size:12px;font-weight:700;color:var(--blue)}
 h1,h2,h3{font-family:Fraunces,serif;letter-spacing:-.045em;line-height:1.03}h1{font-size:clamp(55px,8vw,94px);max-width:850px;margin:18px 0 25px}.hero p,.lead{color:var(--muted);line-height:1.7}.hero p{font-size:20px;max-width:650px}
 .buttons{display:flex;gap:12px;margin-top:30px;flex-wrap:wrap}.btn{display:inline-block;border-radius:999px;padding:13px 22px;font-weight:700;font-size:15px;background:var(--blue);color:#fff;text-decoration:none;transition:.15s}
-.btn:hover{background:#005b73;color:#fff;text-decoration:none}
+.btn:hover{background:var(--blue-hover);color:#fff;text-decoration:none}
 .btn.alt{background:transparent;border:1px solid var(--line);color:var(--ink)}
 .btn.alt:hover{border-color:var(--teal);color:var(--blue);background:transparent}
 /* On the blue band the normal button colours disappear, so invert them. */
 .generator .btn{background:var(--cream);color:#0b3540}
 .generator .btn:hover{background:#fff;color:#0b3540}
-.generator .btn.alt{background:transparent;border:1px solid rgba(253,252,220,.55);color:var(--cream)}
-.generator .btn.alt:hover{border-color:var(--cream);background:rgba(253,252,220,.12);color:var(--cream)}
+.generator .btn.alt{background:transparent;border:1px solid rgba(253,252,220,.55);color:var(--on-accent)}
+.generator .btn.alt:hover{border-color:var(--cream);background:rgba(253,252,220,.12);color:var(--on-accent)}
 .buttons{display:flex;gap:12px;flex-wrap:wrap}.btn.alt{background:transparent;border:1px solid var(--line);color:var(--ink)}.btn.alt:hover{border-color:var(--teal);color:var(--blue)}
 .section{padding:80px 0;border-top:1px solid var(--line)}h2{font-size:52px;margin:10px 0 18px}.lead{font-size:17px;max-width:680px}
 .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:35px}.card{background:var(--white);border:1px solid var(--line);padding:25px;border-radius:20px}.num{font:31px Fraunces;color:var(--coral)}.card h3{font:700 18px "DM Sans";letter-spacing:-.02em;margin:15px 0 8px}.card p{font-size:14px;color:var(--muted);line-height:1.65;margin:0}
-.apps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:35px}.app{background:var(--white);border:1px solid var(--line);padding:23px;border-radius:20px;display:flex;flex-direction:column;min-height:190px}.app:nth-child(3n+2){background:#eaf8f7}.app:nth-child(3n){background:#fff1e4}.app-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.app h3{font:700 20px "DM Sans";letter-spacing:-.03em;margin:0}.tag{font-size:10px;text-transform:uppercase;letter-spacing:.1em;font-weight:700;padding:6px 8px;border-radius:999px;background:var(--peach);color:#744b32;white-space:nowrap}.app p{font-size:14px;color:var(--muted);line-height:1.6;margin:14px 0 18px}.source{margin-top:auto;display:flex;gap:8px;flex-wrap:wrap}.source a{font-size:12px;font-weight:700;color:var(--blue);border-bottom:1px solid #9bcbd2}.source a:hover{color:var(--coral);text-decoration:underline}
-.generator{background:var(--blue);color:var(--cream);padding:85px 0}.generator .lead{color:#d8f1f2}.generator h2{color:var(--cream)}.ghead{display:flex;justify-content:space-between;font-weight:700;padding:6px;border-bottom:1px solid var(--line)}.bar{height:100%;width:14%;background:var(--coral);transition:.45s}
+.apps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:35px}.app{background:var(--white);border:1px solid var(--line);padding:23px;border-radius:20px;display:flex;flex-direction:column;min-height:190px}.app:nth-child(3n+2){background:var(--tint-teal)}.app:nth-child(3n){background:var(--tint-peach)}.app-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.app h3{font:700 20px "DM Sans";letter-spacing:-.03em;margin:0}.tag{font-size:10px;text-transform:uppercase;letter-spacing:.1em;font-weight:700;padding:6px 8px;border-radius:999px;background:var(--peach);color:var(--pill-peach-fg);white-space:nowrap}.app p{font-size:14px;color:var(--muted);line-height:1.6;margin:14px 0 18px}.source{margin-top:auto;display:flex;gap:8px;flex-wrap:wrap}.source a{font-size:12px;font-weight:700;color:var(--blue);border-bottom:1px solid #9bcbd2}.source a:hover{color:var(--coral);text-decoration:underline}
+.generator{background:var(--blue);color:var(--on-accent);padding:85px 0}.generator .lead{color:#d8f1f2}.generator h2{color:var(--on-accent)}.ghead{display:flex;justify-content:space-between;font-weight:700;padding:6px;border-bottom:1px solid var(--line)}.bar{height:100%;width:14%;background:var(--coral);transition:.45s}
 .body{display:grid;grid-template-columns:185px 1fr;min-height:390px}.side{border-right:1px solid var(--line);padding:8px}.main{padding:10px 25px;animation:in .3s ease}@keyframes in{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}.main h3{font-size:34px;margin:4px 0 8px}.main p{font-size:14px;color:var(--muted)}
 .option:hover{transform:translateY(-2px);border-color:#91cdd1}.option b{display:block}.option span{font-size:12px;color:var(--muted)}
-.note{background:#fff0e3;border-left:4px solid var(--coral);padding:13px 15px;color:var(--muted);font-size:13px;line-height:1.55}
+.note{background:var(--warn-bg);border-left:4px solid var(--coral);padding:13px 15px;color:var(--muted);font-size:13px;line-height:1.55}
 .about{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}.blob{background:var(--peach);border-radius:50% 45% 52% 43%;min-height:280px;display:grid;place-items:center;text-align:center;padding:35px;transform:rotate(-3deg)}.blob p{font:30px/1.25 Fraunces;max-width:350px;color:#653f32}.legal{font-size:12px;color:var(--muted);line-height:1.7;margin-top:45px}footer{border-top:1px solid var(--line);padding:25px 0;color:var(--muted);font-size:13px}
 @media(max-width:850px){.grid4{grid-template-columns:1fr 1fr}.apps{grid-template-columns:1fr 1fr}.about{grid-template-columns:1fr}.body{grid-template-columns:1fr}.side{border-right:0;border-bottom:1px solid var(--line);display:flex;overflow:auto}}
 @media(max-width:520px){.grid4,.apps,h2{font-size:42px}.hero{padding-top:55px}}
@@ -56,18 +62,18 @@ nav{position:relative}
 .navlinks{display:none;position:absolute;top:66px;right:0;left:0;background:var(--white);border:1px solid var(--line);border-radius:16px;flex-direction:column;gap:0;padding:8px;z-index:60;box-shadow:0 10px 30px rgba(21,51,59,.09)}
 .navopen .navlinks{display:flex}
 .navlinks a{padding:11px 13px;border-radius:10px;font-size:15px}
-.navlinks a:hover{background:#eaf8f7;text-decoration:none}
+.navlinks a:hover{background:var(--tint-teal);text-decoration:none}
 }
 
 /* ── colour system ─────────────────────────────────────────────── */
 /* Tinted section shells break up long cream pages with rhythm. */
-.tinted{background:#eaf8f7;border:1px solid #cbe8e7;border-radius:26px;padding:38px 34px;margin-bottom:62px}
-.tinted-peach{background:#fff6ee;border:1px solid #f6d5b8;border-radius:26px;padding:38px 34px;margin-bottom:62px}
+.tinted{background:var(--tint-teal);border:1px solid var(--line-teal);border-radius:26px;padding:38px 34px;margin-bottom:62px}
+.tinted-peach{background:var(--tint-peach);border:1px solid var(--line-peach);border-radius:26px;padding:38px 34px;margin-bottom:62px}
 .tinted h2,.tinted-peach h2{margin-top:0}
 
 /* Cards cycle through tints instead of all-white. */
-.cyc>.card:nth-of-type(3n+2){background:#eaf8f7;border-color:#bfe3e2}
-.cyc>.card:nth-of-type(3n){background:#fff6ee;border-color:#f4d3b6}
+.cyc>.card:nth-of-type(3n+2){background:var(--tint-teal);border-color:var(--line-teal)}
+.cyc>.card:nth-of-type(3n){background:var(--tint-peach);border-color:var(--line-peach)}
 
 /* Second hero blob adds depth behind the first. */
 .hero:before{content:"";position:absolute;width:210px;height:210px;border-radius:52% 48% 44% 56%;
@@ -81,7 +87,7 @@ nav{position:relative}
 
 .genfacts{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:34px 0 30px}
 .genfacts div{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.20);border-radius:18px;padding:20px}
-.genfacts b{display:block;font-family:Fraunces,serif;font-size:38px;line-height:1;color:var(--cream);margin-bottom:8px}
+.genfacts b{display:block;font-family:Fraunces,serif;font-size:38px;line-height:1;color:var(--on-accent);margin-bottom:8px}
 .genfacts span{font-size:13.5px;color:#cfeaf0;line-height:1.55}
 .genout{background:#0d2830;border-radius:20px;overflow:hidden;border:1px solid rgba(255,255,255,.14)}
 .genout-bar{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:rgba(255,255,255,.06);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;color:#9fd3dc}
@@ -139,14 +145,14 @@ details.qa,details.m,.shell,.genout{box-shadow:0 1px 2px rgba(21,51,59,.04),0 6p
 .qs-step pre{background:#15333b;color:#fdfcdc;padding:16px 18px;border-radius:14px;font-size:12.5px;line-height:1.7;overflow:auto;margin:0 0 13px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
 .qs-step pre .cm{color:#8fb3ae}
 .qs-step pre .hl{color:var(--peach)}
-.qs-warn{border-left:4px solid var(--coral);background:#fff0e3;padding:13px 16px;border-radius:0 13px 13px 0;font-size:14px;line-height:1.65;margin:0 0 13px}
-.qs-note{border-left:4px solid var(--teal);background:#e4f5f4;padding:13px 16px;border-radius:0 13px 13px 0;font-size:14px;line-height:1.65;margin:0 0 13px}
+.qs-warn{border-left:4px solid var(--coral);background:var(--warn-bg);padding:13px 16px;border-radius:0 13px 13px 0;font-size:14px;line-height:1.65;margin:0 0 13px}
+.qs-note{border-left:4px solid var(--teal);background:var(--tip-bg);padding:13px 16px;border-radius:0 13px 13px 0;font-size:14px;line-height:1.65;margin:0 0 13px}
 .qs-warn b,.qs-note b{color:var(--ink)}
 .qs-done{background:var(--white);border:1px solid var(--line);border-radius:24px;padding:30px;margin-top:14px}
 .qs-done h3{font-family:Fraunces,serif;font-size:27px;letter-spacing:-.04em;margin:0 0 8px;color:var(--ink)}
 .qs-done>p{font-size:15.5px;margin:0 0 20px}
 .qs-next{display:grid;gap:11px}
-.qs-next a{display:block;background:#eaf8f7;border:1px solid #bfe3e2;border-radius:15px;padding:15px 17px;text-decoration:none;transition:.14s}
+.qs-next a{display:block;background:var(--tint-teal);border:1px solid var(--line-teal);border-radius:15px;padding:15px 17px;text-decoration:none;transition:.14s}
 .qs-next a:hover{border-color:var(--teal);transform:translateY(-1px);text-decoration:none}
 .qs-next b{display:block;font-size:15px;color:var(--blue);margin-bottom:3px}
 .qs-next span{font-size:13.5px;color:var(--muted);line-height:1.5}
@@ -168,12 +174,155 @@ details.qa,details.m,.shell,.genout{box-shadow:0 1px 2px rgba(21,51,59,.04),0 6p
 .qs-expand{font-family:inherit;font-size:13px;font-weight:700;background:none;border:1px solid var(--line);border-radius:999px;padding:7px 14px;color:var(--muted);cursor:pointer}
 .qs-expand:hover{border-color:var(--teal);color:var(--blue)}
 .qs-signpost{margin-top:20px;font-size:15px;background:var(--white);border:1px solid var(--line);border-radius:14px;padding:14px 17px;display:inline-block}
-.qs-cli{background:#eaf8f7;border:1px solid #bfe3e2;border-radius:16px;padding:15px 18px;margin:0 0 26px;font-size:14.5px;line-height:1.7}
+.qs-cli{background:var(--tint-teal);border:1px solid var(--line-teal);border-radius:16px;padding:15px 18px;margin:0 0 26px;font-size:14.5px;line-height:1.7}
 .qs-cli b{color:var(--ink)}
+
+/* ── dark theme ─────────────────────────────────────────────────────
+   Same hues, inverted. Every pairing here clears WCAG AA.            */
+html[data-theme="dark"]{
+  --cream:#0d1a1f;--ink:#eef7f5;--muted:#c3d6d9;--white:#132a31;--surface:#132a31;
+  --line:#23434c;--blue:#6ec9d6;--blue-hover:#8fdae5;--teal:#00AFB9;
+  --tint-teal:#12313a;--tint-peach:#2e2118;--tint-soft:#102a31;
+  --warn-bg:#33201c;--tip-bg:#12313a;--line-teal:#2c5560;--line-peach:#4a3526;
+  --code-fg:#8fdae5;--code-bg:#08151a;--code-txt:#dfeef0;--code-cm:#7fa8a4;
+  --pill-teal-bg:#164048;--pill-coral-bg:#43231f;--pill-peach-fg:#e8c09a;--pill-coral-fg:#f6a89f;
+  --ok:#6cc79b;--bad:#f2857a;--warnfg:#e0b06a;
+  --shadow:rgba(0,0,0,.30);--blob-a:rgba(254,217,183,.13);--blob-b:rgba(0,175,185,.10);
+  color-scheme:dark;
+}
+html[data-theme="dark"] body{
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23g)' opacity='0.32'/%3E%3C/svg%3E"),
+    radial-gradient(ellipse 900px 620px at 8% 2%,rgba(0,175,185,.09),transparent 62%),
+    radial-gradient(ellipse 760px 540px at 95% 14%,rgba(254,217,183,.07),transparent 64%),
+    radial-gradient(ellipse 820px 600px at 78% 62%,rgba(240,113,103,.06),transparent 62%),
+    radial-gradient(ellipse 900px 640px at 15% 88%,rgba(110,201,214,.06),transparent 62%);
+  background-blend-mode:overlay,normal,normal,normal,normal;
+}
+html[data-theme="dark"] .hero:after{background:var(--blob-a)}
+html[data-theme="dark"] .hero:before{background:var(--blob-b)}
+html[data-theme="dark"] .generator{background:#0f2830}
+html[data-theme="dark"] .btn{background:var(--blue);color:#08151a}
+html[data-theme="dark"] .btn:hover{background:var(--blue-hover);color:#08151a}
+html[data-theme="dark"] .generator .btn{background:var(--blue);color:#08151a}
+html[data-theme="dark"] pre{border:1px solid var(--line)}
+html[data-theme="dark"] img{opacity:.92}
+
+/* ── shared chrome ──────────────────────────────────────────────────── */
+.navlinks a[aria-current="page"]{color:var(--blue);font-weight:700;position:relative}
+.navlinks a[aria-current="page"]:after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:2px;background:var(--blue);border-radius:2px}
+.navtools{display:flex;align-items:center;gap:10px}
+.themebtn{background:none;border:1px solid var(--line);border-radius:999px;width:34px;height:34px;
+  cursor:pointer;color:var(--muted);display:grid;place-items:center;padding:0;flex-shrink:0;transition:.15s}
+.themebtn:hover{border-color:var(--teal);color:var(--blue)}
+.themebtn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round}
+html[data-theme="dark"] .themebtn .i-sun{display:block}
+html[data-theme="dark"] .themebtn .i-moon{display:none}
+.themebtn .i-sun{display:none}
+.themebtn .i-moon{display:block}
+
+/* next / previous pager */
+.pager{display:grid;gap:12px;margin:56px 0 10px;padding-top:30px;border-top:1px solid var(--line)}
+@media(min-width:760px){.pager{grid-template-columns:1fr 1fr}}
+.pager a{display:block;background:var(--surface);border:1px solid var(--line);border-radius:18px;
+  padding:17px 20px;text-decoration:none;transition:.15s}
+.pager a:hover{border-color:var(--teal);transform:translateY(-1px);text-decoration:none}
+.pager .dir{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);display:block;margin-bottom:5px}
+.pager .ttl{font-family:Fraunces,serif;font-size:19px;letter-spacing:-.03em;color:var(--blue);display:block;margin-bottom:3px}
+.pager .sub{font-size:13.5px;color:var(--muted);line-height:1.5}
+.pager .prev{text-align:left}
+@media(min-width:760px){.pager .next{text-align:right}}
+
+/* site footer */
+.sitefoot{border-top:1px solid var(--line);margin-top:20px;padding:38px 0 30px}
+.footgrid{display:grid;gap:26px;margin-bottom:26px}
+@media(min-width:720px){.footgrid{grid-template-columns:1.4fr 1fr 1fr 1fr}}
+.footbrand .fb{font-family:Fraunces,serif;font-size:20px;letter-spacing:-.03em;color:var(--ink)}
+.footbrand p{font-size:13.5px;margin:8px 0 0;max-width:270px;line-height:1.6}
+.footcol b{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:10px}
+.footcol a{display:block;font-size:14px;padding:4px 0;color:var(--muted)}
+.footcol a:hover{color:var(--blue)}
+.footbase{border-top:1px solid var(--line);padding-top:20px;font-size:12.5px;color:var(--muted);line-height:1.7}
+
+/* The theme toggle now sits beside the menu button, so the dropdown must
+   clear both and the tools row must stay visible on small screens. */
+@media(max-width:900px){
+  .navtools{gap:8px}
+  .navlinks{top:70px}
+  .navlinks a[aria-current="page"]:after{display:none}
+  .navlinks a[aria-current="page"]{background:var(--tint-teal)}
+}
+
+/* surfaces that were still hardcoded light */
+html[data-theme="dark"] details.qa[open]{background:#16333b}
+html[data-theme="dark"] .tbl tr:nth-child(even) td{background:rgba(255,255,255,.022)}
+html[data-theme="dark"] pre{background:var(--code-bg)}
+html[data-theme="dark"] .sbox:before{border-color:var(--muted)}
+html[data-theme="dark"] .sbox:after{background:var(--muted)}
+html[data-theme="dark"] .genout{background:#08151a}
+html[data-theme="dark"] .outwrap,html[data-theme="dark"] .outbar{background:#08151a}
+html[data-theme="dark"] .outbar{border-bottom:1px solid var(--line)}
+html[data-theme="dark"] .qs-step pre,html[data-theme="dark"] .dcard pre,
+html[data-theme="dark"] .stp pre{background:var(--code-bg)}
+html[data-theme="dark"] .chip.on,html[data-theme="dark"] .stepbtn.on,
+html[data-theme="dark"] .pbtn.on{color:#08151a}
+html[data-theme="dark"] .qs-step:before,html[data-theme="dark"] .stp:before,
+html[data-theme="dark"] .steps>li:before{color:#08151a}
+html[data-theme="dark"] .dbadge{color:#08151a}
+html[data-theme="dark"] .secretval{background:var(--tint-teal);color:var(--ink)}
+html[data-theme="dark"] .util,html[data-theme="dark"] .mod,html[data-theme="dark"] .opt,
+html[data-theme="dark"] .pick,html[data-theme="dark"] .price,html[data-theme="dark"] .prov,
+html[data-theme="dark"] .aidcard,html[data-theme="dark"] .mini,html[data-theme="dark"] .dcard,
+html[data-theme="dark"] details.app,html[data-theme="dark"] details.m,
+html[data-theme="dark"] .side,html[data-theme="dark"] .qs-done,
+html[data-theme="dark"] .qs-need,html[data-theme="dark"] .spec div,
+html[data-theme="dark"] .fields,html[data-theme="dark"] .flow span,
+html[data-theme="dark"] .stacklist li{background:var(--surface);border-color:var(--line)}
+html[data-theme="dark"] .mod.on,html[data-theme="dark"] .tg.on,
+html[data-theme="dark"] .qs-next a,html[data-theme="dark"] .aidcard.teal,
+html[data-theme="dark"] .dcard-lead{background:var(--tint-teal);border-color:var(--line-teal)}
+html[data-theme="dark"] .mod.auto,html[data-theme="dark"] .dcard:nth-child(3){background:var(--tint-peach);border-color:var(--line-peach)}
+html[data-theme="dark"] .cyc>.card:nth-of-type(3n+2){background:var(--tint-teal);border-color:var(--line-teal)}
+html[data-theme="dark"] .cyc>.card:nth-of-type(3n){background:var(--tint-peach);border-color:var(--line-peach)}
+html[data-theme="dark"] .genfacts div{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.13)}
+html[data-theme="dark"] .head{background:var(--tint-teal);border-color:var(--line-teal)}
+
+/* Pills keep a fixed light background, so their dark-mode surface must be
+   set explicitly or the label becomes invisible against it. */
+html[data-theme="dark"] .tag,
+html[data-theme="dark"] .pill,
+html[data-theme="dark"] .pill.mod,
+html[data-theme="dark"] .pill.after,
+html[data-theme="dark"] .v-ok,
+html[data-theme="dark"] .vi.warn,
+html[data-theme="dark"] .mod .flag.auto,
+html[data-theme="dark"] .hw-badge{
+  background:#4a3526;color:#f0cfa8;border-color:#5d452f}
+html[data-theme="dark"] .pill.easy,
+html[data-theme="dark"] .pill.first,
+html[data-theme="dark"] .pill.teal,
+html[data-theme="dark"] .v-best,
+html[data-theme="dark"] .t-cyan{background:#164048;color:#9fe0e6}
+html[data-theme="dark"] .pill.adv,
+html[data-theme="dark"] .pill.w,
+html[data-theme="dark"] .v-meh,
+html[data-theme="dark"] .mod .flag,
+html[data-theme="dark"] .tag.w{background:#43231f;color:#f8b4ab}
+html[data-theme="dark"] .stepbtn .n{background:#164048;color:#9fe0e6}
+html[data-theme="dark"] .stepbtn.on .n{background:rgba(0,0,0,.28);color:#08151a}
+html[data-theme="dark"] .dsteps li:before{background:var(--surface);color:var(--blue);border-color:var(--line-teal)}
 </style>
+<script>
+(function(){
+  var t;
+  try{ t=localStorage.getItem('mms-theme'); }catch(e){}
+  if(!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme',t);
+})();
+</script>
 </head>
 <body>
-<div class="wrap"><nav><div class="brand">modular<span>.</span>media</div><div class="navlinks"><a href="#quickstart">Quickstart</a><a href="guide.html">Guide</a><a href="platforms.html">Platforms</a><a href="#how">How it works</a><a href="#apps">Apps</a><a href="generator.html">Generator</a><a href="setup.html">App setup</a><a href="access.html">Access</a><a href="documentation.html">Documentation</a><a href="hardware.html">Hardware</a><a href="faq.html">Help</a><a href="#safety">Safety</a></div><button class="navbtn" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button></nav></div>
+<div class="wrap"><nav><a class="brand" href="index.html">modular<span>.</span>media</a><div class="navlinks"><a href="index.html" aria-current="page">Home</a><a href="guide.html">Guide</a><a href="platforms.html">Platforms</a><a href="generator.html">Generator</a><a href="setup.html">App setup</a><a href="access.html">Access</a><a href="hardware.html">Hardware</a><a href="documentation.html">Docs</a><a href="faq.html">Help</a></div><div class="navtools"><button class="themebtn" id="themebtn" aria-label="Switch between light and dark"><svg class="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><svg class="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button><button class="navbtn" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button></div></nav></div>
 
 <section class="hero"><div class="wrap"><div class="kicker">A calmer way to self-host</div><h1>Build the server you actually want.</h1><p>Modular Media Server is a friendly guide and Compose generator for putting together your own little corner of the internet. Start with one thing. Add another when you need it.</p><div class="buttons"><a class="btn" href="generator.html">Build a stack</a><a class="btn alt" href="#quickstart">Follow the quickstart</a></div></div></section>
 
@@ -386,7 +535,7 @@ volumes:
 </div>
 </div></section>
 <section class="section" id="safety"><div class="wrap"><div class="about"><div><div class="kicker">A small but important thing</div><h2>Self-hosting comes with responsibility.</h2><p class="lead">This project helps you run software. It does not give you permission to download, archive, copy or distribute media you do not have the right to use.</p><div class="note"><strong>Torrents are also a security concern.</strong><br>Files can come from untrusted sources and may contain malware, ransomware, trojans, cryptominers or malicious scripts. A VPN can protect network privacy; it cannot make a malicious file safe.</div></div><div class="blob"><p>Own your server.<br>Know what's running on it.</p></div></div><div class="legal"><strong>Copyright:</strong> Only obtain, store, archive and share content you are legally permitted to use. This project does not provide or endorse piracy. <strong>Security:</strong> Keep your host, Docker engine, images and applications updated; do not blindly execute downloaded programs or scripts; use sensible firewall and network controls; and keep backups. This is general information, not legal or security advice.</div></div></section>
-<footer><div class="wrap">Modular Media Server · <a href="documentation.html">Documentation</a> · <a href="hardware.html">Hardware</a> · <a href="platforms.html">Platforms</a> · Start small. Add what you need. Understand what you're running.</div></footer>
+
 
 
 <script>
@@ -417,6 +566,38 @@ volumes:
         opening=b.textContent.indexOf('Expand')===0;
     d.forEach(function(x){ x.open=opening; });
     b.textContent = opening ? 'Collapse all' : 'Expand all';
+  });
+})();
+</script>
+<div class="wrap"><div class="pager"><span></span><a class="next" href="guide.html"><span class="dir">Next →</span><span class="ttl">Guide</span><span class="sub">Two ways to set the stack up</span></a></div></div>
+<footer class="sitefoot"><div class="wrap">
+<div class="footgrid">
+<div class="footbrand"><div class="fb">modular<span style="color:var(--coral)">.</span>media</div>
+<p>A friendly guide and Compose generator for building the self-hosted server you actually want.</p></div>
+<div class="footcol"><b>Getting started</b>
+<a href="index.html#quickstart">Quickstart</a><a href="guide.html">Setup guide</a>
+<a href="platforms.html">Platform guides</a><a href="hardware.html">Hardware &amp; cost</a></div>
+<div class="footcol"><b>Building</b>
+<a href="generator.html">Compose generator</a><a href="setup.html">App setup</a>
+<a href="access.html">Access &amp; accounts</a><a href="install.sh">install.sh</a></div>
+<div class="footcol"><b>Reference</b>
+<a href="documentation.html">Documentation</a><a href="faq.html">Troubleshooting</a>
+<a href="documentation.html#legal">Legal &amp; security</a>
+<a href="https://github.com/parkertools/Modular-Media-Server" target="_blank" rel="noopener">GitHub</a></div>
+</div>
+<div class="footbase">Start small. Add what you need. Understand what you're running. ·
+Every application here is a separate open-source project owned by its own developers.
+You are responsible for ensuring anything you download, store or share is legally obtained.</div>
+</div></footer>
+<script>
+(function(){
+  /* Applied before paint by the inline head script; this only wires the button. */
+  var btn=document.getElementById('themebtn');
+  if(!btn) return;
+  btn.addEventListener('click',function(){
+    var next=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',next);
+    try{ localStorage.setItem('mms-theme',next); }catch(e){}
   });
 })();
 </script>
