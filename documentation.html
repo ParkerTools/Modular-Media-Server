@@ -875,6 +875,17 @@ curl -s https://ipinfo.io/ip     <span class="c"># must be different</span></pre
 <h5>Official sources</h5><div class="srcs"><a href="https://tailscale.com/" target="_blank" rel="noopener">Website</a><a href="https://tailscale.com/kb/1282/docker" target="_blank" rel="noopener">Docker guide</a></div>
 </div></details>
 
+<details class="m"><summary><b>Cloudflare Tunnel</b><span class="pill mod">Moderate</span><span class="d">Public access with no open ports</span></summary>
+<div class="mbody">
+<div class="spec"><div><b>Port</b><span>None published</span></div><div><b>CPU</b><span>Very low</span></div><div><b>RAM</b><span>Very low</span></div><div><b>Storage</b><span>None</span></div></div>
+<h5>Purpose</h5><p>Runs an outbound-only connection to Cloudflare, who then serve your services on your domain. Nothing is opened on your router, and it works behind CGNAT.</p>
+<h5>How it fits</h5><p>An alternative to Caddy rather than a companion — both publish services externally. Routing is configured in Cloudflare's Zero Trust dashboard, so the Compose file contains no routes at all.</p>
+<h5>Configuration</h5><p>Needs only a tunnel token from the dashboard. Public hostnames point at container names, such as <code>jellyseerr:5055</code>.</p>
+<div class="warning"><strong>Cloudflare terminates TLS</strong>, so traffic is decrypted at their edge — not end-to-end. The free plan also caps requests at 100&nbsp;MB, which breaks larger Immich uploads.</div>
+<div class="warning"><strong>Media streaming is unsettled.</strong> The much-quoted Section 2.8 was removed in 2023, but a CDN-specific restriction replaced it and self-hosted video is not covered by the exemption for Cloudflare-hosted content. Neither clearly banned nor clearly allowed — read the current terms before putting Jellyfin on it.</div>
+<h5>Official sources</h5><div class="srcs"><a href="https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/" target="_blank" rel="noopener">Docs</a><a href="https://github.com/cloudflare/cloudflared" target="_blank" rel="noopener">GitHub</a></div>
+</div></details>
+
 <div class="mcat" id="m-auth"><span class="bar"></span>Authentication</div>
 
 <details class="m"><summary><b>Pocket ID</b><span class="pill adv">Advanced</span><span class="d">Passkey single sign-on</span></summary>
@@ -941,6 +952,7 @@ curl -s https://ipinfo.io/ip     <span class="c"># must be different</span></pre
 <tr><td>Tube Archivist</td><td>8001</td><td>Maps to 8000 inside the container</td></tr>
 <tr><td>Arcane</td><td>3552</td><td>Never expose publicly</td></tr>
 <tr><td>Pocket ID</td><td>1411</td><td>Not published — reached through Caddy</td></tr>
+<tr><td>Cloudflare Tunnel</td><td>None</td><td>Outbound only — nothing to publish</td></tr>
 </tbody></table></div>
 <div class="tip"><strong>On a Synology NAS, DSM reserves many ports.</strong> If a container will not start because a port is in use, shift the host side — <code>"8097:8096"</code> — which breaks nothing.</div>
 </section>
@@ -965,6 +977,7 @@ curl -s https://ipinfo.io/ip     <span class="c"># must be different</span></pre
 <tr><td>WIREGUARD_ADDRESSES</td><td>Supplied with your key, e.g. <code>10.64.0.2/32</code>.</td></tr>
 <tr><td>VPN_SERVER_COUNTRIES</td><td>Optional. Blank uses the provider default.</td></tr>
 <tr><td>TS_AUTHKEY</td><td>Tailscale auth key from the admin console.</td></tr>
+<tr><td>CLOUDFLARE_TUNNEL_TOKEN</td><td>Tunnel token from the Cloudflare Zero Trust dashboard.</td></tr>
 <tr><td>ARCANE_APP_URL</td><td>Where you reach Arcane. Must match the address you actually use.</td></tr>
 <tr><td>ARCANE_ENCRYPTION_KEY</td><td>Generated. Encrypts stored values.</td></tr>
 <tr><td>ARCANE_JWT_SECRET</td><td>Generated. Must stay stable across restarts.</td></tr>
