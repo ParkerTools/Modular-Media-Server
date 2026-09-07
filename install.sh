@@ -73,7 +73,7 @@ SELECTED=()
 ALL_MODULES=(
   arcane jellyfin jellyseerr sonarr radarr lidarr bazarr
   gluetun qbittorrent jackett immich kima uptime-kuma
-  archivebox tubearchivist caddy tailscale pocket-id
+  archivebox tubearchivist caddy tailscale cloudflared pocket-id
 )
 
 module_label() {
@@ -95,6 +95,7 @@ module_label() {
     tubearchivist) echo "Tube Archivist — YouTube archiving" ;;
     caddy)         echo "Caddy — reverse proxy with automatic HTTPS" ;;
     tailscale)     echo "Tailscale — private mesh network (host install is simpler)" ;;
+    cloudflared)   echo "Cloudflare Tunnel — no open ports; routing set in Cloudflare" ;;
     pocket-id)     echo "Pocket ID — passkey single sign-on (needs Caddy + domain)" ;;
     *)             echo "$1" ;;
   esac
@@ -1028,6 +1029,22 @@ emit_tailscale() {
 YAML
 }
 
+emit_cloudflared() {
+  cat <<'YAML'
+
+  # Outbound-only connection to Cloudflare — nothing is opened on your router.
+  # Which hostname maps to which service is configured in the Zero Trust
+  # dashboard, not in this file.
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    command: tunnel --no-autoupdate run
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+    restart: unless-stopped
+YAML
+}
+
 emit_pocket_id() {
   cat <<'YAML'
 
@@ -1115,6 +1132,7 @@ build_compose() {
   selected tubearchivist && emit_tubearchivist
   selected caddy         && emit_caddy
   selected tailscale     && emit_tailscale
+  selected cloudflared   && emit_cloudflared
   selected pocket-id     && emit_pocket_id
   # Kima's docs recommend a named volume for /data rather than a bind mount.
   selected kima && printf '\nvolumes:\n  kima_data:\n'
@@ -1195,6 +1213,15 @@ BASE_DOMAIN=$BASE_DOMAIN
 EOF
   fi
 
+  if selected cloudflared; then
+    cat <<EOF
+
+# ── Cloudflare Tunnel ────────────────────────────────────────────────────
+# Zero Trust dashboard -> Networks -> Tunnels -> your tunnel -> token.
+CLOUDFLARE_TUNNEL_TOKEN=CHANGEME
+EOF
+  fi
+
   if selected tailscale; then
     cat <<EOF
 
@@ -1267,6 +1294,7 @@ service_url() {
     caddy) echo "https://${BASE_DOMAIN:-your-domain}" ;;
     pocket-id) echo "https://id.${BASE_DOMAIN:-your-domain}" ;;
     tailscale) echo "(no web interface)" ;;
+    cloudflared) echo "(no web interface)" ;;
     *) echo "" ;;
   esac
 }
