@@ -401,6 +401,7 @@ html[data-theme="dark"] .skiplink{color:#08151a}
 <a href="#envvars">Environment variables</a>
 <a href="#updates">Updates &amp; backups</a>
 <a href="#glossary">Glossary</a>
+<a href="#status">Project status</a>
 <a href="#legal">Legal &amp; security</a>
 <hr>
 <a href="hardware.html">Hardware &amp; hosting →</a>
@@ -1037,33 +1038,9 @@ docker compose start</pre>
 <dt>CGNAT</dt><dd>When your provider does not give you a real public address, making port forwarding impossible. Tailscale sidesteps it.</dd>
 </dl>
 </section>
-
-<section id="legal" class="tinted-peach">
-<div class="kicker">11 · Please read</div>
-<h2>Legal &amp; security</h2>
-<p class="lead">This project is a guide and a configuration generator. It does not provide, host, index or endorse copyrighted material.</p>
-<div class="card peach"><strong>Your responsibility</strong>
-<p style="margin:10px 0 0">You are responsible for ensuring everything you download, store, stream or share is legally obtained and that you hold the necessary rights. These applications all have legitimate uses — managing media you own, public-domain and Creative Commons material, your own recordings, and openly distributed software. Copyright law differs between countries, and nothing here is legal advice.</p></div>
-<div class="warning"><strong>Downloaded files can be malicious.</strong> Filenames, extensions, trackers and comments guarantee nothing. A VPN changes how your traffic is routed — it does not inspect files, verify sources, or make anything safe. Treat everything you download as untrusted until you have checked it.</div>
-<h3>Security basics</h3>
-<ul>
-<li>Never commit <code>.env</code>, and redact secrets before pasting logs anywhere public.</li>
-<li>Keep administrative interfaces off the public internet — Arcane above all.</li>
-<li>Forward ports 80 and 443 only, never application ports.</li>
-<li>Set a password on every service that offers one, including on a home network.</li>
-<li>Keep Docker and your images updated.</li>
-<li>Back up config and anything irreplaceable, and test the restore.</li>
-</ul>
-<h3>Project ownership</h3>
-<p>Every application here is a separate open-source project owned by its own developers and licensed on its own terms. This project claims no ownership of any of them, and links to each project's official sources in the module reference above. Consult those before deploying.</p>
-<p style="margin-top:24px"><a class="btn ghost" href="generator.html">Build a stack</a> &nbsp; <a class="btn ghost" href="faq.html">Troubleshooting</a> &nbsp; <a class="btn ghost" href="access.html">Access &amp; accounts</a></p>
-</section>
-
 </main>
 </div></div>
-
-
-
+  
 <script>
 (function(){
   var links = [].slice.call(document.querySelectorAll('.toc a[href^="#"]'));
@@ -1118,11 +1095,12 @@ docker compose start</pre>
 <div class="footcol"><b>Reference</b>
 <a href="documentation.html">Documentation</a><a href="faq.html">Troubleshooting</a>
 <a href="documentation.html#legal">Legal &amp; security</a>
+<a href="privacy.html">Privacy &amp; disclosures</a>
 <a href="https://github.com/parkertools/Modular-Media-Server" target="_blank" rel="noopener">GitHub</a></div>
 </div>
 <div class="footbase">Start small. Add what you need. Understand what you're running. ·
 Every application here is a separate open-source project owned by its own developers.
-You are responsible for ensuring anything you download, store or share is legally obtained.</div>
+You are responsible for ensuring anything you download, store or share is legally obtained. · As an Amazon Associate I earn from qualifying purchases. Modular Media Server is a participant in the Amazon Services LLC Associates Program, an affiliate advertising program designed to provide a means for sites to earn advertising fees by advertising and linking to Amazon.</div>
 </div></footer>
 <script>
 (function(){
