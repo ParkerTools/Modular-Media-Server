@@ -314,7 +314,7 @@ details.qa,details.m,.shell,.genout{box-shadow:0 1px 2px rgba(21,51,59,.04),0 6p
 <div class="pane" id="pane-6">
 <h2 class="ph">Your files</h2>
 <p class="pd">Copy each one, or download them. Put them all in the same folder and run <code>docker compose up -d</code> — or paste the Compose and environment files into an Arcane project.</p>
-<div style="margin-bottom:14px"><button class="btn" id="dlall">Download all files</button> <button class="btn ghost" id="regen">Regenerate secrets</button></div>
+<div style="margin-bottom:14px"><button class="btn" id="dlall">Download all files (.zip)</button> <button class="btn ghost" id="regen">Regenerate secrets</button></div>
 <div class="tabs" id="filetabs"></div>
 <div class="outwrap">
 <div class="outbar"><span class="outname" id="outname"></span>
@@ -1565,6 +1565,102 @@ function showFile(){
   var note = $("masknote");
   if(note) note.style.display = (!state.showSecrets && secretValues().length) ? "" : "none";
 }
+/* Minimal ZIP writer — STORE method, no dependencies.
+   Enough for a handful of small text files, which is all we produce. */
+function makeZip(files){
+  var enc = new TextEncoder();
+
+  // CRC32 table, built once
+  var TABLE = (function(){
+    var t = new Uint32Array(256);
+    for(var i=0;i<256;i++){
+      var c=i;
+      for(var k=0;k<8;k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+      t[i]=c>>>0;
+    }
+    return t;
+  })();
+  function crc32(bytes){
+    var c = 0xFFFFFFFF;
+    for(var i=0;i<bytes.length;i++) c = TABLE[(c ^ bytes[i]) & 0xFF] ^ (c >>> 8);
+    return (c ^ 0xFFFFFFFF) >>> 0;
+  }
+
+  // DOS time/date from a JS Date
+  function dosTime(d){
+    return ((d.getHours() & 31) << 11) | ((d.getMinutes() & 63) << 5) | ((d.getSeconds()/2) & 31);
+  }
+  function dosDate(d){
+    return (((d.getFullYear()-1980) & 127) << 9) | (((d.getMonth()+1) & 15) << 5) | (d.getDate() & 31);
+  }
+
+  var parts = [], central = [], offset = 0, now = new Date();
+  var time = dosTime(now), date = dosDate(now);
+
+  function u16(v){ return [v & 0xFF, (v >>> 8) & 0xFF]; }
+  function u32(v){ return [v & 0xFF, (v >>> 8) & 0xFF, (v >>> 16) & 0xFF, (v >>> 24) & 0xFF]; }
+
+  files.forEach(function(f){
+    var nameBytes = enc.encode(f.name);
+    var data = enc.encode(f.body);
+    var crc = crc32(data);
+
+    var local = [].concat(
+      u32(0x04034b50),   // local file header signature
+      u16(20),           // version needed
+      u16(0x0800),       // flags: UTF-8 filenames
+      u16(0),            // method: store
+      u16(time), u16(date),
+      u32(crc),
+      u32(data.length),  // compressed size
+      u32(data.length),  // uncompressed size
+      u16(nameBytes.length),
+      u16(0)             // extra length
+    );
+    parts.push(new Uint8Array(local), nameBytes, data);
+
+    central.push([].concat(
+      u32(0x02014b50),   // central directory signature
+      u16(20),           // version made by
+      u16(20),           // version needed
+      u16(0x0800),
+      u16(0),
+      u16(time), u16(date),
+      u32(crc),
+      u32(data.length),
+      u32(data.length),
+      u16(nameBytes.length),
+      u16(0), u16(0),    // extra, comment
+      u16(0), u16(0),    // disk number, internal attrs
+      u32(0),            // external attrs
+      u32(offset)        // offset of local header
+    ), nameBytes);
+
+    offset += local.length + nameBytes.length + data.length;
+  });
+
+  var cdBytes = [], cdSize = 0;
+  central.forEach(function(c){
+    if(Array.isArray(c)){ cdBytes.push(new Uint8Array(c)); cdSize += c.length; }
+    else { cdBytes.push(c); cdSize += c.length; }
+  });
+
+  var eocd = [].concat(
+    u32(0x06054b50),
+    u16(0), u16(0),
+    u16(files.length), u16(files.length),
+    u32(cdSize),
+    u32(offset),
+    u16(0)
+  );
+
+  var all = parts.concat(cdBytes, [new Uint8Array(eocd)]);
+  var total = all.reduce(function(n,a){ return n + a.length; }, 0);
+  var out = new Uint8Array(total), p = 0;
+  all.forEach(function(a){ out.set(a, p); p += a.length; });
+  return out;
+}
+
 function download(name, body){
   var blob = new Blob([body], {type:"text/plain;charset=utf-8"});
   var url = URL.createObjectURL(blob), a = el("a");
@@ -1579,7 +1675,23 @@ $("copyone").onclick = function(){
 };
 $("dlone").onclick = function(){ download(files[activeFile].name, files[activeFile].body); };
 $("dlall").onclick = function(){
-  files.forEach(function(f,i){ setTimeout(function(){ download(f.name, f.body); }, i*350); });
+  var btn = this;
+  try {
+    var bytes = makeZip(files);
+    var blob = new Blob([bytes], {type:"application/zip"});
+    var url = URL.createObjectURL(blob), a = el("a");
+    a.href = url;
+    a.download = (state.domain ? state.domain.split(".")[0] : "media-server") + "-stack.zip";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
+    btn.textContent = "Downloaded";
+    setTimeout(function(){ btn.textContent = "Download all files (.zip)"; }, 1800);
+  } catch(err) {
+    // If anything goes wrong, fall back to one file at a time rather than
+    // leaving the person with nothing.
+    console.error("zip failed, falling back", err);
+    files.forEach(function(f,i){ setTimeout(function(){ download(f.name, f.body); }, i*350); });
+  }
 };
 $("revealbtn").onclick = function(){ state.showSecrets = !state.showSecrets; showFile(); };
 $("regen").onclick = function(){
