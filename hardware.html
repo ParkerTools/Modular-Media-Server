@@ -303,6 +303,38 @@ html[data-theme="dark"] .skiplink{color:#08151a}
   .chelp-grid{grid-template-columns:repeat(4,1fr)}
   .qs-next{grid-template-columns:repeat(3,1fr)}
 }
+
+/* ── affiliate picks ─────────────────────────────────────────────── */
+.storebar{display:flex;align-items:center;gap:11px;flex-wrap:wrap;background:var(--surface);
+  border:1px solid var(--line);border-radius:14px;padding:12px 16px;margin:20px 0}
+.storebar label{font-size:13.5px;font-weight:700;color:var(--ink)}
+.storebar select{font-family:inherit;font-size:14px;padding:8px 11px;border-radius:10px;
+  border:1px solid var(--line);background:var(--cream);color:var(--ink)}
+.storenote{font-size:12.5px;color:var(--muted)}
+.picks{display:grid;gap:14px;margin:22px 0}
+@media(min-width:820px){.picks{grid-template-columns:1fr 1fr}}
+@media(min-width:1900px){.picks{grid-template-columns:repeat(3,1fr)}}
+.pick-card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:22px;
+  display:flex;flex-direction:column;box-shadow:0 1px 2px rgba(21,51,59,.04),0 6px 18px var(--shadow)}
+.pick-card.lead{background:var(--tint-teal);border-color:var(--line-teal)}
+.pick-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:3px}
+.pick-card h3{font-family:Fraunces,serif;font-size:21px;letter-spacing:-.035em;margin:0;color:var(--ink)}
+.pick-tag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+  padding:3px 9px;border-radius:999px;background:var(--pill-teal-bg);color:var(--code-fg);white-space:nowrap}
+.pick-card>p{font-size:14.5px;margin:6px 0 12px}
+.pick-specs{list-style:none;padding:0;margin:0 0 16px}
+.pick-specs li{font-size:13.5px;padding:5px 0 5px 22px;position:relative;line-height:1.55;border-bottom:1px solid var(--line)}
+.pick-specs li:last-child{border-bottom:0}
+.pick-specs li:before{content:"";position:absolute;left:3px;top:12px;width:9px;height:5px;
+  border-left:2px solid var(--teal);border-bottom:2px solid var(--teal);transform:rotate(-45deg)}
+.pick-specs b{color:var(--ink)}
+.pick-go{margin-top:auto}
+.pick-go a{display:inline-block;border-radius:999px;padding:11px 18px;font-weight:700;font-size:14px;
+  background:var(--blue);color:#fff;text-decoration:none}
+.pick-go a:hover{background:var(--blue-hover);color:#fff;text-decoration:none}
+html[data-theme="dark"] .pick-go a,html[data-theme="dark"] .pick-go a:hover{color:#08151a}
+.pick-go .adlabel{font-size:11.5px;color:var(--muted);margin-left:10px}
+.pick-why{font-size:13px;color:var(--muted);line-height:1.6;margin:12px 0 0;padding-top:12px;border-top:1px solid var(--line)}
 </style>
 <script>
 (function(){
@@ -327,6 +359,7 @@ html[data-theme="dark"] .skiplink{color:#08151a}
 <a href="#selfhosting">Self-hosting at home</a>
 <a href="#vps">When a VPS makes sense</a>
 <a href="#pricing">Cost comparison</a>
+<a href="#picks">Hardware picks</a>
 <a href="#providers">VPN &amp; VPS providers</a>
 <a href="#utilities">Other useful tools</a>
 <a href="#summary">Putting it together</a>
@@ -423,6 +456,37 @@ html[data-theme="dark"] .skiplink{color:#08151a}
 </div>
 <div class="tip"><strong>The comparison people forget:</strong> a $150 mini PC that lasts three years works out around $4 a month before electricity. A $15/month VPS is $540 over the same period, with less storage. Renting buys convenience and uptime, not savings.</div>
 <p style="font-size:13px;margin-top:22px">These are rough estimates for orientation only, and they move around constantly. Drive costs, electricity rates and provider pricing all vary — check current prices yourself before buying anything.</p>
+</section>
+
+<section id="picks">
+<div class="kicker">07 · Buying it</div>
+<h2>Hardware picks</h2>
+
+<div class="card peach" id="amz-disclosure">
+<strong>As an Amazon Associate I earn from qualifying purchases.</strong>
+<p style="margin:10px 0 0">The links below are affiliate links. If you buy through one, this project earns a small commission at no extra cost to you — it pays for the domain and the hardware used to test these guides.</p>
+<p style="margin:10px 0 0">It changes nothing about the advice. Every recommendation here is a description of <em>what to look for</em>, not a specific product we were paid to name. If a cheaper option is better, that is what the page says — see the <a href="#pricing">cost comparison</a>, which recommends a used office PC over anything new.</p>
+</div>
+
+<p class="lead">These are searches rather than single products, because specific models go out of stock and get superseded constantly. Each one is filtered to the specifications that actually matter for a media server, and each explains what you are looking at.</p>
+
+<div class="storebar">
+<label for="amz-region">Shopping from</label>
+<select id="amz-region">
+<option value="com">Amazon.com — United States</option>
+<option value="co.uk">Amazon.co.uk — United Kingdom</option>
+<option value="ca">Amazon.ca — Canada</option>
+<option value="de">Amazon.de — Germany</option>
+<option value="com.au">Amazon.com.au — Australia</option>
+</select>
+<span class="storenote">Links update to your region.</span>
+</div>
+
+<div class="picks" id="amz-picks"></div>
+
+<div class="tip"><strong>No prices here, deliberately.</strong> Amazon prices change constantly and any number written into a page is wrong within days. Every link opens the current listing, where the price is whatever it actually is today. The <a href="#pricing">cost comparison</a> gives you honest ballpark ranges to plan with.</div>
+
+<div class="warning"><strong>Buy the cheapest thing that meets the specification.</strong> This is the section of a website most likely to talk you into overspending, so to be plain about it: a used office mini PC at around $150 runs everything in this project comfortably. The more expensive options solve problems you probably do not have yet. Start small and upgrade the specific thing that runs out.</div>
 </section>
 
 <section id="providers"><div class="kicker">07 · Services</div><h2>VPN &amp; VPS providers</h2>
@@ -564,6 +628,127 @@ You are responsible for ensuring anything you download, store or share is legall
     document.documentElement.setAttribute('data-theme',next);
     try{ localStorage.setItem('mms-theme',next); }catch(e){}
   });
+})();
+</script>
+<script>
+(function(){
+  /* ── Amazon Associates configuration ──────────────────────────────
+     Put your tracking ID for each store you are approved in. Leave a
+     region blank and its links go to Amazon without a tag — no earnings,
+     but nothing breaks and nothing misattributes.
+     Amazon requires a separate approval per marketplace.              */
+  var AMAZON_TAGS = {
+    "com":    "parkertoolsme-20",   /* e.g. yourtag-20  */
+    "co.uk":  "",   /* e.g. yourtag-21  */
+    "ca":     "",
+    "de":     "",
+    "com.au": ""
+  };
+
+  /* Searches, not single products: models go out of stock constantly and a
+     dead link helps nobody. Each query is filtered to what actually matters. */
+  var PICKS = [
+    { name:"Used mini PC",
+      tag:"best value",
+      lead:true,
+      blurb:"The default recommendation. Quiet, low power, and most Intel models include QuickSync for hardware transcoding.",
+      specs:["<b>Intel chip with integrated graphics</b> — QuickSync is what makes transcoding work",
+             "<b>16 GB RAM</b> if you can, 8 GB minimum",
+             "<b>Any SSD</b> — you will add storage separately",
+             "Look for ex-office units: OptiPlex Micro, ThinkCentre Tiny, EliteDesk Mini"],
+      q:"refurbished mini pc intel 16gb ssd",
+      why:"Refurbished business machines are the sweet spot — built to run continuously, sold cheaply when offices upgrade." },
+
+    { name:"Mini PC, new",
+      tag:"low effort",
+      blurb:"If you would rather not buy used. Newer Intel N-series units are efficient and quiet, with transcoding support.",
+      specs:["<b>Intel N100 or newer</b> — plenty for this stack",
+             "<b>16 GB RAM</b>, ideally upgradeable",
+             "<b>Two network ports</b> are useful but not required",
+             "Check it has enough USB ports for external drives"],
+      q:"intel n100 mini pc 16gb",
+      why:"Costs more than used, needs no research into what an office was throwing out." },
+
+    { name:"Internal hard drives",
+      tag:"storage",
+      blurb:"Where your library actually lives. Capacity per pound matters more than speed — media streaming is not demanding.",
+      specs:["<b>CMR, not SMR</b> — SMR drives are slow to write and poor in arrays",
+             "<b>NAS-rated</b> if the machine runs continuously",
+             "<b>8–16 TB</b> is usually the best value per terabyte",
+             "Buy two if the data matters; one drive is not a backup"],
+      q:"nas hard drive cmr 3.5 inch",
+      why:"Drive failure is a when, not an if. Plan for it at purchase rather than afterwards." },
+
+    { name:"External drive enclosure",
+      tag:"storage",
+      blurb:"Mini PCs have no room for 3.5-inch drives, so the storage lives outside in an enclosure.",
+      specs:["<b>USB 3.0 or better</b> — plenty for media",
+             "<b>Its own power supply</b> for 3.5-inch drives",
+             "<b>Multi-bay</b> if you expect to add drives",
+             "Avoid enclosures that spin drives down aggressively"],
+      q:"usb 3.0 hard drive enclosure 3.5 external power",
+      why:"The cheapest way to attach real capacity to a small machine." },
+
+    { name:"NAS enclosure",
+      tag:"storage first",
+      blurb:"Purpose-built for always-on storage with drive redundancy. More expensive, and simpler to live with.",
+      specs:["<b>Four bays</b> gives room to grow",
+             "<b>Intel CPU</b> if you want any transcoding at all",
+             "<b>Check Docker support</b> before buying — not all models have it",
+             "Drives are a separate and significant cost"],
+      q:"4 bay nas enclosure intel docker",
+      why:"Worth it if storage and redundancy matter more to you than raw performance." },
+
+    { name:"Small UPS",
+      tag:"protection",
+      blurb:"A power cut mid-write is one of the few things that genuinely corrupts a database. A small battery avoids it.",
+      specs:["<b>Enough for a clean shutdown</b>, not hours of uptime",
+             "<b>USB connection</b> so the server knows to shut down",
+             "<b>600–900 VA</b> is ample for a mini PC and a drive",
+             "Batteries wear out — plan to replace in a few years"],
+      q:"ups battery backup 650va usb",
+      why:"Cheap insurance for your Immich database and your *arr configuration." }
+  ];
+
+  var region = "com";
+  var sel = document.getElementById("amz-region");
+  var box = document.getElementById("amz-picks");
+  if(!box) return;
+
+  function link(query){
+    var tag = AMAZON_TAGS[region];
+    var url = "https://www.amazon." + region + "/s?k=" + encodeURIComponent(query);
+    if(tag) url += "&tag=" + encodeURIComponent(tag);
+    return url;
+  }
+
+  function render(){
+    box.innerHTML = PICKS.map(function(p){
+      return '<div class="pick-card' + (p.lead ? ' lead' : '') + '">' +
+        '<div class="pick-top"><h3>' + p.name + '</h3><span class="pick-tag">' + p.tag + '</span></div>' +
+        '<p>' + p.blurb + '</p>' +
+        '<ul class="pick-specs">' + p.specs.map(function(x){ return '<li>' + x + '</li>'; }).join('') + '</ul>' +
+        '<div class="pick-go"><a href="' + link(p.q) + '" target="_blank" rel="nofollow sponsored noopener">' +
+        'See options on Amazon</a><span class="adlabel">paid link</span></div>' +
+        '<p class="pick-why">' + p.why + '</p>' +
+      '</div>';
+    }).join("");
+  }
+
+  /* Remember the chosen store, but never break if storage is unavailable. */
+  try{
+    var saved = localStorage.getItem("mms-amz-region");
+    if(saved && AMAZON_TAGS.hasOwnProperty(saved)) region = saved;
+  }catch(e){}
+  if(sel){
+    sel.value = region;
+    sel.addEventListener("change", function(){
+      region = sel.value;
+      try{ localStorage.setItem("mms-amz-region", region); }catch(e){}
+      render();
+    });
+  }
+  render();
 })();
 </script>
 </body></html>
