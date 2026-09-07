@@ -405,6 +405,60 @@ html[data-theme="dark"] .skiplink{color:#08151a}
 html[data-theme="dark"] .hint-error{color:#f8b4ab}
 html[data-theme="dark"] .hint-ok{color:#6cc79b}
 .f input.bad{border-color:var(--coral);background:var(--warn-bg)}
+
+.chelp{background:var(--tint-teal);border:1px solid var(--line-teal);border-radius:20px;padding:20px 22px;margin:22px 0 0}
+.chelp-h{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.chelp-h b{font-family:Fraunces,serif;font-size:20px;letter-spacing:-.03em;color:var(--ink)}
+.chelp-h span{font-size:13px;color:var(--muted)}
+.chelp-grid{display:grid;gap:12px}
+@media(min-width:800px){.chelp-grid{grid-template-columns:1fr 1fr}}
+.chelp-grid>div{position:relative;padding-left:32px}
+.chelp-grid i{position:absolute;left:0;top:0;width:22px;height:22px;border-radius:50%;background:var(--surface);
+  border:1px solid var(--line-teal);color:var(--blue);font-size:11.5px;font-weight:700;font-style:normal;
+  display:grid;place-items:center}
+.chelp-grid b{display:block;font-size:14.5px;color:var(--ink);letter-spacing:-.02em;margin-bottom:2px}
+.chelp-grid p{font-size:13.5px;margin:0;line-height:1.6}
+.chelp-more{margin-top:14px;border-top:1px solid var(--line-teal);padding-top:12px}
+.chelp-more summary{cursor:pointer;font-size:13.5px;font-weight:700;color:var(--blue);list-style:none}
+.chelp-more summary::-webkit-details-marker{display:none}
+.chelp-more summary:before{content:"+ ";font-weight:700}
+.chelp-more[open] summary:before{content:"\2212 "}
+.chelp-body{padding-top:10px}
+.chelp-body p{font-size:13.5px;margin:0 0 10px}
+.chelp-body b{color:var(--ink)}
+.chelp-body pre{font-size:12px;padding:13px 15px;margin:0 0 12px}
+
+/* ── large displays ─────────────────────────────────────────────────
+   The 1160px cap uses only 30% of a 4K screen. Widen in steps and lift
+   the base size a little, so the page fills the space without prose
+   lines growing past a comfortable reading measure.                   */
+@media(min-width:1500px){
+  .wrap{max-width:1320px}
+  html{font-size:17px}
+}
+@media(min-width:2000px){
+  .wrap{max-width:1680px}
+  html{font-size:18px}
+  .hero{padding-top:96px;padding-bottom:74px}
+}
+@media(min-width:2800px){
+  .wrap{max-width:2040px}
+  html{font-size:20px}
+}
+/* Prose stays readable even as the container grows — long measures are
+   harder to read, so text blocks keep their own ceiling. */
+@media(min-width:1500px){
+  .lead,.hero p,.pd,.qs-step p,.abody p,.mbody p{max-width:78ch}
+  .toc{width:230px}
+}
+/* Wider containers can afford more columns. */
+@media(min-width:1900px){
+  .mods{grid-template-columns:repeat(3,1fr)}
+  .util-grid{grid-template-columns:repeat(4,1fr)}
+  .prices{grid-template-columns:repeat(3,1fr)}
+  .chelp-grid{grid-template-columns:repeat(4,1fr)}
+  .qs-next{grid-template-columns:repeat(3,1fr)}
+}
 </style>
 <script>
 (function(){
@@ -537,59 +591,6 @@ mkdir media
 <span class="cm"># put docker-compose.yml and .env inside</span></pre>
 <p>Refresh Arcane's <b>Projects</b> page and it is there. Press deploy.</p>
 <div class="dwarn"><b>Mount paths must match.</b> If your stacks live at <code>/opt/stacks</code>, mount them into Arcane as <code>/opt/stacks:/opt/stacks</code> — the same path on both sides. Compose files use relative paths and break if the two differ.</div>
-<h3 style="font-family:Fraunces,serif;font-size:26px;letter-spacing:-.04em;margin:38px 0 12px">Using the Caddyfile</h3>
-<p class="pd" style="margin-bottom:18px">If you selected Caddy, you got a second file that people often do not know what to do with. Here is the whole of it.</p>
-
-<div class="card teal">
-<strong>Where it goes</strong>
-<p style="margin:10px 0 0">Right beside <code>docker-compose.yml</code>, in the same folder, named exactly <code>Caddyfile</code> with no extension. The Compose file mounts it with a relative path:</p>
-<pre>volumes:
-  - ./Caddyfile:/etc/caddy/Caddyfile:ro</pre>
-<p style="margin:10px 0 0">That <code>./</code> means "the folder this Compose file is in". Put it anywhere else and Docker creates an empty directory in its place, and Caddy starts with no routes.</p>
-</div>
-
-<div class="card">
-<strong>What it contains</strong>
-<p style="margin:10px 0 0">One block per hostname. Each says "requests for this name go to that container":</p>
-<pre>jellyfin.example.com {
-    reverse_proxy jellyfin:8096
-}</pre>
-<p style="margin:10px 0 0">Targets use container names because Caddy shares the Docker network — <code>jellyfin:8096</code>, not <code>localhost:8096</code>, which inside Caddy would mean Caddy itself.</p>
-</div>
-
-<h4 style="font-family:'DM Sans';font-size:16px;font-weight:700;margin:22px 0 8px;color:var(--ink)">Before you start it</h4>
-<ol class="dsteps" style="counter-reset:d">
-<li><b>Point DNS at your machine.</b> Every hostname in the file needs an A or AAAA record resolving to your public address. Caddy requests a certificate per name, and a name that does not resolve will fail.</li>
-<li><b>Forward ports 80 and 443</b> on your router to the server — those two only, never the application ports. Port 80 is needed for certificate issuance, not for serving your site.</li>
-<li><b>Delete any hostname you are not using.</b> The generated file only includes services safe to publish, but if you removed one later, its block will still try to get a certificate and fail.</li>
-</ol>
-
-<div class="card peach">
-<strong>Test before you go live</strong>
-<p style="margin:10px 0 0">Certificate authorities rate-limit failed attempts, and it is easy to burn through them while getting DNS right. Add this at the very top of the Caddyfile while testing:</p>
-<pre>{
-    acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
-}</pre>
-<p style="margin:10px 0 0">Your browser will warn that the certificate is untrusted — that is expected. It proves routing and DNS work. Remove the block and restart to get real certificates.</p>
-</div>
-
-<h4 style="font-family:'DM Sans';font-size:16px;font-weight:700;margin:22px 0 8px;color:var(--ink)">Starting and checking it</h4>
-<pre>docker compose up -d caddy
-docker compose logs -f caddy</pre>
-<p>Watch for certificate issuance. Errors here are nearly always DNS not resolving yet, or port 80 not actually reaching the machine.</p>
-
-<h4 style="font-family:'DM Sans';font-size:16px;font-weight:700;margin:22px 0 8px;color:var(--ink)">Changing it later</h4>
-<p>Adding a service means adding a block and reloading. Reloading is not a restart — it swaps the config with no dropped connections:</p>
-<pre><span class="cm"># check the syntax first</span>
-docker compose exec caddy caddy validate --config /etc/caddy/Caddyfile
-
-<span class="cm"># apply it without downtime</span>
-docker compose exec caddy caddy reload --config /etc/caddy/Caddyfile</pre>
-<p>If you edited the file through Arcane or a text editor on the host, the container sees the change immediately — the mount is live. Only the reload is needed.</p>
-
-<div class="dwarn"><b>Keep Caddy's data volume in your backups.</b> It holds your issued certificates. Losing it means every certificate has to be requested again, and repeated requests hit rate limits.</div>
-
-<div class="dnote"><b>Services deliberately left out.</b> The generated Caddyfile does not proxy Arcane, qBittorrent, Sonarr, Radarr, Lidarr, Bazarr or Jackett, and lists them in a comment at the bottom. They hold the Docker socket, can write files anywhere, or authenticate weakly. Reach those over Tailscale or your LAN instead — see the <a href="access.html">access guide</a>.</div>
 
 </div>
 
@@ -620,6 +621,8 @@ docker compose logs -f</pre>
 </div>
 
 </div>
+
+<div id="caddyhelp"></div>
 </div>
 
 <div class="nav2">
@@ -1833,6 +1836,40 @@ function renderReview(){
 }
 
 /* ── output ── */
+
+/* Only rendered when Caddy is selected — it is meaningless otherwise, and
+   it was previously taking a screenful from everyone who skipped it. */
+function renderCaddyHelp(){
+  var box = $("caddyhelp");
+  if(!box) return;
+  if(state.selected.indexOf("caddy") === -1){ box.innerHTML = ""; return; }
+  var d = state.domain || "example.com";
+  box.innerHTML =
+    '<div class="chelp">' +
+      '<div class="chelp-h"><b>Your Caddyfile</b><span>the second file, and where people get stuck</span></div>' +
+      '<div class="chelp-grid">' +
+        '<div><i>1</i><b>Put it beside the Compose file</b>' +
+          '<p>Same folder, named <code>Caddyfile</code>, no extension \u2014 the mount is <code>./Caddyfile</code>. Anywhere else and Caddy starts with no routes.</p></div>' +
+        '<div><i>2</i><b>Point DNS at this machine</b>' +
+          '<p>An A record for every name in the file. Caddy requests a certificate per name.</p></div>' +
+        '<div><i>3</i><b>Forward 80 and 443 only</b>' +
+          '<p>Never the app ports. Port 80 is for certificate issuance, not for serving.</p></div>' +
+        '<div><i>4</i><b>Start it</b>' +
+          '<p><code>docker compose up -d caddy</code> then watch <code>logs -f caddy</code> for certificates.</p></div>' +
+      '</div>' +
+      '<details class="chelp-more"><summary>Editing it later, and testing safely</summary>' +
+        '<div class="chelp-body">' +
+          '<p><b>Adding a service</b> means adding a block and reloading. A reload is not a restart \u2014 no connections drop:</p>' +
+          '<pre>docker compose exec caddy caddy validate --config /etc/caddy/Caddyfile\n' +
+          'docker compose exec caddy caddy reload --config /etc/caddy/Caddyfile</pre>' +
+          '<p><b>Testing without burning rate limits.</b> Certificate authorities limit failed attempts. While getting DNS right, put this at the top of the file \u2014 your browser will warn the certificate is untrusted, which is the point:</p>' +
+          '<pre>{\n    acme_ca https://acme-staging-v02.api.letsencrypt.org/directory\n}</pre>' +
+          '<p><b>Back up Caddy\u2019s data volume.</b> It holds your issued certificates; losing it means requesting them all again.</p>' +
+          '<p><b>Left out on purpose.</b> Arcane, qBittorrent and the *arr apps are not proxied \u2014 they hold the Docker socket, write files anywhere, or authenticate weakly. Reach them over Tailscale or your LAN. <a href="access.html">More on access</a>.</p>' +
+        '</div></details>' +
+    '</div>';
+}
+
 function buildFiles(){
   files = CORE.buildAll(state);
   activeFile = 0;
@@ -1843,6 +1880,7 @@ function buildFiles(){
     t.appendChild(b);
   });
   showFile();
+  renderCaddyHelp();
   var notes = [];
   if(state.selected.indexOf("caddy") !== -1)
     notes.push("Point your DNS records at this machine and forward only ports 80 and 443 before starting Caddy.");
