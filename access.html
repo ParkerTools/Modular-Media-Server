@@ -288,6 +288,38 @@ html[data-theme="dark"] .skiplink{color:#08151a}
     transition-duration:.01ms!important;scroll-behavior:auto!important}
   .pager a:hover,.util:hover,.qs-next a:hover{transform:none}
 }
+
+/* ── large displays ─────────────────────────────────────────────────
+   The 1160px cap uses only 30% of a 4K screen. Widen in steps and lift
+   the base size a little, so the page fills the space without prose
+   lines growing past a comfortable reading measure.                   */
+@media(min-width:1500px){
+  .wrap{max-width:1320px}
+  html{font-size:17px}
+}
+@media(min-width:2000px){
+  .wrap{max-width:1680px}
+  html{font-size:18px}
+  .hero{padding-top:96px;padding-bottom:74px}
+}
+@media(min-width:2800px){
+  .wrap{max-width:2040px}
+  html{font-size:20px}
+}
+/* Prose stays readable even as the container grows — long measures are
+   harder to read, so text blocks keep their own ceiling. */
+@media(min-width:1500px){
+  .lead,.hero p,.pd,.qs-step p,.abody p,.mbody p{max-width:78ch}
+  .toc{width:230px}
+}
+/* Wider containers can afford more columns. */
+@media(min-width:1900px){
+  .mods{grid-template-columns:repeat(3,1fr)}
+  .util-grid{grid-template-columns:repeat(4,1fr)}
+  .prices{grid-template-columns:repeat(3,1fr)}
+  .chelp-grid{grid-template-columns:repeat(4,1fr)}
+  .qs-next{grid-template-columns:repeat(3,1fr)}
+}
 </style>
 <script>
 (function(){
