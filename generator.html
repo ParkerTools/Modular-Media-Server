@@ -844,6 +844,16 @@ var MODULES = {
       "      - ${CONFIG_ROOT}/caddy/config:/config","    environment:","      - TZ=${TZ}",
       "    restart: unless-stopped"].join("\n");}},
 
+  cloudflared:{cat:"conn",name:"Cloudflare Tunnel",
+    desc:"Reaches your services with no open ports. Routing is configured in Cloudflare, not here.",
+    secretsManual:[{key:"CLOUDFLARE_TUNNEL_TOKEN",label:"Tunnel token",hint:"From the Cloudflare Zero Trust dashboard, after creating a tunnel."}],
+    compose:function(){return ["","  # Outbound-only connection to Cloudflare — nothing is opened on your",
+      "  # router. Which hostname maps to which service is configured in the",
+      "  # Zero Trust dashboard, not in this file.",
+      "  cloudflared:","    image: cloudflare/cloudflared:latest","    container_name: cloudflared",
+      "    command: tunnel --no-autoupdate run","    environment:",
+      "      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}","    restart: unless-stopped"].join("\n");}},
+
   tailscale:{cat:"conn",name:"Tailscale",
     desc:"Private mesh network. Nothing is published publicly. Often simpler installed on the host.",
     secretsManual:[{key:"TS_AUTHKEY",label:"Tailscale auth key",hint:"Generate one in the Tailscale admin console under Settings → Keys."}],
@@ -984,7 +994,7 @@ function ctx(state){
 function orderOf(id){
   var order = ["arcane","jellyfin","jellyseerr","sonarr","radarr","lidarr","bazarr","gluetun",
     "qbittorrent","jackett","immich","kima","uptime-kuma","archivebox","tubearchivist",
-    "tailscale","caddy","pocket-id"];
+    "tailscale","cloudflared","caddy","pocket-id"];
   var i = order.indexOf(id); return i === -1 ? 99 : i;
 }
 
@@ -1062,6 +1072,11 @@ function buildEnv(state, example){
       "POCKETID_URL=https://id."+(state.domain || "example.com"),
       "POCKETID_ENCRYPTION_KEY="+v(state.secrets.POCKETID_ENCRYPTION_KEY));
   }
+  if(state.selected.indexOf("cloudflared") !== -1){
+    L.push("","# ── Cloudflare Tunnel ────────────────────────────────────────────────────",
+      "# From the Zero Trust dashboard: Networks -> Tunnels -> your tunnel -> token.",
+      "CLOUDFLARE_TUNNEL_TOKEN="+(example ? "CHANGEME" : (state.manual.CLOUDFLARE_TUNNEL_TOKEN || "CHANGEME")));
+  }
   if(state.selected.indexOf("tailscale") !== -1){
     L.push("","# ── Tailscale ────────────────────────────────────────────────────────────",
       "# Generate in the Tailscale admin console under Settings → Keys.",
@@ -1129,7 +1144,7 @@ function serviceUrl(id, state){
   var m = MODULES[id];
   if(id === "pocket-id") return "https://id." + (state.domain || "example.com");
   if(id === "caddy")     return "https://" + (state.domain || "example.com");
-  if(id === "tailscale") return "(no web interface)";
+  if(id === "tailscale" || id === "cloudflared") return "(no web interface)";
   return m && m.port ? "http://localhost:" + m.port : "—";
 }
 
@@ -1247,6 +1262,17 @@ function validate(state){
   if(sel.indexOf("pocket-id") !== -1){
     if(sel.indexOf("caddy") === -1) err("Pocket ID needs a reverse proxy","Passkeys require HTTPS.");
     else ok("Pocket ID will be served over HTTPS","Register two passkeys on separate devices.");
+  }
+  if(sel.indexOf("cloudflared") !== -1){
+    if(!state.manual.CLOUDFLARE_TUNNEL_TOKEN)
+      warn("No Cloudflare tunnel token","A CHANGEME placeholder is written; the tunnel will not connect until you replace it.");
+    else ok("Cloudflare Tunnel configured","Public hostnames are mapped in the Zero Trust dashboard, not in these files.");
+    if(sel.indexOf("jellyfin") !== -1)
+      warn("Jellyfin behind Cloudflare needs thought","Cloudflare terminates TLS and their CDN terms restrict self-hosted video. Consider keeping Jellyfin off the tunnel.");
+    if(sel.indexOf("immich") !== -1)
+      warn("Immich uploads may hit the 100 MB limit","Cloudflare's free plan caps request size, which blocks larger photo and video uploads through the tunnel.");
+    if(sel.indexOf("caddy") !== -1)
+      warn("Caddy and Cloudflare Tunnel overlap","Both publish services externally. Pick one, or give each a distinct job.");
   }
   if(sel.indexOf("tailscale") !== -1 && !state.manual.TS_AUTHKEY){
     warn("No Tailscale auth key","A CHANGEME placeholder is written; the container will not connect until you replace it.");
@@ -1542,11 +1568,11 @@ function renderConn(){
       hasPid   = state.selected.indexOf("pocket-id") !== -1,
       b = $("connbody");
   b.innerHTML = "";
-  $("conndesc").textContent = (hasCaddy || hasTs)
+  $("conndesc").textContent = (hasCaddy || hasTs || state.selected.indexOf("cloudflared") !== -1)
     ? "How people reach your server from outside the house."
     : "You have not selected a connection module, so everything stays on your local network.";
 
-  if(!hasCaddy && !hasTs){
+  if(!hasCaddy && !hasTs && state.selected.indexOf("cloudflared") === -1){
     b.innerHTML = '<div class="card teal"><strong>Local network only.</strong><p style="margin:10px 0 0">'
       + 'Your services will be reachable at your server\'s address on your own network and nowhere else. '
       + 'That is a perfectly good place to start, and the safest default.</p></div>'
@@ -1616,6 +1642,44 @@ function renderConn(){
       + "Browsers only allow passkey registration on a proper HTTPS origin — you cannot use a bare "
       + "LAN address. Finish DNS and certificates before setting it up.</p>";
     b.appendChild(p);
+  }
+
+  var hasCf = state.selected.indexOf("cloudflared") !== -1;
+  if(hasCf){
+    var gc = el("div","fgrid");
+    var fc = el("div","f wide");
+    var lc = el("label",null,"Cloudflare tunnel token"); lc.setAttribute("for","cft"); fc.appendChild(lc);
+    var wrapc = el("div","secretfield");
+    var ic = el("input"); ic.id = "cft"; ic.type = "password";
+    ic.autocomplete = "off"; ic.spellcheck = false;
+    ic.value = state.manual.CLOUDFLARE_TUNNEL_TOKEN || "";
+    ic.placeholder = "eyJhIjoi\u2026";
+    ic.oninput = function(){ state.manual.CLOUDFLARE_TUNNEL_TOKEN = ic.value.trim(); };
+    wrapc.appendChild(ic);
+    var eyec = el("button","secretbtn"); eyec.type = "button"; eyec.textContent = "Reveal";
+    eyec.onclick = function(){
+      var hidden = ic.type === "password";
+      ic.type = hidden ? "text" : "password";
+      eyec.textContent = hidden ? "Hide" : "Reveal";
+    };
+    wrapc.appendChild(eyec); fc.appendChild(wrapc);
+    var hc = el("div","hint");
+    hc.innerHTML = "Zero Trust dashboard \u2192 Networks \u2192 Tunnels \u2192 create a tunnel \u2192 copy the token. Leave blank to fill in later.";
+    fc.appendChild(hc); gc.appendChild(fc); b.appendChild(gc);
+
+    var cn = el("div","tip");
+    cn.innerHTML = "<strong>Routing lives in Cloudflare, not in these files.</strong> After the tunnel connects, add a "
+      + "public hostname in the dashboard for each service and point it at the container \u2014 "
+      + "<code>http://jellyfin:8096</code>, using the container name, because cloudflared shares the Docker network.";
+    b.appendChild(cn);
+
+    var cw = el("div","warning");
+    cw.innerHTML = "<strong>Think before putting Jellyfin on it.</strong> Cloudflare terminates TLS, so they can see the traffic, "
+      + "and their CDN terms restrict serving video that is not hosted on a Cloudflare service. The much-quoted "
+      + "\u201cSection 2.8\u201d was removed in 2023, but a CDN-specific restriction replaced it \u2014 so this is unsettled rather "
+      + "than clearly allowed. The free plan also caps requests at 100&nbsp;MB, which breaks larger Immich uploads. "
+      + "Lightweight apps are a good fit; heavy media is the risky part.";
+    b.appendChild(cw);
   }
 
   if(hasTs){
