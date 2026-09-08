@@ -459,6 +459,12 @@ html[data-theme="dark"] .hint-ok{color:#6cc79b}
   .chelp-grid{grid-template-columns:repeat(4,1fr)}
   .qs-next{grid-template-columns:repeat(3,1fr)}
 }
+
+.optline{display:flex;gap:10px;align-items:flex-start;background:var(--tint-teal);border:1px solid var(--line-teal);
+  border-radius:14px;padding:13px 16px;margin:0 0 16px;cursor:pointer;max-width:760px}
+.optline input{margin-top:3px;flex-shrink:0;width:16px;height:16px;accent-color:var(--blue)}
+.optline span{font-size:13.5px;line-height:1.6;color:var(--muted)}
+.optline b{color:var(--ink)}
 </style>
 <script>
 (function(){
@@ -549,6 +555,7 @@ html[data-theme="dark"] .hint-ok{color:#6cc79b}
 <h2 class="ph">Your files</h2>
 <p class="pd">Copy each one, or download them. Put them all in the same folder and run <code>docker compose up -d</code> — or paste the Compose and environment files into an Arcane project.</p>
 <div style="margin-bottom:14px"><button class="btn" id="dlall">Download all files (.zip)</button> <button class="btn ghost" id="regen">Regenerate secrets</button></div>
+<label class="optline"><input type="checkbox" id="arcopt"> <span><b>Include an Arcane deploy script</b> — creates the project in your Arcane instance and starts it, in one command. Runs on your machine; your API key never touches this page.</span></label>
 <div class="tabs" id="filetabs"></div>
 <div class="outwrap">
 <div class="outbar"><span class="outname" id="outname"></span>
@@ -610,6 +617,21 @@ git push</pre>
 
 <div class="dcard">
 <div class="dnum">3</div>
+<h4>Arcane, via its API</h4>
+<p class="dwho">One command, if you tick the deploy script above</p>
+<p>The generator can include <code>deploy-to-arcane.sh</code>, which creates the project in Arcane and starts it.</p>
+<pre>export ARCANE_URL=http://192.168.1.50:3552
+export ARCANE_API_KEY=<span class="cm">your-key</span>
+bash deploy-to-arcane.sh</pre>
+<p>Create the key in Arcane under <b>Settings → API Keys</b>. The script finds your environment, uploads the Compose and env content, and deploys.</p>
+<div class="dnote"><b>Grant three permissions, not full access.</b> Arcane keys are scoped, so give the key only:
+<br><code>environments:read</code> &nbsp; <code>projects:create</code> &nbsp; <code>projects:deploy</code>
+<br>Run <code>bash deploy-to-arcane.sh --permissions</code> to list what your instance actually offers, and the script names the missing one if a call is refused.</div>
+<div class="dwarn"><b>The key stays on your machine.</b> This runs locally rather than from this page — an unrestricted Arcane key is root-equivalent on that host, and no website should ever ask you to paste one in.</div>
+</div>
+
+<div class="dcard">
+<div class="dnum">4</div>
 <h4>Straight from a terminal</h4>
 <p class="dwho">No Arcane needed</p>
 <p>Put every file in one folder and bring it up.</p>
@@ -1296,6 +1318,202 @@ function validate(state){
   return r;
 }
 
+var ARCANE_SCRIPT = `#!/usr/bin/env bash
+#
+# Deploy this stack to Arcane.
+#
+# Creates the project in your Arcane instance and starts it. Runs entirely on
+# your machine, so your API key never touches a browser and there are no
+# cross-origin or mixed-content restrictions to work around.
+#
+#   export ARCANE_URL=http://192.168.1.50:3552
+#   export ARCANE_API_KEY=your-key
+#   bash deploy-to-arcane.sh
+#
+# Create the key in Arcane under Settings -> API Keys.
+#
+# PERMISSIONS. Arcane API keys are scoped, and a key cannot exceed the
+# permissions of the user who created it. This script needs, at minimum:
+#
+#   environments:read    to find the environment to deploy into
+#   projects:create      to create the project
+#   projects:deploy      to start it
+#
+# Names follow a resource:action pattern. If your Arcane uses different
+# wording, run this script with --permissions to list what your instance
+# actually offers, or check Settings -> Roles.
+#
+# Grant only those three. A key with full access is root-equivalent on that
+# host, and this script does not need that.
+#
+set -euo pipefail
+
+PROJECT_NAME="\${PROJECT_NAME:-__PROJECT_NAME__}"
+ARCANE_URL="\${ARCANE_URL:-}"
+ARCANE_API_KEY="\${ARCANE_API_KEY:-}"
+ARCANE_ENV_ID="\${ARCANE_ENV_ID:-}"
+
+if [[ -t 1 ]] && [[ -z "\${NO_COLOR:-}" ]]; then
+  B=$'\\e[1m'; R=$'\\e[0m'
+  GREEN=$'\\e[38;5;71m'; RED=$'\\e[38;5;167m'; CORAL=$'\\e[38;5;209m'
+else
+  B=""; R=""; GREEN=""; RED=""; CORAL=""
+fi
+ok()   { printf '%s %s\\n' "\${GREEN}✓\${R}" "$*"; }
+warn() { printf '%s %s\\n' "\${CORAL}!\${R}" "$*"; }
+die()  { printf '\\n%s %s\\n\\n' "\${RED}✗\${R}" "$*" >&2; exit 1; }
+step() { printf '\\n%s\\n' "\${B}$*\${R}"; }
+
+SHOW_PERMS=0
+for a in "$@"; do
+  case "$a" in
+    --permissions|--perms) SHOW_PERMS=1 ;;
+    -h|--help)
+      sed -n '2,30p' "$0" | sed 's/^# \\{0,1\\}//'
+      exit 0 ;;
+  esac
+done
+
+command -v curl >/dev/null || die "curl is required."
+command -v jq   >/dev/null || die "jq is required. Install it, or use the Arcane web interface instead."
+
+[[ -n "$ARCANE_URL" ]]     || die "Set ARCANE_URL, e.g. export ARCANE_URL=http://192.168.1.50:3552"
+[[ -n "$ARCANE_API_KEY" ]] || die "Set ARCANE_API_KEY. Create one in Arcane under Settings -> API Keys."
+
+ARCANE_URL="\${ARCANE_URL%/}"
+API="$ARCANE_URL/api"
+
+[[ -f docker-compose.yml ]] || die "docker-compose.yml not found. Run this from the folder holding your generated files."
+
+api() {                       # api <method> <path> [curl args...]
+  local method="$1" path="$2"; shift 2
+  curl -fsS -X "$method" "$API$path" \\
+    -H "X-API-Key: $ARCANE_API_KEY" \\
+    -H "Accept: application/json" "$@"
+}
+
+# Same call, but reports the HTTP status so a 403 can be explained rather
+# than surfacing as a bare curl failure.
+api_status() {                # api_status <method> <path> [curl args...]
+  local method="$1" path="$2"; shift 2
+  curl -sS -o /tmp/arcane_body -w '%{http_code}' -X "$method" "$API$path" \\
+    -H "X-API-Key: $ARCANE_API_KEY" \\
+    -H "Accept: application/json" "$@" 2>/tmp/arcane_err
+}
+
+denied() {                    # denied <permission> <what it was doing>
+  echo
+  warn "Arcane refused that ($2)."
+  warn "The key is missing the \${B}$1\${R} permission, or an equivalent on your instance."
+  warn "Edit the key under Settings -> API Keys, or run:  bash $(basename "$0") --permissions"
+  echo
+  exit 1
+}
+
+# ── connectivity ─────────────────────────────────────────────────────────
+step "Checking Arcane"
+if ! version="$(api GET /version 2>/dev/null)"; then
+  die "Could not reach $API — check the URL, and that the key is valid."
+fi
+ok "Connected to Arcane $(printf '%s' "$version" | jq -r '.data.version // .version // "?"' 2>/dev/null || echo '')"
+
+# ── permissions ──────────────────────────────────────────────────────────
+if (( SHOW_PERMS )); then
+  step "Permissions your Arcane offers"
+  if perms="$(api GET /roles/available-permissions 2>/dev/null)"; then
+    printf '%s' "$perms" | jq -r '
+      (.data // .) | .. | objects | select(has("permission")) | "  \\(.permission)"' 2>/dev/null \\
+      | sort -u || printf '%s\\n' "$perms"
+    echo
+    printf '  %sThis script needs:%s environments:read, projects:create, projects:deploy\\n\\n' "$B" "$R"
+  else
+    warn "Could not read the permission list — the key may lack access to it."
+    warn "Check Settings -> Roles in Arcane instead."
+  fi
+  exit 0
+fi
+
+# ── environment ──────────────────────────────────────────────────────────
+if [[ -z "$ARCANE_ENV_ID" ]]; then
+  code="$(api_status GET /environments)"
+  [[ "$code" == "403" ]] && denied "environments:read" "listing environments"
+  [[ "$code" == "200" ]] || die "Could not list environments (HTTP $code)."
+  envs="$(cat /tmp/arcane_body)"
+  ARCANE_ENV_ID="$(printf '%s' "$envs" | jq -r '(.data // .)[0].id // empty')"
+  [[ -n "$ARCANE_ENV_ID" ]] || die "No environments found. Set ARCANE_ENV_ID manually."
+  env_name="$(printf '%s' "$envs" | jq -r '(.data // .)[0].name // "unnamed"')"
+  ok "Environment: $env_name ($ARCANE_ENV_ID)"
+else
+  ok "Environment: $ARCANE_ENV_ID (from ARCANE_ENV_ID)"
+fi
+
+# ── payload ──────────────────────────────────────────────────────────────
+step "Preparing project"
+compose="$(cat docker-compose.yml)"
+envfile=""
+if [[ -f .env ]]; then
+  envfile="$(cat .env)"
+  ok "Including .env ($(grep -c '=' .env 2>/dev/null || echo 0) values)"
+else
+  warn "No .env found — the stack will start without its variables."
+fi
+
+project_json="$(jq -n \\
+  --arg name "$PROJECT_NAME" \\
+  --arg compose "$compose" \\
+  --arg env "$envfile" \\
+  '{name: $name, composeContent: $compose, envContent: $env}')"
+
+# The API requires a workspace manifest alongside the project. We upload no
+# extra files, so an empty file list is what it should contain.
+manifest_json='{"files":[]}'
+
+# ── create ───────────────────────────────────────────────────────────────
+step "Creating '$PROJECT_NAME'"
+code="$(api_status POST "/environments/$ARCANE_ENV_ID/projects" \\
+      -F "project=$project_json" -F "manifest=$manifest_json")"
+[[ "$code" == "403" ]] && denied "projects:create" "creating the project"
+if [[ "$code" != "200" && "$code" != "201" ]]; then
+  created=""
+  echo
+  warn "Create failed (HTTP $code). Arcane said:"
+  sed 's/^/    /' /tmp/arcane_body >&2 || true
+  echo
+  die "If the project already exists, delete it in Arcane or set PROJECT_NAME to something else."
+fi
+created="$(cat /tmp/arcane_body)"
+
+project_id="$(printf '%s' "$created" | jq -r '.data.id // .id // empty')"
+[[ -n "$project_id" ]] || { printf '%s\\n' "$created"; die "Created, but no project id came back."; }
+ok "Created (id $project_id)"
+
+# ── deploy ───────────────────────────────────────────────────────────────
+step "Deploying"
+code="$(api_status POST "/environments/$ARCANE_ENV_ID/projects/$project_id/up" \\
+     -H "Content-Type: application/json" \\
+     -d '{"pullPolicy":"missing","removeOrphans":true}')"
+[[ "$code" == "403" ]] && denied "projects:deploy" "starting the project"
+if [[ "$code" == "200" || "$code" == "202" ]]; then
+  ok "Deploy started."
+else
+  warn "Project was created but the deploy call failed (HTTP $code):"
+  sed 's/^/    /' /tmp/arcane_body >&2 || true
+  warn "Open Arcane and press deploy there — the project is ready."
+fi
+
+rm -f /tmp/arcane_err /tmp/arcane_body
+echo
+printf '  %sOpen it:%s %s\\n\\n' "$B" "$R" "$ARCANE_URL/projects/$project_id"
+`;
+
+/* Deploy script for Arcane's API. Runs on the user's machine rather than in
+   the browser: an API key is root-equivalent on that host, and a page served
+   over HTTPS cannot reach a LAN address over plain HTTP anyway. */
+function buildArcaneScript(state){
+  var name = (state.domain ? state.domain.split(".")[0] : "media-server").replace(/[^a-z0-9-]/gi,"-").toLowerCase();
+  return ARCANE_SCRIPT.replace("__PROJECT_NAME__", name);
+}
+
 function buildAll(state){
   var files = [
     {name:"docker-compose.yml", body:buildCompose(state)},
@@ -1306,6 +1524,8 @@ function buildAll(state){
   ];
   if(state.selected.indexOf("caddy") !== -1)
     files.splice(1,0,{name:"Caddyfile", body:buildCaddyfile(state)});
+  if(state.arcaneDeploy)
+    files.push({name:"deploy-to-arcane.sh", body:buildArcaneScript(state)});
   return files;
 }
 
@@ -1331,7 +1551,7 @@ var state = {
   puid:"1000", pgid:"1000", tz:"",
   domain:"", vpnType:"wireguard", vpnProvider:"", vpnKey:"", vpnAddr:"",
   vpnUser:"", vpnPass:"", vpnCountry:"",
-  secrets:{}, manual:{}, showSecrets:false
+  secrets:{}, manual:{}, showSecrets:false, arcaneDeploy:false
 };
 try{ state.tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ""; }catch(e){}
 
@@ -2103,6 +2323,7 @@ $("dlall").onclick = function(){
   }
 };
 $("revealbtn").onclick = function(){ state.showSecrets = !state.showSecrets; showFile(); };
+$("arcopt").onclick = function(){ state.arcaneDeploy = this.checked; buildFiles(); };
 $("regen").onclick = function(){
   genSecrets();
   state.showSecrets = false;   // new values start hidden again
