@@ -450,6 +450,32 @@ html[data-theme="dark"] .skiplink{color:#08151a}
 <h4>Seeding and cleanup</h4>
 <p>Under <b>Tools → Options → BitTorrent</b> you can set a share ratio and what happens when it is reached. Pausing rather than deleting is the safe default — hardlinked files are safe to remove, but if you are not using hardlinks, deleting the torrent deletes the file your library points at.</p>
 </div></details>
+
+<details class="app"><summary><b>API keys and permissions</b><span class="d">For the generator's deploy script</span></summary>
+<div class="abody">
+<p>The generator can produce a <code>deploy-to-arcane.sh</code> that creates and starts your project through Arcane's API. It needs a key, and that key should be scoped.</p>
+<h5>Creating the key</h5>
+<ol class="steps">
+<li>In Arcane, go to <b>Settings → API Keys</b> and create one.</li>
+<li>Grant only these three permissions:
+<div class="fields"><dl>
+<dt>environments:read</dt><dd>so the script can find which environment to deploy into</dd>
+<dt>projects:create</dt><dd>to create the project</dd>
+<dt>projects:deploy</dt><dd>to start it</dd>
+</dl></div></li>
+<li>Copy the key. It is shown once.</li>
+</ol>
+<div class="warning"><strong>Do not use an unrestricted key.</strong> Arcane holds the Docker socket, so a key with full access is equivalent to root on that machine. These three permissions are all the script uses, and a key cannot exceed the permissions of the user who created it.</div>
+<h5>If the names differ on your instance</h5>
+<p>Permissions follow a <code>resource:action</code> pattern, and the exact set depends on your Arcane version. Ask your own instance rather than guessing:</p>
+<pre>bash deploy-to-arcane.sh --permissions</pre>
+<p>That lists every permission your Arcane offers. If a call is refused, the script names the specific permission that was missing rather than failing with a bare error.</p>
+<h5>Running it</h5>
+<pre>export ARCANE_URL=http://192.168.1.50:3552
+export ARCANE_API_KEY=<span class="hl">your-key</span>
+bash deploy-to-arcane.sh</pre>
+<p>It runs on your machine, so the key never passes through a browser and there are no cross-origin restrictions to work around.</p>
+</div></details>
 </section>
 
 <!-- JACKETT -->
