@@ -620,9 +620,8 @@ git push</pre>
 <h4>Arcane, via its API</h4>
 <p class="dwho">One command, if you tick the deploy script above</p>
 <p>The generator can include <code>deploy-to-arcane.sh</code>, which creates the project in Arcane and starts it.</p>
-<pre>export ARCANE_URL=http://192.168.1.50:3552
-export ARCANE_API_KEY=<span class="cm">your-key</span>
-bash deploy-to-arcane.sh</pre>
+<pre>bash deploy-to-arcane.sh</pre>
+<p>It asks for your Arcane URL and API key. The key is typed in with the input hidden, and is never written to a file or an environment variable.</p>
 <p>Create the key in Arcane under <b>Settings → API Keys</b>. The script finds your environment, uploads the Compose and env content, and deploys.</p>
 <div class="dnote"><b>Grant three permissions, not full access.</b> Arcane keys are scoped, so give the key only:
 <br><code>environments:read</code> &nbsp; <code>projects:create</code> &nbsp; <code>projects:deploy</code>
@@ -1323,14 +1322,12 @@ var ARCANE_SCRIPT = `#!/usr/bin/env bash
 # Deploy this stack to Arcane.
 #
 # Creates the project in your Arcane instance and starts it. Runs entirely on
-# your machine, so your API key never touches a browser and there are no
-# cross-origin or mixed-content restrictions to work around.
+# your machine — your API key is typed in, never echoed, never written to disk,
+# and never passed as an argument where other processes could read it.
 #
-#   export ARCANE_URL=http://192.168.1.50:3552
-#   export ARCANE_API_KEY=your-key
 #   bash deploy-to-arcane.sh
-#
-# Create the key in Arcane under Settings -> API Keys.
+#   bash deploy-to-arcane.sh --debug         show the request when something fails
+#   bash deploy-to-arcane.sh --permissions   list what your key is allowed to do
 #
 # PERMISSIONS. Arcane API keys are scoped, and a key cannot exceed the
 # permissions of the user who created it. This script needs, at minimum:
@@ -1339,171 +1336,379 @@ var ARCANE_SCRIPT = `#!/usr/bin/env bash
 #   projects:create      to create the project
 #   projects:deploy      to start it
 #
-# Names follow a resource:action pattern. If your Arcane uses different
-# wording, run this script with --permissions to list what your instance
-# actually offers, or check Settings -> Roles.
-#
 # Grant only those three. A key with full access is root-equivalent on that
-# host, and this script does not need that.
+# host, and this script does not need that. Run with --permissions to list
+# what your own instance offers.
 #
-set -euo pipefail
+set -uo pipefail          # deliberately not -e: every call is checked by hand
 
-PROJECT_NAME="\${PROJECT_NAME:-__PROJECT_NAME__}"
-ARCANE_URL="\${ARCANE_URL:-}"
-ARCANE_API_KEY="\${ARCANE_API_KEY:-}"
-ARCANE_ENV_ID="\${ARCANE_ENV_ID:-}"
+PROJECT_NAME_DEFAULT="__PROJECT_NAME__"
 
+# ── output ───────────────────────────────────────────────────────────────
 if [[ -t 1 ]] && [[ -z "\${NO_COLOR:-}" ]]; then
-  B=$'\\e[1m'; R=$'\\e[0m'
+  B=$'\\e[1m'; DIM=$'\\e[2m'; R=$'\\e[0m'
   GREEN=$'\\e[38;5;71m'; RED=$'\\e[38;5;167m'; CORAL=$'\\e[38;5;209m'
 else
-  B=""; R=""; GREEN=""; RED=""; CORAL=""
+  B=""; DIM=""; R=""; GREEN=""; RED=""; CORAL=""
 fi
-ok()   { printf '%s %s\\n' "\${GREEN}✓\${R}" "$*"; }
-warn() { printf '%s %s\\n' "\${CORAL}!\${R}" "$*"; }
-die()  { printf '\\n%s %s\\n\\n' "\${RED}✗\${R}" "$*" >&2; exit 1; }
-step() { printf '\\n%s\\n' "\${B}$*\${R}"; }
+# The marker is passed as its own argument rather than sitting inside a quoted
+# string. Putting the marker inside the quotes places an exclamation mark
+# directly before a dollar sign, which bash expands from history if this file
+# is ever sourced or pasted into an interactive shell.
+ok()   { printf '%s%s%s %s\\n' "$GREEN" '✓' "$R" "$*"; }
+warn() { printf '%s%s%s %s\\n' "$CORAL" '!' "$R" "$*"; }
+step() { printf '\\n%s%s%s\\n' "$B" "$*" "$R"; }
+
+CALLF="$(mktemp)"
+BODY="$(mktemp)"; ERRF="$(mktemp)"
+PFIELD="$(mktemp)"; MFIELD="$(mktemp)"
+LOG="./arcane-deploy.log"
+cleanup(){ rm -f "$BODY" "$ERRF" "$PFIELD" "$MFIELD" "$CALLF"; }
+trap cleanup EXIT INT TERM
+
+# Failures used to vanish with the window when the script was double-clicked.
+# Write the detail to a file, say where it is, and wait before closing.
+die() {
+  printf '\\n%s%s%s %s\\n' "$RED" '✗' "$R" "$*" >&2
+  {
+    printf '=== %s ===\\n' "$(date)"
+    printf 'failed: %s\\n' "$*"
+    printf 'url: %s\\n' "\${API:-unset}"
+    printf 'last request: %s\\n' "$(cat "$CALLF" 2>/dev/null || echo '?')"
+    printf 'last response body:\\n'
+    [[ -s "$BODY" ]] && head -c 4000 "$BODY"
+    printf '\\ncurl stderr:\\n'
+    [[ -s "$ERRF" ]] && head -c 2000 "$ERRF"
+    printf '\\n'
+  } >>"$LOG" 2>/dev/null
+  printf '  %sDetail written to %s%s\\n\\n' "$DIM" "$LOG" "$R" >&2
+  if [[ -n "\${TTY_IN:-}" ]]; then
+    read -r -p "  Press Enter to close. " _ <"$TTY_IN" || true
+  fi
+  exit 1
+}
+
+
+# Reading from /dev/tty lets the key be typed even when stdin is a pipe, but
+# /dev/tty does not exist in containers or CI — so fall back to stdin there.
+# -r is not enough: in a container /dev/tty can exist as a device node while
+# having no controlling terminal, so opening it still fails. Try the open.
+if { : </dev/tty; } 2>/dev/null; then TTY_IN="/dev/tty"; else TTY_IN=""; fi
+
+ask() {                       # ask <prompt> <default>  -> echoes the answer
+  local prompt="$1" default="\${2:-}" reply=""
+  if [[ -n "$TTY_IN" ]]; then
+    read -r -p "$prompt" reply <"$TTY_IN"
+  else
+    read -r -p "$prompt" reply
+  fi
+  printf '%s' "\${reply:-$default}"
+}
+
+ask_secret() {                # ask_secret <prompt>  -> echoes the answer
+  local prompt="$1" reply=""
+  if [[ -n "$TTY_IN" ]]; then
+    read -r -s -p "$prompt" reply <"$TTY_IN"
+  else
+    read -r -s -p "$prompt" reply
+  fi
+  echo >&2
+  printf '%s' "$reply"
+}
+
+# ── prerequisites ────────────────────────────────────────────────────────
+command -v curl >/dev/null 2>&1 || die "curl is required but was not found."
+
+# JSON encoding has to survive quotes, newlines and unicode in your compose
+# file. Either of these does it properly; hand-rolled escaping does not.
+JSON_TOOL=""
+if command -v python3 >/dev/null 2>&1; then JSON_TOOL="python3"
+elif command -v jq >/dev/null 2>&1; then JSON_TOOL="jq"
+else
+  die "Needs either python3 or jq to build the request safely. Neither was found."
+fi
 
 SHOW_PERMS=0
+DEBUG=0
 for a in "$@"; do
   case "$a" in
     --permissions|--perms) SHOW_PERMS=1 ;;
-    -h|--help)
-      sed -n '2,30p' "$0" | sed 's/^# \\{0,1\\}//'
-      exit 0 ;;
+    --debug) DEBUG=1 ;;
+    -h|--help) sed -n '2,22p' "$0" | sed 's/^# \\{0,1\\}//'; exit 0 ;;
+    *) die "Unknown option: $a" ;;
   esac
 done
 
-command -v curl >/dev/null || die "curl is required."
-command -v jq   >/dev/null || die "jq is required. Install it, or use the Arcane web interface instead."
+if [[ ! -f docker-compose.yml ]]; then
+  die "docker-compose.yml not found. Run this from the folder holding your generated files."
+fi
 
-[[ -n "$ARCANE_URL" ]]     || die "Set ARCANE_URL, e.g. export ARCANE_URL=http://192.168.1.50:3552"
-[[ -n "$ARCANE_API_KEY" ]] || die "Set ARCANE_API_KEY. Create one in Arcane under Settings -> API Keys."
+# ── connection details, asked for rather than passed in ──────────────────
+step "Arcane connection"
+printf '%sNothing you type here is saved. The key is not echoed, not exported,%s\\n' "$DIM" "$R"
+printf '%sand not visible to other processes.%s\\n\\n' "$DIM" "$R"
 
+ARCANE_URL="\${ARCANE_URL:-}"
+if [[ -z "$ARCANE_URL" ]]; then
+  ARCANE_URL="$(ask "  Arcane URL [http://localhost:3552]: " "http://localhost:3552")"
+fi
 ARCANE_URL="\${ARCANE_URL%/}"
+if [[ "$ARCANE_URL" != http://* && "$ARCANE_URL" != https://* ]]; then
+  die "The URL needs to start with http:// or https:// — got '$ARCANE_URL'."
+fi
 API="$ARCANE_URL/api"
 
-[[ -f docker-compose.yml ]] || die "docker-compose.yml not found. Run this from the folder holding your generated files."
+# read -s keeps the key off the screen. It lives in a shell variable in this
+# process only: never exported, never written to disk, never passed as an
+# argument, since arguments are visible to anyone running ps.
+API_KEY="$(ask_secret "  API key (input hidden): ")"
+if [[ -z "$API_KEY" ]]; then
+  die "No key entered. Create one in Arcane under Settings → API Keys."
+fi
 
-api() {                       # api <method> <path> [curl args...]
+# ── request helpers ──────────────────────────────────────────────────────
+# Returns the HTTP status; the body lands in $BODY. Nothing relies on set -e,
+# so a non-2xx response is handled rather than silently fatal.
+call() {                      # call <method> <path> [curl args...]
   local method="$1" path="$2"; shift 2
-  curl -fsS -X "$method" "$API$path" \\
-    -H "X-API-Key: $ARCANE_API_KEY" \\
-    -H "Accept: application/json" "$@"
+  printf '%s %s' "$method" "$path" >"$CALLF"   # a subshell cannot set a parent variable
+  curl -sS -o "$BODY" -w '%{http_code}' -X "$method" "$API$path" \\
+    -H "X-API-Key: $API_KEY" -H "Accept: application/json" "$@" 2>"$ERRF"
 }
 
-# Same call, but reports the HTTP status so a 403 can be explained rather
-# than surfacing as a bare curl failure.
-api_status() {                # api_status <method> <path> [curl args...]
-  local method="$1" path="$2"; shift 2
-  curl -sS -o /tmp/arcane_body -w '%{http_code}' -X "$method" "$API$path" \\
-    -H "X-API-Key: $ARCANE_API_KEY" \\
-    -H "Accept: application/json" "$@" 2>/tmp/arcane_err
+json_get() {                  # json_get <dotted.key>  — reads $BODY
+  if [[ "$JSON_TOOL" == "python3" ]]; then
+    python3 -c '
+import json,sys
+try: d=json.load(sys.stdin)
+except Exception: sys.exit(0)
+cur=d.get("data",d) if isinstance(d,dict) else d
+for k in sys.argv[1].split("."):
+    if isinstance(cur,list): cur=cur[0] if cur else {}
+    cur=cur.get(k,"") if isinstance(cur,dict) else ""
+print(cur if isinstance(cur,(str,int,float)) else "")
+' "$1" <"$BODY" 2>/dev/null
+  else
+    jq -r "(.data // .) | if type==\\"array\\" then .[0] else . end | .$1 // empty" <"$BODY" 2>/dev/null
+  fi
+}
+
+show_error() {                # show_error <http status>
+  warn "Arcane returned HTTP $1."
+  if [[ "$DEBUG" == "1" ]]; then
+    printf '  %srequest was:%s %s\\n' "$DIM" "$R" "$(cat "$CALLF" 2>/dev/null || echo '?')" >&2
+    if [[ -s "$PFIELD" ]]; then
+      printf '  %sproject field (first 400 bytes):%s\\n' "$DIM" "$R" >&2
+      head -c 400 "$PFIELD" | sed 's/^/    /' >&2; echo >&2
+    fi
+  fi
+  if [[ -s "$BODY" ]]; then
+    head -c 600 "$BODY" | sed 's/^/    /' >&2
+    echo >&2
+  elif [[ -s "$ERRF" ]]; then
+    sed 's/^/    /' "$ERRF" >&2
+  fi
 }
 
 denied() {                    # denied <permission> <what it was doing>
   echo
-  warn "Arcane refused that ($2)."
-  warn "The key is missing the \${B}$1\${R} permission, or an equivalent on your instance."
-  warn "Edit the key under Settings -> API Keys, or run:  bash $(basename "$0") --permissions"
+  warn "Arcane refused that (\${2})."
+  warn "The key is missing \${B}\${1}\${R}, or the equivalent on your instance."
+  warn "Edit the key under Settings → API Keys, or rerun with --permissions."
   echo
   exit 1
 }
 
 # ── connectivity ─────────────────────────────────────────────────────────
 step "Checking Arcane"
-if ! version="$(api GET /version 2>/dev/null)"; then
-  die "Could not reach $API — check the URL, and that the key is valid."
-fi
-ok "Connected to Arcane $(printf '%s' "$version" | jq -r '.data.version // .version // "?"' 2>/dev/null || echo '')"
+code="$(call GET /version)"
+case "$code" in
+  200)     ok "Connected to Arcane $(json_get version)" ;;
+  401|403) die "The key was rejected. Check it was copied whole and has not been revoked." ;;
+  000)     die "Could not reach $API — check the URL, and that Arcane is running." ;;
+  *)       show_error "$code"; die "Unexpected response from $API/version." ;;
+esac
 
-# ── permissions ──────────────────────────────────────────────────────────
-if (( SHOW_PERMS )); then
+# ── permissions listing ──────────────────────────────────────────────────
+if [[ "$SHOW_PERMS" == "1" ]]; then
   step "Permissions your Arcane offers"
-  if perms="$(api GET /roles/available-permissions 2>/dev/null)"; then
-    printf '%s' "$perms" | jq -r '
-      (.data // .) | .. | objects | select(has("permission")) | "  \\(.permission)"' 2>/dev/null \\
-      | sort -u || printf '%s\\n' "$perms"
-    echo
-    printf '  %sThis script needs:%s environments:read, projects:create, projects:deploy\\n\\n' "$B" "$R"
+  code="$(call GET /roles/available-permissions)"
+  if [[ "$code" == "200" ]]; then
+    if [[ "$JSON_TOOL" == "python3" ]]; then
+      python3 -c '
+import json,sys
+d=json.load(sys.stdin); out=set()
+def walk(o):
+    if isinstance(o,dict):
+        p=o.get("permission")
+        if isinstance(p,str): out.add(p)
+        for v in o.values(): walk(v)
+    elif isinstance(o,list):
+        for v in o: walk(v)
+walk(d)
+for p in sorted(out): print("  "+p)
+' <"$BODY"
+    else
+      jq -r '.. | objects | select(has("permission")) | "  \\(.permission)"' <"$BODY" | sort -u
+    fi
+    printf '\\n  %sThis script needs:%s environments:read, projects:create, projects:deploy\\n\\n' "$B" "$R"
   else
-    warn "Could not read the permission list — the key may lack access to it."
-    warn "Check Settings -> Roles in Arcane instead."
+    warn "Could not read the permission list (HTTP $code)."
+    warn "Check Settings → Roles in Arcane instead."
   fi
   exit 0
 fi
 
 # ── environment ──────────────────────────────────────────────────────────
-if [[ -z "$ARCANE_ENV_ID" ]]; then
-  code="$(api_status GET /environments)"
-  [[ "$code" == "403" ]] && denied "environments:read" "listing environments"
-  [[ "$code" == "200" ]] || die "Could not list environments (HTTP $code)."
-  envs="$(cat /tmp/arcane_body)"
-  ARCANE_ENV_ID="$(printf '%s' "$envs" | jq -r '(.data // .)[0].id // empty')"
-  [[ -n "$ARCANE_ENV_ID" ]] || die "No environments found. Set ARCANE_ENV_ID manually."
-  env_name="$(printf '%s' "$envs" | jq -r '(.data // .)[0].name // "unnamed"')"
-  ok "Environment: $env_name ($ARCANE_ENV_ID)"
+step "Finding the environment"
+ENV_ID="\${ARCANE_ENV_ID:-}"
+if [[ -z "$ENV_ID" ]]; then
+  code="$(call GET /environments)"
+  if [[ "$code" == "403" ]]; then denied "environments:read" "listing environments"; fi
+  if [[ "$code" != "200" ]]; then show_error "$code"; die "Could not list environments."; fi
+
+  # List every environment found, so a wrong guess is visible rather than silent.
+  if [[ "$JSON_TOOL" == "python3" ]]; then
+    ENV_LIST="$(python3 -c '
+import json,sys
+try: d=json.load(sys.stdin)
+except Exception: sys.exit(0)
+# Accept the documented {data:[...]} envelope and the plainer shapes some
+# versions return, rather than assuming one of them.
+items = d.get("data") if isinstance(d,dict) else d
+if isinstance(items,dict): items = items.get("items") or items.get("environments") or []
+if not isinstance(items,list): items = []
+for e in items:
+    if isinstance(e,dict) and e.get("id") is not None:
+        print("%s\\t%s\\t%s" % (e["id"], e.get("name") or "unnamed", e.get("status") or ""))
+' <"$BODY" 2>/dev/null)"
+  else
+    ENV_LIST="$(jq -r '
+      (if type=="array" then . else (.data // .items // .environments // []) end)
+      | (if type=="object" then (.items // .environments // []) else . end)
+      | .[]? | "\\(.id)\\t\\(.name // "unnamed")\\t\\(.status // "")"' <"$BODY" 2>/dev/null)"
+  fi
+
+  ENV_COUNT=0
+  if [[ -n "$ENV_LIST" ]]; then ENV_COUNT="$(printf '%s\\n' "$ENV_LIST" | grep -c .)"; fi
+
+  if [[ "$ENV_COUNT" == "0" ]]; then
+    # The list can come back empty even when an environment exists — the key
+    # may not be allowed to enumerate them. Ask for the known ids directly.
+    for probe in 0 1 local default; do
+      code="$(call GET "/environments/$probe")"
+      if [[ "$code" == "200" ]]; then
+        ENV_ID="$probe"
+        ENV_NAME="$(json_get name)"
+        ok "Found environment \${ENV_NAME:-$probe} ($probe) directly"
+        break
+      fi
+    done
+  fi
+
+  if [[ -z "\${ENV_ID:-}" && "$ENV_COUNT" == "0" ]]; then
+    warn "Arcane answered, but no environment could be read from the reply."
+    echo
+    printf '  %sWhat it actually returned:%s\\n' "$DIM" "$R"
+    head -c 700 "$BODY" | sed 's/^/    /'
+    echo; echo
+    warn "That usually means the key cannot see any environment, or this Arcane"
+    warn "version wraps the list differently. You can enter the id by hand —"
+    warn "it is in the URL when you open an environment in Arcane, and the"
+    warn "built-in local one is normally 0."
+    echo
+    ENV_ID="$(ask "  Environment id [0]: " "0")"
+  fi
+
+  if [[ -z "\${ENV_ID:-}" && "$ENV_COUNT" == "1" ]]; then
+    ENV_ID="$(printf '%s' "$ENV_LIST" | head -1 | cut -f1)"
+    ENV_NAME="$(printf '%s' "$ENV_LIST" | head -1 | cut -f2)"
+    ok "Using \${ENV_NAME} ($ENV_ID)"
+  fi
+
+  if [[ -z "\${ENV_ID:-}" && "$ENV_COUNT" -gt 1 ]]; then
+    echo
+    printf '  %sMore than one environment:%s\\n' "$DIM" "$R"
+    printf '%s\\n' "$ENV_LIST" | while IFS=$'\\t' read -r i n st; do
+      printf '    %-20s %s %s\\n' "$i" "$n" "\${st:+($st)}"
+    done
+    echo
+    DEFAULT_ENV="$(printf '%s' "$ENV_LIST" | head -1 | cut -f1)"
+    ENV_ID="$(ask "  Which id? [$DEFAULT_ENV]: " "$DEFAULT_ENV")"
+  fi
+  if [[ -z "$ENV_ID" ]]; then die "No environment id given."; fi
 else
-  ok "Environment: $ARCANE_ENV_ID (from ARCANE_ENV_ID)"
+  ok "Using environment $ENV_ID"
 fi
 
-# ── payload ──────────────────────────────────────────────────────────────
-step "Preparing project"
-compose="$(cat docker-compose.yml)"
-envfile=""
+# ── project name ─────────────────────────────────────────────────────────
+step "Project"
+PROJECT_NAME="\${PROJECT_NAME:-}"
+if [[ -z "$PROJECT_NAME" ]]; then
+  PROJECT_NAME="$(ask "  Project name [$PROJECT_NAME_DEFAULT]: " "$PROJECT_NAME_DEFAULT")"
+fi
+case "$PROJECT_NAME" in
+  ''|*[!a-zA-Z0-9_-]*)
+    die "'$PROJECT_NAME' will not work. Use letters, numbers, hyphens and underscores." ;;
+esac
+
+ENV_CONTENT=""
 if [[ -f .env ]]; then
-  envfile="$(cat .env)"
-  ok "Including .env ($(grep -c '=' .env 2>/dev/null || echo 0) values)"
+  ENV_CONTENT="$(cat .env)"
+  ok "Including .env"
 else
-  warn "No .env found — the stack will start without its variables."
+  warn "No .env alongside the compose file — the stack will start without its variables."
 fi
 
-project_json="$(jq -n \\
-  --arg name "$PROJECT_NAME" \\
-  --arg compose "$compose" \\
-  --arg env "$envfile" \\
-  '{name: $name, composeContent: $compose, envContent: $env}')"
-
-# The API requires a workspace manifest alongside the project. We upload no
-# extra files, so an empty file list is what it should contain.
-manifest_json='{"files":[]}'
+# ── build the payload ────────────────────────────────────────────────────
+if [[ "$JSON_TOOL" == "python3" ]]; then
+  PROJECT_JSON="$(PNAME="$PROJECT_NAME" ENVC="$ENV_CONTENT" python3 -c '
+import json,os
+print(json.dumps({
+  "name": os.environ["PNAME"],
+  "composeContent": open("docker-compose.yml").read(),
+  "envContent": os.environ.get("ENVC",""),
+}))')"
+else
+  PROJECT_JSON="$(jq -n --arg n "$PROJECT_NAME" \\
+    --rawfile c docker-compose.yml --arg e "$ENV_CONTENT" \\
+    '{name:$n, composeContent:$c, envContent:$e}')"
+fi
+MANIFEST_JSON='{"files":[]}'
 
 # ── create ───────────────────────────────────────────────────────────────
 step "Creating '$PROJECT_NAME'"
-code="$(api_status POST "/environments/$ARCANE_ENV_ID/projects" \\
-      -F "project=$project_json" -F "manifest=$manifest_json")"
-[[ "$code" == "403" ]] && denied "projects:create" "creating the project"
-if [[ "$code" != "200" && "$code" != "201" ]]; then
-  created=""
-  echo
-  warn "Create failed (HTTP $code). Arcane said:"
-  sed 's/^/    /' /tmp/arcane_body >&2 || true
-  echo
-  die "If the project already exists, delete it in Arcane or set PROJECT_NAME to something else."
+printf '%s' "$PROJECT_JSON"  >"$PFIELD"
+printf '%s' "$MANIFEST_JSON" >"$MFIELD"
+code="$(call POST "/environments/$ENV_ID/projects" \\
+        -F "project=<$PFIELD" -F "manifest=<$MFIELD")"
+if [[ "$code" == "403" ]]; then denied "projects:create" "creating the project"; fi
+if [[ "$code" == "409" ]]; then
+  die "A project called '$PROJECT_NAME' already exists. Delete it in Arcane, or pick another name."
 fi
-created="$(cat /tmp/arcane_body)"
-
-project_id="$(printf '%s' "$created" | jq -r '.data.id // .id // empty')"
-[[ -n "$project_id" ]] || { printf '%s\\n' "$created"; die "Created, but no project id came back."; }
-ok "Created (id $project_id)"
+if [[ "$code" != "200" && "$code" != "201" ]]; then
+  show_error "$code"
+  die "Could not create the project."
+fi
+PROJECT_ID="$(json_get id)"
+if [[ -z "$PROJECT_ID" ]]; then show_error "$code"; die "Created, but no project id came back."; fi
+ok "Created (id $PROJECT_ID)"
 
 # ── deploy ───────────────────────────────────────────────────────────────
 step "Deploying"
-code="$(api_status POST "/environments/$ARCANE_ENV_ID/projects/$project_id/up" \\
-     -H "Content-Type: application/json" \\
-     -d '{"pullPolicy":"missing","removeOrphans":true}')"
-[[ "$code" == "403" ]] && denied "projects:deploy" "starting the project"
+code="$(call POST "/environments/$ENV_ID/projects/$PROJECT_ID/up" \\
+        -H "Content-Type: application/json" \\
+        -d '{"pullPolicy":"missing","removeOrphans":true}')"
+if [[ "$code" == "403" ]]; then denied "projects:deploy" "starting the project"; fi
 if [[ "$code" == "200" || "$code" == "202" ]]; then
-  ok "Deploy started."
+  ok "Deploy started — images are pulling now."
 else
-  warn "Project was created but the deploy call failed (HTTP $code):"
-  sed 's/^/    /' /tmp/arcane_body >&2 || true
-  warn "Open Arcane and press deploy there — the project is ready."
+  show_error "$code"
+  warn "The project exists but did not start. Open Arcane and press deploy there."
 fi
 
-rm -f /tmp/arcane_err /tmp/arcane_body
-echo
-printf '  %sOpen it:%s %s\\n\\n' "$B" "$R" "$ARCANE_URL/projects/$project_id"
+API_KEY=""     # drop it from memory as soon as it is no longer needed
+printf '\\n  %sOpen it:%s %s/projects/%s\\n\\n' "$B" "$R" "$ARCANE_URL" "$PROJECT_ID"
 `;
 
 /* Deploy script for Arcane's API. Runs on the user's machine rather than in
