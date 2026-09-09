@@ -505,6 +505,37 @@ docker compose exec caddy caddy reload --config /etc/caddy/Caddyfile</pre>
 <p>The Caddyfile is mounted live, so editing it on the host or through Arcane is enough — only the reload is needed.</p>
 <div class="tip"><strong>The generator writes this file for you</strong>, containing only the services that are safe to publish. See <a href="generator.html">the generator</a> for where it goes and how to test certificate issuance without hitting rate limits.</div>
 
+<h3 id="pickone">Caddy or Cloudflare Tunnel, not both</h3>
+<p>They solve the same problem in opposite directions. Caddy opens ports on your router and gets certificates itself; Cloudflare Tunnel opens nothing and lets Cloudflare handle the certificates. Running both means two sets of routing and two certificate authorities competing over the same names, so the generator treats them as mutually exclusive — picking one drops the other.</p>
+<div class="tbl"><table>
+<thead><tr><th></th><th>Caddy</th><th>Cloudflare Tunnel</th></tr></thead>
+<tbody>
+<tr><td>Router changes</td><td>Ports 80 and 443 forwarded</td><td>None</td></tr>
+<tr><td>Works behind CGNAT</td><td>No</td><td>Yes</td></tr>
+<tr><td>Who sees your traffic</td><td>Only you</td><td>Cloudflare decrypts at their edge</td></tr>
+<tr><td>Large media</td><td>Fine</td><td>Unsettled under their CDN terms</td></tr>
+<tr><td>Upload limit</td><td>None</td><td>100&nbsp;MB on the free plan</td></tr>
+</tbody></table></div>
+<div class="tip"><strong>If you can forward ports, Caddy is usually the better answer</strong> — nothing sits between you and your server. Use a tunnel when your ISP puts you behind CGNAT, or when you would rather not open anything at all.</div>
+
+<h3 id="localonly">Or publish nothing at all</h3>
+<p>The generator has a <b>local network only</b> switch that removes both, along with Pocket ID, which needs a public HTTPS origin for passkeys to work.</p>
+<p>Tailscale stays available, because it is not publishing anything — it builds a private network between your own devices, so you reach the server from a phone on mobile data without a single port being open. For most households that is the whole requirement, and it is the safest configuration on this page.</p>
+
+<h3 id="split">Keeping access up when apps restart</h3>
+<p>By default every container sits in one Compose project, which means <code>docker compose down</code> stops your reverse proxy along with everything else. Rebuild an app at the wrong moment and you have locked yourself out of the machine you are rebuilding it on.</p>
+<p>The generator can split the connection layer — Caddy, Tailscale, Cloudflare Tunnel and Pocket ID — into its own <code>access/</code> project, so it keeps running while the apps come and go.</p>
+<div class="warning"><strong>This only works with a shared network.</strong> Separate Compose projects get separate default networks, so the proxy would no longer resolve <code>jellyfin</code> by name. Create one, once, before starting either stack:
+<pre>docker network create edge</pre>
+The generated files declare it as external on both sides, so Docker expects you to have made it.</div>
+<p>Running order after that:</p>
+<pre><span class="c"># the connection layer, started once and left alone</span>
+cd access &amp;&amp; docker compose up -d &amp;&amp; cd ..
+
+<span class="c"># your apps, restarted as often as you like</span>
+docker compose up -d</pre>
+<div class="tip"><strong>Worth it if you reach the server remotely.</strong> If everything is on your LAN and you only ever restart things while sitting next to the machine, one project is simpler and there is nothing to gain here.</div>
+
 <h3 id="never">What to never expose</h3>
 <p>Publishing a hostname makes it reachable by everyone, including automated scanners that will find it within hours. Some things in this stack must not be among them.</p>
 <div class="tbl"><table>
