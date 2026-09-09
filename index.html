@@ -366,6 +366,30 @@ html[data-theme="dark"] .skiplink{color:#08151a}
   .chelp-grid{grid-template-columns:repeat(4,1fr)}
   .qs-next{grid-template-columns:repeat(3,1fr)}
 }
+
+/* platform switcher */
+.ostabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+.ostab{font-family:inherit;font-size:14px;font-weight:700;padding:9px 17px;border-radius:999px;
+  border:1px solid var(--line);background:var(--surface);color:var(--muted);cursor:pointer;transition:.14s}
+.ostab:hover{border-color:var(--teal);color:var(--blue)}
+.ostab.on{background:var(--blue);border-color:var(--blue);color:#fff}
+html[data-theme="dark"] .ostab.on{color:#08151a}
+.osnote{background:var(--tint-teal);border:1px solid var(--line-teal);border-radius:16px;
+  padding:15px 18px;margin:0 0 26px;font-size:14.5px;line-height:1.7;display:none}
+.osnote b{color:var(--ink)}
+.osnote-inline{background:var(--tint-peach);border-left:4px solid var(--peach);border-radius:0 12px 12px 0;
+  padding:12px 15px;margin:0 0 13px;font-size:13.5px;line-height:1.65;display:none}
+.osnote-inline b{color:var(--ink)}
+.osnote-inline pre{margin:8px 0 0;font-size:12px;padding:11px 13px}
+kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.85em;background:var(--surface);
+  border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:1px 6px;color:var(--ink)}
+.qs-words{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:20px 22px;margin:0 0 22px}
+.qs-words>b{display:block;font-size:14px;color:var(--ink);margin-bottom:12px}
+.qs-words dl{margin:0;display:grid;grid-template-columns:minmax(110px,auto) 1fr;gap:0 16px}
+.qs-words dt{font-weight:700;color:var(--blue);font-size:14px;padding:7px 0;border-bottom:1px solid var(--line)}
+.qs-words dd{margin:0;font-size:14px;color:var(--muted);padding:7px 0;border-bottom:1px solid var(--line);line-height:1.6}
+.qs-words dl>dt:last-of-type,.qs-words dl>dd:last-of-type{border-bottom:0}
+@media(max-width:640px){.qs-words dl{grid-template-columns:1fr}.qs-words dt{border-bottom:0;padding-bottom:0}}
 </style>
 <script>
 (function(){
@@ -441,32 +465,87 @@ html[data-theme="dark"] .skiplink{color:#08151a}
 <section class="quickstart" id="quickstart"><div class="wrap">
 <div class="kicker">Start here</div>
 <h2>Your first server, in about half an hour.</h2>
-<p class="lead">Three services, end to end: Arcane to manage everything, Jellyfin to watch things, and Uptime Kuma to tell you on Discord when something breaks. Nothing here assumes you have done this before.</p>
+<p class="lead">Three things running by the end: somewhere to watch your films, a control panel so you never need the command line again, and an alert on Discord if it stops. No experience assumed — every command is one you can copy.</p>
+
+<div class="qs-words">
+<b>Four words that come up a lot</b>
+<dl>
+<dt>Container</dt><dd>One app in a sealed box, with everything it needs inside. Deleting it leaves no mess behind.</dd>
+<dt>Image</dt><dd>The recipe a container is made from. You download one, and it becomes your container.</dd>
+<dt>Compose file</dt><dd>A text file listing which containers you want and how they are set up. You will copy and paste two of these.</dd>
+<dt>Volume</dt><dd>A folder on your computer that a container is allowed to see. This is how the film on your hard drive gets into the app.</dd>
+</dl>
+</div>
 
 <div class="qs-need">
-<b>You need:</b> a machine that stays on — a mini PC, an old laptop, a NAS or a VPS — with Docker installed.
-<a href="platforms.html">Docker setup for Windows, macOS, Linux or NAS →</a>
+<b>You need:</b> a computer that can stay switched on — an old laptop, a spare desktop, a mini PC or a NAS.
+<a href="platforms.html">Install Docker first, if you have not →</a>
 </div>
 
-<div class="qs-cli">
-<b>About the command line.</b> Step one is the only place you have to type commands, and they are all copy-and-paste.
-Once Arcane is running, everything after it — including every service you add later — is done by clicking in a browser.
-If that is still more than you want, a Synology or QNAP NAS can create the Arcane container from its own app store
-with no terminal at all.
+<div class="ostabs" role="tablist" aria-label="Choose your operating system">
+<button class="ostab" data-os="win"  role="tab">Windows</button>
+<button class="ostab" data-os="mac"  role="tab">macOS</button>
+<button class="ostab" data-os="lin"  role="tab">Linux</button>
+<button class="ostab" data-os="nas"  role="tab">NAS</button>
 </div>
 
-<div class="qs-meta"><span><b>7 steps</b> · about 30 minutes</span><button class="qs-expand" id="qsx">Expand all</button></div>
+<div class="osnote" data-os="win">
+<b>On Windows, do all of this in the Ubuntu window, not PowerShell.</b>
+Docker runs on top of Linux, and Windows can run one inside itself. It is quicker than it sounds — about five minutes, once.
+
+<p style="margin:12px 0 6px"><b>1. Do you already have Ubuntu?</b> Press Start and type <b>Ubuntu</b>. If an app appears, open it and skip to step 3. If you only see Microsoft Store results, you do not have it yet.</p>
+
+<p style="margin:0 0 6px"><b>2. Install it.</b> Right-click Start, choose <b>Terminal (Admin)</b> or <b>PowerShell (Admin)</b>, and run:</p>
+<pre>wsl --install -d Ubuntu</pre>
+<p style="margin:0 0 6px">Restart your computer when it asks. Ubuntu then opens on its own and asks you to pick a username and password — any will do, but write the password down. You will type it whenever a command starts with <code>sudo</code>.</p>
+
+<p style="margin:12px 0 6px"><b>3. Check Docker reached it.</b> In the Ubuntu window, type:</p>
+<pre>docker version</pre>
+<p style="margin:0">If that prints version numbers, you are ready. If it says <b>command not found</b>, open Docker Desktop, go to <b>Settings → Resources → WSL Integration</b>, switch on <b>Ubuntu</b>, and press <b>Apply &amp; Restart</b>. Then close and reopen the Ubuntu window.</p>
+
+<div class="qs-note" style="margin:12px 0 0"><b>Docker Desktop makes its own hidden Linux systems</b> called <code>docker-desktop</code> and <code>docker-desktop-data</code>. Those are not for you to use, and installing Ubuntu does not conflict with them.</div>
+</div>
+<div class="osnote" data-os="mac">
+<b>On a Mac, open the Terminal app.</b> Press <kbd>Cmd</kbd> + <kbd>Space</kbd>, type <b>Terminal</b>, press Enter.
+Make sure Docker Desktop is running — you should see a whale in the menu bar at the top of the screen.
+</div>
+<div class="osnote" data-os="lin">
+<b>Open a terminal.</b> On most systems that is <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>T</kbd>.
+</div>
+<div class="osnote" data-os="nas">
+<b>Synology and QNAP can do most of this without any typing.</b> Install <b>Container Manager</b> (Synology) or <b>Container Station</b> (QNAP) from your NAS app store, then use its Project or Application feature and paste the compose text from each step into it.
+Where a step gives a command, use the NAS interface instead — the compose text is the part that matters.
+</div>
+
+<div class="qs-meta"><span><b>7 steps</b> · about 30 minutes</span>
+<button class="qs-expand" id="qsx">Expand all</button></div>
+
 <ol class="qs">
 
-<li class="qs-step"><details open><summary><span class="qs-title">Install Arcane</span><span class="qs-toggle"></span></summary><div class="qs-body">
-<p>Arcane is the web interface you will use for everything after this. It needs two secrets of its own — run this twice and keep both lines:</p>
-<pre>openssl rand -base64 32</pre>
-<p>Make a folder for your stacks, and one inside it for Arcane:</p>
-<pre>sudo mkdir -p /opt/stacks/arcane
-cd /opt/stacks/arcane
-nano docker-compose.yml</pre>
-<p>Paste this in, replacing both secrets:</p>
-<pre>services:
+<li class="qs-step"><details open><summary><span class="qs-title">Install Arcane, your control panel</span><span class="qs-toggle"></span></summary><div class="qs-body">
+<p>Arcane is a website that runs on your own machine and manages everything else. This is the only step that needs typing. After this, it is all clicking.</p>
+
+<p><b>First, two passwords.</b> Run this twice and keep both answers somewhere — a notes app is fine. They are long and random on purpose.</p>
+<pre data-os="win lin mac">openssl rand -base64 32</pre>
+<pre data-os="nas"><span class="cm"># On a NAS, use any password generator — 30+ random characters.</span>
+<span class="cm"># Or run this in the NAS terminal if you have SSH enabled:</span>
+openssl rand -base64 32</pre>
+
+<p><b>Now make a folder</b> to keep everything in.</p>
+<pre data-os="win lin">sudo mkdir -p /opt/stacks/arcane
+sudo chown -R $USER /opt/stacks
+cd /opt/stacks/arcane</pre>
+<pre data-os="mac">mkdir -p ~/stacks/arcane
+cd ~/stacks/arcane</pre>
+<pre data-os="nas"><span class="cm"># In Container Manager, create a Project called "arcane".</span>
+<span class="cm"># It makes the folder for you.</span></pre>
+
+<p><b>Create the file.</b> This opens a simple text editor in the window.</p>
+<pre data-os="win lin mac">nano docker-compose.yml</pre>
+<pre data-os="nas"><span class="cm"># Paste the text below into the Project's compose box.</span></pre>
+
+<p>Paste this in, then swap the two <span class="hl">highlighted</span> bits for the passwords you just made:</p>
+<pre data-os="win lin">services:
   arcane:
     image: ghcr.io/getarcaneapp/arcane:latest
     container_name: arcane
@@ -475,32 +554,113 @@ nano docker-compose.yml</pre>
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - arcane-data:/app/data
-      <span class="cm"># same path on both sides — this matters</span>
       - /opt/stacks:/opt/stacks
     environment:
       - APP_URL=http://localhost:3552
       - PUID=1000
       - PGID=1000
-      - ENCRYPTION_KEY=<span class="hl">your-first-secret</span>
-      - JWT_SECRET=<span class="hl">your-second-secret</span>
+      - ENCRYPTION_KEY=<span class="hl">your-first-password</span>
+      - JWT_SECRET=<span class="hl">your-second-password</span>
     restart: unless-stopped
 
 volumes:
   arcane-data:</pre>
-<pre>docker compose up -d</pre>
-<p>Open <code>http://your-server-ip:3552</code> and create your admin account. <b>That is the last command you have to type.</b></p>
-<div class="qs-warn">Arcane can control your whole machine through the Docker socket. Keep it on your home network — never forward port 3552 to the internet.</div>
+<pre data-os="mac">services:
+  arcane:
+    image: ghcr.io/getarcaneapp/arcane:latest
+    container_name: arcane
+    ports:
+      - "3552:3552"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - arcane-data:/app/data
+      - <span class="hl">/Users/yourname</span>/stacks:/opt/stacks
+    environment:
+      - APP_URL=http://localhost:3552
+      - PUID=501
+      - PGID=20
+      - ENCRYPTION_KEY=<span class="hl">your-first-password</span>
+      - JWT_SECRET=<span class="hl">your-second-password</span>
+    restart: unless-stopped
+
+volumes:
+  arcane-data:</pre>
+<pre data-os="nas">services:
+  arcane:
+    image: ghcr.io/getarcaneapp/arcane:latest
+    container_name: arcane
+    ports:
+      - "3552:3552"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - arcane-data:/app/data
+      - <span class="hl">/volume1/docker/stacks</span>:/opt/stacks
+    environment:
+      - APP_URL=http://localhost:3552
+      - PUID=1000
+      - PGID=1000
+      - ENCRYPTION_KEY=<span class="hl">your-first-password</span>
+      - JWT_SECRET=<span class="hl">your-second-password</span>
+    restart: unless-stopped
+
+volumes:
+  arcane-data:</pre>
+
+<div class="osnote-inline" data-os="mac"><b>Replace <code>/Users/yourname</code></b> with your actual home folder. Not sure what it is? Type <code>echo $HOME</code> and use what it prints.</div>
+<div class="osnote-inline" data-os="win lin"><b>About PUID=1000.</b> That is your user number, and 1000 is right for almost everyone. To check, type <code>id -u</code> — if it says something else, use that.</div>
+
+<p><b>Save and close the editor:</b> press <kbd>Ctrl</kbd> + <kbd>O</kbd>, then <kbd>Enter</kbd>, then <kbd>Ctrl</kbd> + <kbd>X</kbd>.</p>
+
+<p><b>Start it.</b></p>
+<pre data-os="win lin mac">docker compose up -d</pre>
+<pre data-os="nas"><span class="cm"># Press Build / Start in Container Manager.</span></pre>
+
+<p>Open <code>http://localhost:3552</code> in your browser and create your account. <b>That is the last command you have to type.</b></p>
+<div class="osnote-inline" data-os="nas"><b>From another computer</b>, use your NAS address instead — something like <code>http://192.168.1.20:3552</code>.</div>
+<div class="qs-warn"><b>Keep this off the internet.</b> Arcane can control your whole computer. It is fine on your home network — just never forward port 3552 on your router.</div>
 </div></details></li>
 
-<li class="qs-step"><details><summary><span class="qs-title">Point Arcane at your stacks folder</span><span class="qs-toggle"></span></summary><div class="qs-body">
-<p>In Arcane, open <b>Settings</b> and set the projects directory to <code>/opt/stacks</code> — the same path you mounted above.</p>
-<p>Any folder in there containing a <code>docker-compose.yml</code> now appears under <b>Projects</b>. Arcane itself will already be listed, because you put it there.</p>
-<div class="qs-note">Matching paths inside and outside the container is the detail people get wrong. <code>/opt/stacks:/opt/stacks</code> works; <code>/opt/stacks:/app/data/projects</code> quietly breaks relative paths.</div>
+<li class="qs-step"><details><summary><span class="qs-title">Tell Arcane where your projects live</span><span class="qs-toggle"></span></summary><div class="qs-body">
+<p>In Arcane, click <b>Settings</b> and set the projects directory:</p>
+<div class="fields"><dl>
+<dt data-os="win lin">Projects directory</dt><dd data-os="win lin"><code>/opt/stacks</code></dd>
+<dt data-os="mac">Projects directory</dt><dd data-os="mac"><code>/opt/stacks</code> — the same path you used on the right of the colon in step 1</dd>
+<dt data-os="nas">Projects directory</dt><dd data-os="nas"><code>/opt/stacks</code></dd>
+</dl></div>
+<p>Now any folder you put in there shows up under <b>Projects</b>. Arcane will already be listed, because you made it there.</p>
+<div class="qs-note"><b>Why it has to match.</b> In step 1 you wrote <code>something:/opt/stacks</code>. The part after the colon is what Arcane sees, and that is the name to use here. Getting this wrong is the single most common mistake, and it shows up later as folders that look empty.</div>
 </div></details></li>
 
-<li class="qs-step"><details><summary><span class="qs-title">Create a project for Jellyfin</span><span class="qs-toggle"></span></summary><div class="qs-body">
-<p>In Arcane, go to <b>Projects → New Project</b>, call it <code>jellyfin</code>, and paste this as the Compose file:</p>
-<pre>services:
+<li class="qs-step"><details><summary><span class="qs-title">Add Jellyfin, for watching things</span><span class="qs-toggle"></span></summary><div class="qs-body">
+<p>No terminal from here on. In Arcane: <b>Projects → New Project</b>, name it <code>jellyfin</code>, and paste this in:</p>
+<pre data-os="win">services:
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    user: "1000:1000"
+    ports:
+      - "8096:8096"
+    volumes:
+      - /opt/stacks/jellyfin/config:/config
+      - /opt/stacks/jellyfin/cache:/cache
+      - <span class="hl">/mnt/d/Movies</span>:/media:ro
+    environment:
+      - TZ=<span class="hl">Europe/London</span>
+    restart: unless-stopped</pre>
+<pre data-os="mac">services:
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    ports:
+      - "8096:8096"
+    volumes:
+      - /opt/stacks/jellyfin/config:/config
+      - /opt/stacks/jellyfin/cache:/cache
+      - <span class="hl">/Users/yourname/Movies</span>:/media:ro
+    environment:
+      - TZ=<span class="hl">Europe/London</span>
+    restart: unless-stopped</pre>
+<pre data-os="lin">services:
   jellyfin:
     image: jellyfin/jellyfin:latest
     container_name: jellyfin
@@ -514,25 +674,56 @@ volumes:
     environment:
       - TZ=<span class="hl">Europe/London</span>
     restart: unless-stopped</pre>
-<p>Change <code>/srv/media</code> to wherever your films and shows live, and set your timezone. Press <b>Deploy</b>. The first run downloads a few hundred megabytes.</p>
-<div class="qs-note"><code>:ro</code> means read-only. Jellyfin has no reason to modify your files, so it is not allowed to.</div>
+<pre data-os="nas">services:
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    ports:
+      - "8096:8096"
+    volumes:
+      - /volume1/docker/stacks/jellyfin/config:/config
+      - /volume1/docker/stacks/jellyfin/cache:/cache
+      - <span class="hl">/volume1/media</span>:/media:ro
+    environment:
+      - TZ=<span class="hl">Europe/London</span>
+    restart: unless-stopped</pre>
+
+<div class="osnote-inline" data-os="win">
+<b>Where are my films?</b> Windows drive letters change name inside Ubuntu. Your <code>D:</code> drive is <code>/mnt/d</code>, so <code>D:\Movies</code> becomes <code>/mnt/d/Movies</code>. Check it exists before you deploy:
+<pre>ls /mnt/d/Movies</pre>
+If that lists your films, the path is right.
+</div>
+<div class="osnote-inline" data-os="mac">
+<b>Where are my films?</b> Drag the folder into the Terminal window and it types the path for you. An external drive is usually <code>/Volumes/DriveName</code>.
+</div>
+<div class="osnote-inline" data-os="lin">
+<b>Where are my films?</b> An external drive is usually under <code>/media/yourname/</code> or <code>/mnt/</code>. Type <code>ls /media/$USER</code> to see.
+</div>
+<div class="osnote-inline" data-os="nas">
+<b>Where are my films?</b> Whatever shared folder you use — a folder called <code>media</code> is <code>/volume1/media</code> on Synology.
+</div>
+
+<p>Set your timezone too — <a href="https://en.wikipedia.org/wiki/List_of_tz_database_time_zones" target="_blank" rel="noopener">the list is here</a>, and it looks like <code>America/New_York</code>.</p>
+<p>Press <b>Deploy</b>. The first start downloads a few hundred megabytes, so give it a minute.</p>
+<div class="qs-note"><code>:ro</code> on the end means read-only. Jellyfin never needs to change your files, so it is not allowed to. One less way to lose something.</div>
 </div></details></li>
 
-<li class="qs-step"><details><summary><span class="qs-title">Set up a Jellyfin library</span><span class="qs-toggle"></span></summary><div class="qs-body">
-<p>Open <code>http://your-server-ip:8096</code>. Create your user account, then when it asks for a media library:</p>
+<li class="qs-step"><details><summary><span class="qs-title">Point Jellyfin at your films</span><span class="qs-toggle"></span></summary><div class="qs-body">
+<p>Open <code>http://localhost:8096</code>. Create your account, then when it asks for a media library:</p>
 <ul>
-<li>Content type: <b>Movies</b> — make a second library later for Shows, since separate types matter for metadata</li>
+<li>Content type: <b>Movies</b></li>
 <li>Display name: <b>Films</b></li>
-<li>Folder: <code>/media/movies</code> — the path <em>inside</em> the container, not the host path</li>
+<li>Folder: <code>/media</code></li>
 </ul>
-<p>Finish the wizard, then run <b>Scan All Libraries</b> from the dashboard.</p>
-<div class="qs-warn">If the library comes up empty, the mount is wrong rather than Jellyfin. Check what it can actually see: in Arcane open the Jellyfin container, use the console, and run <code>ls /media</code>. Nothing listed means the volume path in step 3 does not match your real folder.</div>
-<p>Naming decides whether artwork matches. <code>The Thing (1982).mkv</code> works; <code>film.final.copy.mkv</code> rarely does.</p>
+<div class="qs-note"><b>Use <code>/media</code>, not your real folder path.</b> In step 3 you wrote <code>yourfolder:/media</code>. Inside Jellyfin, your films are simply at <code>/media</code>. This trips up almost everyone once.</div>
+<p>Finish the wizard, then press <b>Scan All Libraries</b> on the dashboard. Films start appearing with posters.</p>
+<div class="qs-warn"><b>Nothing showed up?</b> The folder is almost certainly wrong, not Jellyfin. In Arcane, open the Jellyfin container, click <b>Console</b>, and type <code>ls /media</code>. If nothing lists, the left-hand side of that volume line in step 3 does not point at your films.</div>
+<p>Names matter for posters. <code>The Matrix (1999).mkv</code> works. <code>movie_final_2.mkv</code> usually does not.</p>
 </div></details></li>
 
-<li class="qs-step"><details><summary><span class="qs-title">Add Uptime Kuma</span><span class="qs-toggle"></span></summary><div class="qs-body">
-<p>Another Arcane project, this one called <code>uptime-kuma</code>:</p>
-<pre>services:
+<li class="qs-step"><details><summary><span class="qs-title">Add Uptime Kuma, the watchdog</span><span class="qs-toggle"></span></summary><div class="qs-body">
+<p>Another Arcane project, named <code>uptime-kuma</code>:</p>
+<pre data-os="win">services:
   uptime-kuma:
     image: louislam/uptime-kuma:1
     container_name: uptime-kuma
@@ -540,57 +731,111 @@ volumes:
       - "3001:3001"
     volumes:
       - /opt/stacks/uptime-kuma/data:/app/data
-      <span class="cm"># lets Kuma watch containers, not just web pages</span>
       - /var/run/docker.sock:/var/run/docker.sock:ro
+    extra_hosts:
+      <span class="cm"># lets Kuma reach apps in other projects, via the machine itself</span>
+      - "host.docker.internal:host-gateway"
     environment:
       - TZ=<span class="hl">Europe/London</span>
     restart: unless-stopped</pre>
-<p>Deploy it, then open <code>http://your-server-ip:3001</code> and create an account.</p>
-<div class="qs-note">The socket mount is read-only and only needed for container monitors. If you would rather not grant it, leave that line out and use the HTTP monitor in the next step — it answers the more useful question anyway.</div>
+<pre data-os="mac">services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:1
+    container_name: uptime-kuma
+    ports:
+      - "3001:3001"
+    volumes:
+      - /opt/stacks/uptime-kuma/data:/app/data
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    extra_hosts:
+      <span class="cm"># lets Kuma reach apps in other projects, via the machine itself</span>
+      - "host.docker.internal:host-gateway"
+    environment:
+      - TZ=<span class="hl">Europe/London</span>
+    restart: unless-stopped</pre>
+<pre data-os="lin">services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:1
+    container_name: uptime-kuma
+    ports:
+      - "3001:3001"
+    volumes:
+      - /opt/stacks/uptime-kuma/data:/app/data
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    extra_hosts:
+      <span class="cm"># lets Kuma reach apps in other projects, via the machine itself</span>
+      - "host.docker.internal:host-gateway"
+    environment:
+      - TZ=<span class="hl">Europe/London</span>
+    restart: unless-stopped</pre>
+<pre data-os="nas">services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:1
+    container_name: uptime-kuma
+    ports:
+      - "3001:3001"
+    volumes:
+      - /volume1/docker/stacks/uptime-kuma/data:/app/data
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    extra_hosts:
+      <span class="cm"># lets Kuma reach apps in other projects, via the machine itself</span>
+      - "host.docker.internal:host-gateway"
+    environment:
+      - TZ=<span class="hl">Europe/London</span>
+    restart: unless-stopped</pre>
+<p>Deploy it, open <code>http://localhost:3001</code>, and make an account.</p>
 </div></details></li>
 
-<li class="qs-step"><details><summary><span class="qs-title">Watch the Jellyfin container</span><span class="qs-toggle"></span></summary><div class="qs-body">
-<p>First tell Kuma about Docker. Go to <b>Profile → Settings → Docker Hosts → Add Docker Host</b>:</p>
-<ul>
-<li>Friendly name: <b>Local</b></li>
-<li>Connection type: <b>Socket</b></li>
-<li>Path: <code>/var/run/docker.sock</code></li>
-</ul>
+<li class="qs-step"><details><summary><span class="qs-title">Watch Jellyfin</span><span class="qs-toggle"></span></summary><div class="qs-body">
+<p>In Uptime Kuma, first tell it about Docker. Go to <b>Profile → Settings → Docker Hosts → Add Docker Host</b>:</p>
+<div class="fields"><dl>
+<dt>Friendly name</dt><dd>Local</dd>
+<dt>Connection type</dt><dd>Socket</dd>
+<dt>Path</dt><dd><code>/var/run/docker.sock</code></dd>
+</dl></div>
 <p>Save, then <b>Add New Monitor</b>:</p>
-<ul>
-<li>Monitor type: <b>Docker Container</b></li>
-<li>Friendly name: <b>Jellyfin container</b></li>
-<li>Container name: <code>jellyfin</code></li>
-<li>Docker host: the one you just created</li>
-</ul>
-<div class="qs-note"><b>Add an HTTP monitor as well.</b> A container can be running while the app inside it is wedged. Choose type <b>HTTP(s)</b> and URL <code>http://jellyfin:8096</code> — using the container name, because inside Docker <code>localhost</code> means Kuma itself. Between the two you learn both that it exists and that it works.</div>
+<div class="fields"><dl>
+<dt>Monitor type</dt><dd>Docker Container</dd>
+<dt>Friendly name</dt><dd>Jellyfin</dd>
+<dt>Container name</dt><dd><code>jellyfin</code></dd>
+<dt>Docker host</dt><dd>Local</dd>
+</dl></div>
+<div class="qs-note"><b>Add a second monitor as well.</b> Type <b>HTTP(s)</b>, URL <code>http://host.docker.internal:8096</code>. The first one tells you the container is running; this one tells you the app inside it is actually answering. They fail in different ways, and the second is the one you care about.</div>
+<div class="qs-note"><b>Why that odd address?</b> Containers can call each other by name — but only inside the same project. You made Jellyfin and Uptime Kuma as two separate Arcane projects, so <code>http://jellyfin:8096</code> would not resolve. <code>host.docker.internal</code> means "the computer all of this is running on", which reaches Jellyfin on the port it published. That is what the <code>extra_hosts</code> line in the last step was for.
+<br><br><code>localhost</code> would not work either — inside Uptime Kuma, that means Uptime Kuma itself.</div>
 </div></details></li>
 
-<li class="qs-step"><details><summary><span class="qs-title">Get told on Discord</span><span class="qs-toggle"></span></summary><div class="qs-body">
-<p>In Discord, open the channel you want alerts in, then <b>Edit Channel → Integrations → Webhooks → New Webhook</b>. Name it, then <b>Copy Webhook URL</b>.</p>
-<p>Back in Uptime Kuma, edit your monitor and choose <b>Setup Notification</b>:</p>
-<ul>
-<li>Notification type: <b>Discord</b></li>
-<li>Friendly name: <b>Discord</b></li>
-<li>Discord webhook URL: paste it</li>
-<li>Tick <b>Default enabled</b> so new monitors use it automatically</li>
-</ul>
-<p>Press <b>Test</b> — a message should land in the channel within a second or two. If it does not, the webhook URL is wrong; nothing else in the chain produces that result.</p>
-<div class="qs-warn">A webhook URL is a password. Anyone who has it can post to your channel, so keep it out of screenshots and out of git.</div>
+<li class="qs-step"><details><summary><span class="qs-title">Get a message when it breaks</span><span class="qs-toggle"></span></summary><div class="qs-body">
+<p>In Discord, open the channel you want the alerts in. You need to own the server, or be an admin of it.</p>
+<ol class="steps">
+<li><b>Edit Channel → Integrations → Webhooks → New Webhook</b></li>
+<li>Give it a name, then press <b>Copy Webhook URL</b></li>
+<li>In Uptime Kuma, edit your monitor and press <b>Setup Notification</b></li>
+</ol>
+<div class="fields"><dl>
+<dt>Notification type</dt><dd>Discord</dd>
+<dt>Discord webhook URL</dt><dd>paste it</dd>
+<dt>Default enabled</dt><dd>tick this</dd>
+<dt>Apply to all existing monitors</dt><dd>tick this too</dd>
+</dl></div>
+<p>Press <b>Test</b>. A message should appear in Discord within a second or two. If it does not, the webhook URL is wrong — nothing else can cause that.</p>
+<div class="qs-note"><b>No Discord?</b> Telegram works the same way and is a five-minute setup — <a href="setup.html#kuma-telegram">steps here</a>.</div>
+<div class="qs-warn">That webhook URL is a password. Anyone who has it can post in your channel, so keep it out of screenshots.</div>
 </div></details></li>
 
 </ol>
 
 <div class="qs-done">
 <h3>That is a working server.</h3>
-<p>Jellyfin is serving your library, Arcane manages it without a terminal, and you find out on Discord if it stops. Everything after this is optional.</p>
+<p>Your films are on your own machine, you manage it from a browser, and it messages you if it stops. Everything from here is optional.</p>
 <div class="qs-next">
-<a href="generator.html"><b>Add more services →</b><span>Sonarr, Radarr, Immich and the rest, with dependencies resolved for you</span></a>
-<a href="access.html"><b>Reach it from outside →</b><span>Tailscale, a reverse proxy, or passkey single sign-on</span></a>
-<a href="faq.html"><b>Something broken? →</b><span>The four commands that diagnose most problems</span></a>
+<a href="generator.html"><b>Add more services →</b><span>Automatic downloads, photo backup, and the rest — with the compose files written for you</span></a>
+<a href="access.html"><b>Watch from outside the house →</b><span>The safe way, using Tailscale</span></a>
+<a href="faq.html"><b>Something broken? →</b><span>Four commands that find most problems</span></a>
 </div>
 </div>
 </div></section>
+
 <section class="section" id="safety"><div class="wrap"><div class="about"><div><div class="kicker">A small but important thing</div><h2>Self-hosting comes with responsibility.</h2><p class="lead">This project helps you run software. It does not give you permission to download, archive, copy or distribute media you do not have the right to use.</p><div class="note"><strong>Torrents are also a security concern.</strong><br>Files can come from untrusted sources and may contain malware, ransomware, trojans, cryptominers or malicious scripts. A VPN can protect network privacy; it cannot make a malicious file safe.</div></div><div class="blob"><p>Own your server.<br>Know what's running on it.</p></div></div><div class="legal"><strong>Copyright:</strong> Only obtain, store, archive and share content you are legally permitted to use. This project does not provide or endorse piracy. <strong>Security:</strong> Keep your host, Docker engine, images and applications updated; do not blindly execute downloaded programs or scripts; use sensible firewall and network controls; and keep backups. This is general information, not legal or security advice.</div></div></section>
 
 
@@ -658,6 +903,41 @@ You are responsible for ensuring anything you download, store or share is legall
     document.documentElement.setAttribute('data-theme',next);
     try{ localStorage.setItem('mms-theme',next); }catch(e){}
   });
+})();
+</script>
+<script>
+(function(){
+  /* Show only the commands for the visitor's own machine. Guessing right most
+     of the time beats making everyone read four versions of every step. */
+  function detect(){
+    var u = navigator.userAgent;
+    if(/Windows/i.test(u)) return "win";
+    if(/Mac OS X|Macintosh/i.test(u)) return "mac";
+    if(/Linux|X11/i.test(u)) return "lin";
+    return "lin";
+  }
+  var os = detect();
+  try{ var saved = localStorage.getItem("mms-os"); if(saved) os = saved; }catch(e){}
+
+  function apply(){
+    document.querySelectorAll(".ostab").forEach(function(t){
+      t.classList.toggle("on", t.dataset.os === os);
+      t.setAttribute("aria-selected", t.dataset.os === os ? "true" : "false");
+    });
+    document.querySelectorAll("[data-os]").forEach(function(el){
+      if(el.classList.contains("ostab")) return;
+      var list = el.dataset.os.split(/\s+/);
+      el.style.display = list.indexOf(os) !== -1 ? "" : "none";
+    });
+  }
+  document.querySelectorAll(".ostab").forEach(function(t){
+    t.addEventListener("click", function(){
+      os = t.dataset.os;
+      try{ localStorage.setItem("mms-os", os); }catch(e){}
+      apply();
+    });
+  });
+  apply();
 })();
 </script>
 </body>
