@@ -471,10 +471,9 @@ html[data-theme="dark"] .skiplink{color:#08151a}
 <pre>bash deploy-to-arcane.sh --permissions</pre>
 <p>That lists every permission your Arcane offers. If a call is refused, the script names the specific permission that was missing rather than failing with a bare error.</p>
 <h5>Running it</h5>
-<pre>export ARCANE_URL=http://192.168.1.50:3552
-export ARCANE_API_KEY=<span class="hl">your-key</span>
-bash deploy-to-arcane.sh</pre>
-<p>It runs on your machine, so the key never passes through a browser and there are no cross-origin restrictions to work around.</p>
+<pre>bash deploy-to-arcane.sh</pre>
+<p>It prompts for the URL and the key. The key is typed with the input hidden and held only in that shell process — never exported, never written to disk, and never passed as an argument, since arguments are visible to anyone running <code>ps</code>.</p>
+<div class="tip"><strong>Environment variables were the wrong tool here.</strong> An exported key lands in your shell history, in <code>/proc</code>, and in the environment of every child process. Typing it at a prompt avoids all three.</div>
 </div></details>
 </section>
 
