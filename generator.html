@@ -465,6 +465,15 @@ html[data-theme="dark"] .hint-ok{color:#6cc79b}
 .optline input{margin-top:3px;flex-shrink:0;width:16px;height:16px;accent-color:var(--blue)}
 .optline span{font-size:13.5px;line-height:1.6;color:var(--muted)}
 .optline b{color:var(--ink)}
+
+.ahelp-first{background:var(--warn-bg);border-left:4px solid var(--coral);border-radius:0 12px 12px 0;
+  padding:13px 16px;margin:0 0 15px;font-size:14px;line-height:1.65}
+.ahelp-first b{color:var(--ink)}
+
+.mod.blocked{opacity:.42;cursor:not-allowed;background:var(--tint-soft)}
+.mod.blocked .tick{display:none}
+.flag.block{background:var(--pill-coral-bg);color:var(--pill-coral-fg)}
+.flag.swap{background:var(--pill-teal-bg);color:var(--code-fg)}
 </style>
 <script>
 (function(){
@@ -493,6 +502,7 @@ html[data-theme="dark"] .hint-ok{color:#6cc79b}
 <div class="pane on" id="pane-0">
 <h2 class="ph">Choose your modules</h2>
 <p class="pd">Click to add or remove. Required dependencies are pulled in for you and shown in amber — qBittorrent will always bring Gluetun with it.</p>
+<label class="optline" id="localline"><input type="checkbox" id="localopt"> <span><b>Local network only</b> — nothing published to the internet. Tailscale stays available, since it is a private network rather than a public address; the reverse proxy, tunnel and single sign-on are hidden.</span></label>
 <div class="build">
 <div id="cats"></div>
 <aside class="side">
@@ -555,7 +565,8 @@ html[data-theme="dark"] .hint-ok{color:#6cc79b}
 <h2 class="ph">Your files</h2>
 <p class="pd">Copy each one, or download them. Put them all in the same folder and run <code>docker compose up -d</code> — or paste the Compose and environment files into an Arcane project.</p>
 <div style="margin-bottom:14px"><button class="btn" id="dlall">Download all files (.zip)</button> <button class="btn ghost" id="regen">Regenerate secrets</button></div>
-<label class="optline"><input type="checkbox" id="arcopt"> <span><b>Include an Arcane deploy script</b> — creates the project in your Arcane instance and starts it, in one command. Runs on your machine; your API key never touches this page.</span></label>
+<label class="optline" id="splitline"><input type="checkbox" id="splitopt"> <span><b>Keep the connection layer in its own project</b> — Caddy, Tailscale, Cloudflare Tunnel and Pocket ID go in a separate <code>access/</code> stack, so restarting your apps never drops remote access. Adds one shared network.</span></label>
+<label class="optline"><input type="checkbox" id="arcopt"> <span><b>Include an Arcane deploy script</b> — creates the project in your Arcane instance and starts it, in one command. Needs an Arcane already running, and an API key. Runs on your machine; the key never touches this page.</span></label>
 <div class="tabs" id="filetabs"></div>
 <div class="outwrap">
 <div class="outbar"><span class="outname" id="outname"></span>
@@ -564,6 +575,13 @@ html[data-theme="dark"] .hint-ok{color:#6cc79b}
 </div>
 <div class="tip" id="masknote" style="margin-top:14px"><strong>Secrets are hidden on screen.</strong> The dots stand in for real values so nothing leaks into a screenshot or over your shoulder. Copy and Download always give you the real file.</div>
 <div id="postnotes"></div>
+
+<div class="card teal" id="splitnote" style="display:none">
+<strong>You split the connection layer, so there are two projects</strong>
+<p style="margin:10px 0 0">Create the shared network once on the host, before starting either stack — separate Compose projects get separate networks, and without it the proxy cannot resolve your apps by name:</p>
+<pre style="margin:10px 0">docker network create edge</pre>
+<p style="margin:0">Then start <code>access/</code> first and leave it running. After that, <code>docker compose down</code> on your apps never takes remote access with it.</p>
+</div>
 
 <h3 style="font-family:Fraunces,serif;font-size:26px;letter-spacing:-.04em;margin:38px 0 12px">Where do these files go?</h3>
 <p class="pd" style="margin-bottom:18px">Downloading them is half the job. Here is where they actually go — start with the first if you would rather not open a terminal.</p>
@@ -622,7 +640,7 @@ git push</pre>
 <p>The generator can include <code>deploy-to-arcane.sh</code>, which creates the project in Arcane and starts it.</p>
 <pre>bash deploy-to-arcane.sh</pre>
 <p>It asks for your Arcane URL and API key. The key is typed in with the input hidden, and is never written to a file or an environment variable.</p>
-<p>Create the key in Arcane under <b>Settings → API Keys</b>. The script finds your environment, uploads the Compose and env content, and deploys.</p>
+<p>Create the key in Arcane under <b>Settings → API Keys</b>. The script finds your environment, uploads the Compose and env content, and deploys.</p><p><b>Arcane must already be running</b> — the script deploys to one, it cannot install one. See the <a href="index.html#quickstart">quickstart</a> for that, and <a href="setup.html#arcane-api">the full walkthrough</a> for this.</p>
 <div class="dnote"><b>Grant three permissions, not full access.</b> Arcane keys are scoped, so give the key only:
 <br><code>environments:read</code> &nbsp; <code>projects:create</code> &nbsp; <code>projects:deploy</code>
 <br>Run <code>bash deploy-to-arcane.sh --permissions</code> to list what your instance actually offers, and the script names the missing one if a call is refused.</div>
@@ -644,6 +662,7 @@ docker compose logs -f</pre>
 </div>
 
 <div id="caddyhelp"></div>
+<div id="arcanehelp"></div>
 </div>
 
 <div class="nav2">
@@ -816,7 +835,7 @@ var MODULES = {
   "uptime-kuma":{cat:"monitor",name:"Uptime Kuma",port:3001,desc:"Monitoring and status pages.",
     compose:function(){return ["","  uptime-kuma:","    image: louislam/uptime-kuma:1",
       "    container_name: uptime-kuma","    ports:","      - \"3001:3001\"","    volumes:",
-      "      - ${CONFIG_ROOT}/uptime-kuma:/app/data","    environment:","      - TZ=${TZ}",
+      "      - ${CONFIG_ROOT}/uptime-kuma:/app/data","    extra_hosts:","      # reaches services running in other Compose projects, via the host","      - \"host.docker.internal:host-gateway\"","    environment:","      - TZ=${TZ}",
       "    restart: unless-stopped"].join("\n");}},
 
   archivebox:{cat:"monitor",name:"ArchiveBox",port:8000,desc:"Web page archiving.",
@@ -855,7 +874,7 @@ var MODULES = {
       "    restart: unless-stopped"].join("\n");}},
 
   /* ── connection ── */
-  caddy:{cat:"conn",name:"Caddy",needsDomain:true,
+  caddy:{cat:"conn",name:"Caddy",conflicts:["cloudflared"],needsDomain:true,
     desc:"Reverse proxy with automatic HTTPS. The only container that should face the internet.",
     compose:function(){return ["","  # Terminates HTTPS and routes by hostname. Forward only 80",
       "  # and 443 on your router — never the application ports.",
@@ -865,7 +884,7 @@ var MODULES = {
       "      - ${CONFIG_ROOT}/caddy/config:/config","    environment:","      - TZ=${TZ}",
       "    restart: unless-stopped"].join("\n");}},
 
-  cloudflared:{cat:"conn",name:"Cloudflare Tunnel",
+  cloudflared:{cat:"conn",name:"Cloudflare Tunnel",conflicts:["caddy"],
     desc:"Reaches your services with no open ports. Routing is configured in Cloudflare, not here.",
     secretsManual:[{key:"CLOUDFLARE_TUNNEL_TOKEN",label:"Tunnel token",hint:"From the Cloudflare Zero Trust dashboard, after creating a tunnel."}],
     compose:function(){return ["","  # Outbound-only connection to Cloudflare — nothing is opened on your",
@@ -1019,23 +1038,103 @@ function orderOf(id){
   var i = order.indexOf(id); return i === -1 ? 99 : i;
 }
 
-function buildCompose(state){
+/* The connection layer can live in its own Compose project, so restarting the
+   media stack does not take remote access down with it. That only works if
+   both projects share a network — separate projects get separate default
+   networks, and Caddy would not be able to resolve jellyfin at all. */
+/* Caddy and Cloudflare Tunnel both publish services to the internet. Running
+   both is not an error exactly, but it is two answers to one question and it
+   confuses certificates and routing, so picking one drops the other. */
+function conflictsOf(id){
+  var m = MODULES[id];
+  return (m && m.conflicts) ? m.conflicts.slice() : [];
+}
+
+/* Local-only means nothing is published. Tailscale still works — it is a
+   private network rather than a public address — but a reverse proxy, a
+   tunnel, and the identity provider that needs a public HTTPS origin do not. */
+var PUBLIC_MODULES = ["caddy","cloudflared","pocket-id"];
+
+var ACCESS_MODULES = ["caddy","tailscale","cloudflared","pocket-id"];
+var EDGE_NET = "edge";
+
+function isAccess(id){ return ACCESS_MODULES.indexOf(id) !== -1; }
+
+/* Services using network_mode cannot also be given networks, and anything the
+   proxy never talks to does not need the shared network either. */
+function joinsEdge(id, state){
+  if(id === "qbittorrent") return false;
+  if(isAccess(id)) return true;
+  var m = MODULES[id];
+  return !!(m && m.proxy);
+}
+
+function attachEdge(yaml, id, state){
+  if(!joinsEdge(id, state)) return yaml;
+  var lines = yaml.split("\n"), out = [], added = false;
+  for(var i = 0; i < lines.length; i++){
+    out.push(lines[i]);
+    // append to the service block, just after its restart policy
+    if(!added && /^\s{4}restart:/.test(lines[i])){
+      out.push("    networks:");
+      out.push("      - default");
+      out.push("      - " + EDGE_NET);
+      added = true;
+    }
+  }
+  return out.join("\n");
+}
+
+function buildCompose(state, which){
+  which = which || "all";
   var c = ctx(state);
+  var split = !!state.splitAccess;
   var sel = state.selected.slice().sort(function(a,b){ return orderOf(a) - orderOf(b); });
+  if(split && which === "apps")   sel = sel.filter(function(id){ return !isAccess(id); });
+  if(split && which === "access") sel = sel.filter(isAccess);
+
+  var title = (which === "access")
+    ? "Modular Media Server — connection layer"
+    : "Modular Media Server";
+  var note = (which === "access")
+    ? ["#  Caddy, Tailscale, Cloudflare Tunnel and Pocket ID live here so that",
+       "#  restarting your apps never takes remote access down with them.",
+       "#",
+       "#  Create the shared network once, before starting either stack:",
+       "#    docker network create " + EDGE_NET]
+    : (split
+      ? ["#  Your applications. The connection layer is a separate project in",
+         "#  ./access — start that one too, and create the shared network first:",
+         "#    docker network create " + EDGE_NET]
+      : ["#  Settings live in .env beside this file.",
+         "#  Start with:  docker compose up -d"]);
+
   var out = ["# ─────────────────────────────────────────────────────────────────────────",
-    "#  Modular Media Server",
-    "#  Generated by the Compose Generator — edit freely, it is yours now.",
-    "#",
-    "#  Settings live in .env beside this file.",
-    "#  Start with:  docker compose up -d",
-    "# ─────────────────────────────────────────────────────────────────────────","","services:"];
-  sel.forEach(function(id){ if(MODULES[id]) out.push(MODULES[id].compose(c)); });
+    "#  " + title,
+    "#  Generated by the Compose Generator — edit freely, it is yours now."]
+    .concat(["#"], note,
+    ["# ─────────────────────────────────────────────────────────────────────────","","services:"]);
+
+  sel.forEach(function(id){
+    if(!MODULES[id]) return;
+    var y = MODULES[id].compose(c);
+    if(split) y = attachEdge(y, id, state);
+    out.push(y);
+  });
+
   var vols = sel.filter(function(id){ return MODULES[id] && MODULES[id].volume; })
                 .map(function(id){ return MODULES[id].volume; });
   if(vols.length){
     out.push("");
     out.push("volumes:");
     vols.forEach(function(v){ out.push("  "+v+":"); });
+  }
+
+  if(split && sel.some(function(id){ return joinsEdge(id, state); })){
+    out.push("");
+    out.push("networks:");
+    out.push("  " + EDGE_NET + ":");
+    out.push("    external: true      # created once with: docker network create " + EDGE_NET);
   }
   return out.join("\n") + "\n";
 }
@@ -1170,15 +1269,42 @@ function serviceUrl(id, state){
 }
 
 function buildReadme(state){
+  var splitting = state.splitAccess && state.selected.some(isAccess);
   var L = ["# My media server","",
-    "Generated by the Modular Media Server Compose Generator.","",
-    "## Running it","",
-    "    docker compose up -d      # start everything",
-    "    docker compose ps         # what is running",
-    "    docker compose logs -f    # watch the logs",
-    "    docker compose pull       # fetch newer images",
-    "    docker compose down       # stop everything","",
-    "## What is here","","| Service | Address |","| --- | --- |"];
+    "Generated by the Modular Media Server Compose Generator.",""];
+  if(splitting){
+    L = L.concat([
+      "## Two stacks, on purpose","",
+      "The connection layer lives in `access/` as its own Compose project, so",
+      "restarting or rebuilding your apps never takes remote access down with",
+      "them. They talk to each other over a shared Docker network.","",
+      "### First time only","",
+      "    docker network create " + EDGE_NET,"",
+      "Separate Compose projects get separate networks, so without this the",
+      "proxy cannot resolve your apps by name and nothing will be reachable.","",
+      "### Running it","",
+      "    # connection layer — start this first, and leave it running",
+      "    cd access && docker compose up -d && cd ..","",
+      "    # your applications",
+      "    docker compose up -d","",
+      "Restarting the apps is now safe:","",
+      "    docker compose down && docker compose up -d   # access stays up","",
+      "### Everyday commands","",
+      "    docker compose ps                 # what is running",
+      "    docker compose logs -f            # watch the app logs",
+      "    cd access && docker compose logs -f   # watch the proxy",
+      "    docker compose pull               # fetch newer images",""]);
+  } else {
+    L = L.concat([
+      "## Running it","",
+      "    docker compose up -d      # start everything",
+      "    docker compose ps         # what is running",
+      "    docker compose logs -f    # watch the logs",
+      "    docker compose pull       # fetch newer images",
+      "    docker compose down       # stop everything",""]);
+  }
+  L = L.concat([
+    "## What is here","","| Service | Address |","| --- | --- |"]);
   state.selected.slice().sort(function(a,b){ return orderOf(a)-orderOf(b); }).forEach(function(id){
     if(MODULES[id]) L.push("| " + MODULES[id].name + " | " + serviceUrl(id, state) + " |");
   });
@@ -1284,6 +1410,13 @@ function validate(state){
     if(sel.indexOf("caddy") === -1) err("Pocket ID needs a reverse proxy","Passkeys require HTTPS.");
     else ok("Pocket ID will be served over HTTPS","Register two passkeys on separate devices.");
   }
+  if(state.localOnly){
+    ok("Local network only","Nothing is published. Reach the server on your LAN, or over Tailscale from outside.");
+    if(sel.indexOf("tailscale") === -1)
+      warn("No way in from outside","Local-only with no Tailscale means the server is reachable on your own network and nowhere else. That may be exactly what you want.");
+  }
+  if(sel.indexOf("caddy") !== -1 && sel.indexOf("cloudflared") !== -1)
+    err("Two ways of publishing at once","Caddy and Cloudflare Tunnel do the same job. Pick one.");
   if(sel.indexOf("cloudflared") !== -1){
     if(!state.manual.CLOUDFLARE_TUNNEL_TOKEN)
       warn("No Cloudflare tunnel token","A CHANGEME placeholder is written; the tunnel will not connect until you replace it.");
@@ -1665,6 +1798,8 @@ else
   warn "No .env alongside the compose file — the stack will start without its variables."
 fi
 
+MANIFEST_JSON='{"files":[]}'
+
 # ── build the payload ────────────────────────────────────────────────────
 if [[ "$JSON_TOOL" == "python3" ]]; then
   PROJECT_JSON="$(PNAME="$PROJECT_NAME" ENVC="$ENV_CONTENT" python3 -c '
@@ -1679,7 +1814,55 @@ else
     --rawfile c docker-compose.yml --arg e "$ENV_CONTENT" \\
     '{name:$n, composeContent:$c, envContent:$e}')"
 fi
-MANIFEST_JSON='{"files":[]}'
+# ── the connection layer, if it was split out ────────────────────────────
+# Deploying access/ as its own project is the whole point of the split: the
+# apps can be torn down and rebuilt without taking remote access with them.
+if [[ -f access/docker-compose.yml ]]; then
+  step "Connection layer"
+  warn "This stack expects a shared Docker network, created once on the host:"
+  printf '      docker network create edge\\n'
+  warn "Arcane cannot create it for you. Do that first if you have not already."
+  echo
+  ACCESS_JSON=""
+  ACCESS_ENV=""
+  if [[ -f access/.env ]]; then ACCESS_ENV="$(cat access/.env)"; fi
+  if [[ "$JSON_TOOL" == "python3" ]]; then
+    ACCESS_JSON="$(PNAME="\${PROJECT_NAME}-access" ENVC="$ACCESS_ENV" python3 -c '
+import json,os
+print(json.dumps({
+  "name": os.environ["PNAME"],
+  "composeContent": open("access/docker-compose.yml").read(),
+  "envContent": os.environ.get("ENVC",""),
+}))')"
+  else
+    ACCESS_JSON="$(jq -n --arg n "\${PROJECT_NAME}-access" \\
+      --rawfile c access/docker-compose.yml --arg e "$ACCESS_ENV" \\
+      '{name:$n, composeContent:$c, envContent:$e}')"
+  fi
+  printf '%s' "$ACCESS_JSON" >"$PFIELD"
+  printf '%s' "$MANIFEST_JSON" >"$MFIELD"
+  code="$(call POST "/environments/$ENV_ID/projects" \\
+          -F "project=<$PFIELD" -F "manifest=<$MFIELD")"
+  if [[ "$code" == "403" ]]; then denied "projects:create" "creating the connection project"; fi
+  if [[ "$code" == "409" ]]; then
+    warn "A project called '\${PROJECT_NAME}-access' already exists — leaving it alone."
+  elif [[ "$code" != "200" && "$code" != "201" ]]; then
+    show_error "$code"
+    warn "Could not create the connection project. Carrying on with the apps."
+  else
+    ACCESS_ID="$(json_get id)"
+    ok "Created \${PROJECT_NAME}-access (id $ACCESS_ID)"
+    code="$(call POST "/environments/$ENV_ID/projects/$ACCESS_ID/up" \\
+            -H "Content-Type: application/json" \\
+            -d '{"pullPolicy":"missing","removeOrphans":true}')"
+    if [[ "$code" == "200" || "$code" == "202" ]]; then
+      ok "Connection layer deploying."
+    else
+      show_error "$code"
+      warn "Created but not started — deploy it from Arcane."
+    fi
+  fi
+fi
 
 # ── create ───────────────────────────────────────────────────────────────
 step "Creating '$PROJECT_NAME'"
@@ -1733,14 +1916,20 @@ function buildAll(state){
     {name:".gitignore",         body:buildGitignore()},
     {name:"README.md",          body:buildReadme(state)}
   ];
+  if(state.splitAccess && state.selected.some(isAccess)){
+    files[0] = {name:"docker-compose.yml", body:buildCompose(state,"apps")};
+    files.splice(1,0,{name:"access/docker-compose.yml", body:buildCompose(state,"access")});
+    files.splice(2,0,{name:"access/.env", body:buildEnv(state,false)});
+  }
   if(state.selected.indexOf("caddy") !== -1)
-    files.splice(1,0,{name:"Caddyfile", body:buildCaddyfile(state)});
+    files.splice(state.splitAccess ? 3 : 1, 0,
+      {name:(state.splitAccess?"access/":"")+"Caddyfile", body:buildCaddyfile(state)});
   if(state.arcaneDeploy)
     files.push({name:"deploy-to-arcane.sh", body:buildArcaneScript(state)});
   return files;
 }
 
-return {CATS:CATS, MODULES:MODULES, PRESETS:PRESETS, resolve:resolve, validate:validate, checkDomain:checkDomain,
+return {CATS:CATS, MODULES:MODULES, PRESETS:PRESETS, resolve:resolve, validate:validate, checkDomain:checkDomain, ACCESS_MODULES:ACCESS_MODULES, isAccess:isAccess, PUBLIC_MODULES:PUBLIC_MODULES, conflictsOf:conflictsOf,
         buildAll:buildAll, buildCompose:buildCompose, buildEnv:buildEnv,
         buildCaddyfile:buildCaddyfile, buildReadme:buildReadme,
         collectSecrets:collectSecrets, collectManual:collectManual, serviceUrl:serviceUrl};
@@ -1762,7 +1951,7 @@ var state = {
   puid:"1000", pgid:"1000", tz:"",
   domain:"", vpnType:"wireguard", vpnProvider:"", vpnKey:"", vpnAddr:"",
   vpnUser:"", vpnPass:"", vpnCountry:"",
-  secrets:{}, manual:{}, showSecrets:false, arcaneDeploy:false
+  secrets:{}, manual:{}, showSecrets:false, arcaneDeploy:false, splitAccess:false, localOnly:false
 };
 try{ state.tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ""; }catch(e){}
 
@@ -1836,15 +2025,49 @@ function renderCats(){
       else if(m.privileged) card.appendChild(el("span","flag","privileged"));
       else if(m.requires) card.appendChild(el("span","flag","needs "+m.requires.map(function(r){return M[r].name;}).join(", ")));
       card.appendChild(el("span","tick"));
-      card.onclick = function(){ toggle(id); };
+      if(state.localOnly && CORE.PUBLIC_MODULES.indexOf(id) !== -1){
+        card.classList.add("blocked");
+        card.appendChild(el("span","flag block","local only"));
+        card.onclick = null;
+      } else {
+        var clash = CORE.conflictsOf(id).filter(function(o){
+          return state.selected.indexOf(o) !== -1;
+        });
+        if(clash.length)
+          card.appendChild(el("span","flag swap","replaces "+M[clash[0]].name));
+        card.onclick = function(){ toggle(id); };
+      }
       grid.appendChild(card);
     });
     box.appendChild(grid); w.appendChild(box);
   });
 }
+/* Removes a module and anything that required it. Dropping a module without
+   its dependants leaves them broken, and the resolver would only add it back. */
+function dropWithDependants(id){
+  state.selected = state.selected.filter(function(x){ return x !== id; });
+  state.chosen   = state.chosen.filter(function(x){ return x !== id; });
+  var changed = true;
+  while(changed){
+    changed = false;
+    state.selected.slice().forEach(function(s2){
+      var m = M[s2];
+      if(m && m.requires && m.requires.some(function(r){ return state.selected.indexOf(r) === -1; })){
+        state.selected = state.selected.filter(function(x){ return x !== s2; });
+        state.chosen   = state.chosen.filter(function(c){ return c !== s2; });
+        changed = true;
+      }
+    });
+  }
+}
+
 function toggle(id){
   var i = state.selected.indexOf(id);
   if(i === -1){
+    if(state.localOnly && CORE.PUBLIC_MODULES.indexOf(id) !== -1) return;  // not offered
+    // Two ways of doing the same job cannot both be on. Whatever depended on
+    // the one being replaced goes with it.
+    CORE.conflictsOf(id).forEach(dropWithDependants);
     state.selected.push(id);
     state.chosen.push(id);                 // explicitly picked by the user
   } else {
@@ -1867,9 +2090,34 @@ function toggle(id){
   applyDeps();
 }
 function applyDeps(){
+  if(state.localOnly){
+    CORE.PUBLIC_MODULES.forEach(function(p){
+      if(state.chosen.indexOf(p) !== -1 || state.selected.indexOf(p) !== -1)
+        dropWithDependants(p);
+    });
+  }
+  // A preset can bring in a conflicting pair; keep the last one chosen.
+  state.chosen.slice().reverse().forEach(function(id){
+    CORE.conflictsOf(id).forEach(function(other){
+      if(state.chosen.indexOf(id) !== -1)
+        state.chosen = state.chosen.filter(function(x){ return x !== other || x === id; });
+    });
+  });
   // resolve required dependencies for what the user actually chose
   var r = CORE.resolve(state.chosen);
   state.selected = r.list;
+  // A required dependency can reintroduce something a conflict just removed,
+  // so check the resolved list rather than trusting the chosen one.
+  state.selected.slice().forEach(function(id){
+    CORE.conflictsOf(id).forEach(function(other){
+      if(state.selected.indexOf(other) !== -1 && state.selected.indexOf(id) !== -1){
+        var keep = state.chosen.lastIndexOf(id) >= state.chosen.lastIndexOf(other) ? id : other;
+        dropWithDependants(keep === id ? other : id);
+        r = CORE.resolve(state.chosen);
+        state.selected = r.list;
+      }
+    });
+  });
   state.auto = r.added.map(function(a){ return a.dep; })
                       .filter(function(d){ return state.chosen.indexOf(d) === -1; });
   state.secrets = {};
@@ -2334,6 +2582,62 @@ function renderReview(){
 
 /* Only rendered when Caddy is selected — it is meaningless otherwise, and
    it was previously taking a screenful from everyone who skipped it. */
+
+/* Shown only when the deploy script is included. It assumes Arcane is already
+   running, which is a chicken-and-egg problem worth naming up front. */
+function renderArcaneHelp(){
+  var box = $("arcanehelp");
+  if(!box) return;
+  if(!state.arcaneDeploy){ box.innerHTML = ""; return; }
+  var hasArcane = state.selected.indexOf("arcane") !== -1;
+  box.innerHTML =
+    '<div class="chelp">' +
+      '<div class="chelp-h"><b>Running the deploy script</b><span>what it needs, and in what order</span></div>' +
+
+      '<div class="ahelp-first">' +
+        '<b>Arcane has to be running first.</b> The script talks to an Arcane you already have — ' +
+        'it cannot install one. ' +
+        (hasArcane
+          ? 'You included Arcane in this stack, so start that on its own before running the script, ' +
+            'then use the script for everything after it.'
+          : 'You have not included Arcane here, so you need one already running somewhere.') +
+        ' The <a href="index.html#quickstart">quickstart</a> covers getting it up in a few commands.' +
+      '</div>' +
+
+      '<div class="chelp-grid">' +
+        '<div><i>1</i><b>Put the files together</b>' +
+          '<p>Unzip the download so <code>deploy-to-arcane.sh</code> sits beside ' +
+          '<code>docker-compose.yml</code> and <code>.env</code>. It reads them from the current folder.</p></div>' +
+        '<div><i>2</i><b>Make an API key</b>' +
+          '<p>In Arcane: <b>Settings \u2192 API Keys</b>. Grant only <code>environments:read</code>, ' +
+          '<code>projects:create</code> and <code>projects:deploy</code>. Copy it \u2014 it is shown once.</p></div>' +
+        '<div><i>3</i><b>Run it</b>' +
+          '<p><code>cd</code> into that folder and run <code>bash deploy-to-arcane.sh</code>. ' +
+          'On Windows use Git Bash or WSL, not PowerShell.</p></div>' +
+        '<div><i>4</i><b>Answer three prompts</b>' +
+          '<p>Your Arcane URL, the API key (typed hidden), and a project name. ' +
+          'Then it creates the project and starts it.</p></div>' +
+      '</div>' +
+
+      '<pre>cd ~/Downloads/media-server\nbash deploy-to-arcane.sh</pre>' +
+
+      '<details class="chelp-more"><summary>If something goes wrong</summary>' +
+        '<div class="chelp-body">' +
+          '<p><b>It shows what it is doing at each step</b> and stops at the first problem rather than ' +
+          'half-deploying. Nothing is created until the connection and permissions check out.</p>' +
+          '<pre>bash deploy-to-arcane.sh --debug        <span class="cm"># show the request that failed</span>\n' +
+          'bash deploy-to-arcane.sh --permissions  <span class="cm"># list what your key can do</span>\n' +
+          'bash deploy-to-arcane.sh --version      <span class="cm"># check you have the current build</span></pre>' +
+          '<p>Failures also write <code>arcane-deploy.log</code> next to the script, and it waits for a ' +
+          'keypress before closing so the error does not vanish with the window.</p>' +
+          '<p><b>The key is never stored.</b> It is typed with the input hidden, held only in that shell ' +
+          'process, and cleared when the script finishes \u2014 not exported, not written to a file, and ' +
+          'not passed as an argument where <code>ps</code> would show it.</p>' +
+          '<p><b>Prefer not to use the script?</b> Every route below does the same job by hand.</p>' +
+        '</div></details>' +
+    '</div>';
+}
+
 function renderCaddyHelp(){
   var box = $("caddyhelp");
   if(!box) return;
@@ -2376,6 +2680,11 @@ function buildFiles(){
   });
   showFile();
   renderCaddyHelp();
+  renderArcaneHelp();
+  var sn = $("splitnote");
+  if(sn) sn.style.display = (state.splitAccess && state.selected.some(CORE.isAccess)) ? "" : "none";
+  var sl = $("splitline");
+  if(sl) sl.style.display = state.selected.some(CORE.isAccess) ? "" : "none";
   var notes = [];
   if(state.selected.indexOf("caddy") !== -1)
     notes.push("Point your DNS records at this machine and forward only ports 80 and 443 before starting Caddy.");
@@ -2535,6 +2844,8 @@ $("dlall").onclick = function(){
 };
 $("revealbtn").onclick = function(){ state.showSecrets = !state.showSecrets; showFile(); };
 $("arcopt").onclick = function(){ state.arcaneDeploy = this.checked; buildFiles(); };
+$("splitopt").onclick = function(){ state.splitAccess = this.checked; buildFiles(); };
+$("localopt").onclick = function(){ state.localOnly = this.checked; applyDeps(); };
 $("regen").onclick = function(){
   genSecrets();
   state.showSecrets = false;   // new values start hidden again
