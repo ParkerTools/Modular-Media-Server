@@ -451,7 +451,7 @@ html[data-theme="dark"] .skiplink{color:#08151a}
 <p>Under <b>Tools → Options → BitTorrent</b> you can set a share ratio and what happens when it is reached. Pausing rather than deleting is the safe default — hardlinked files are safe to remove, but if you are not using hardlinks, deleting the torrent deletes the file your library points at.</p>
 </div></details>
 
-<details class="app"><summary><b>API keys and permissions</b><span class="d">For the generator's deploy script</span></summary>
+<details class="app" id="arcane-api"><summary><b>API keys and permissions</b><span class="d">For the generator's deploy script</span></summary>
 <div class="abody">
 <p>The generator can produce a <code>deploy-to-arcane.sh</code> that creates and starts your project through Arcane's API. It needs a key, and that key should be scoped.</p>
 <h5>Creating the key</h5>
@@ -470,10 +470,41 @@ html[data-theme="dark"] .skiplink{color:#08151a}
 <p>Permissions follow a <code>resource:action</code> pattern, and the exact set depends on your Arcane version. Ask your own instance rather than guessing:</p>
 <pre>bash deploy-to-arcane.sh --permissions</pre>
 <p>That lists every permission your Arcane offers. If a call is refused, the script names the specific permission that was missing rather than failing with a bare error.</p>
+<h5>Before any of this: Arcane has to exist</h5>
+<div class="warning"><strong>The script deploys <em>to</em> Arcane; it cannot install one.</strong> If you have no Arcane yet, start there — it is one Compose file and one command, covered in <a href="index.html#quickstart">the quickstart</a>. Once it is running and you have an admin account, come back here.</div>
+<p>The usual order is:</p>
+<ol class="steps">
+<li><b>Get Arcane running</b> by hand, once. That is the only part that needs a terminal.</li>
+<li><b>Create an API key</b> in Arcane with the three permissions above.</li>
+<li><b>Use the script</b> for every stack after that.</li>
+</ol>
+
 <h5>Running it</h5>
-<pre>bash deploy-to-arcane.sh</pre>
-<p>It prompts for the URL and the key. The key is typed with the input hidden and held only in that shell process — never exported, never written to disk, and never passed as an argument, since arguments are visible to anyone running <code>ps</code>.</p>
-<div class="tip"><strong>Environment variables were the wrong tool here.</strong> An exported key lands in your shell history, in <code>/proc</code>, and in the environment of every child process. Typing it at a prompt avoids all three.</div>
+<ol class="steps">
+<li>Unzip the generator's download, so <code>deploy-to-arcane.sh</code> sits beside <code>docker-compose.yml</code> and <code>.env</code>. It reads them from whichever folder you run it in.</li>
+<li>Open a terminal in that folder:
+<pre>cd ~/Downloads/media-server
+bash deploy-to-arcane.sh</pre></li>
+<li>Answer three prompts — your Arcane URL, the API key, and a project name.</li>
+</ol>
+<div class="fields"><dl>
+<dt>Arcane URL</dt><dd><code>http://192.168.1.50:3552</code> — the address you open Arcane at</dd>
+<dt>API key</dt><dd>typed with the input hidden; nothing appears as you type</dd>
+<dt>Project name</dt><dd>defaults to something sensible; press Enter to accept</dd>
+</dl></div>
+<p>It then checks the connection, finds your environment, creates the project and starts it — printing a link to open it when done.</p>
+<div class="tip"><strong>On Windows, use Git Bash or WSL</strong> rather than PowerShell or Command Prompt. The script is bash, and Git Bash comes with Git for Windows if you already have that.</div>
+
+<h5>If it fails</h5>
+<p>It stops at the first problem rather than half-deploying, and nothing is created until the connection and permissions check out. Three flags help:</p>
+<pre>bash deploy-to-arcane.sh --debug        <span class="cm"># show the request that failed</span>
+bash deploy-to-arcane.sh --permissions  <span class="cm"># list what your key can actually do</span>
+bash deploy-to-arcane.sh --version      <span class="cm"># confirm you have the current build</span></pre>
+<p>Failures also write <code>arcane-deploy.log</code> beside the script, and it waits for a keypress before closing, so the error does not disappear with the window.</p>
+
+<h5>How the key is handled</h5>
+<p>It is typed with the input hidden, held only in that shell process, and cleared when the script finishes.</p>
+<div class="tip"><strong>Environment variables were the wrong tool here.</strong> An exported key lands in your shell history, in <code>/proc</code>, and in the environment of every child process. It is also never passed as an argument, since anyone running <code>ps</code> can read those. Typing it at a prompt avoids all of that.</div>
 </div></details>
 </section>
 
@@ -781,6 +812,9 @@ docker compose exec sonarr ls /data/downloads</pre>
 <tr><td>qBittorrent</td><td><code>http://gluetun:8080</code></td></tr>
 </tbody></table></div>
 <div class="tip"><strong>Why the container name?</strong> Inside Docker, <code>localhost</code> means Uptime Kuma itself. Using container names also means you are testing the internal path rather than your router, so a monitor failing tells you something real.</div>
+<div class="warning"><strong>Names only resolve inside one project.</strong> This works because the generator puts everything in a single <code>docker-compose.yml</code>. If you built your stacks as separate Arcane projects, <code>http://jellyfin:8096</code> will fail with <code>ENOTFOUND</code> — each project gets its own network. Use <code>http://host.docker.internal:8096</code> instead, and add this to the Uptime Kuma service:
+<pre>extra_hosts:
+  - "host.docker.internal:host-gateway"</pre></div>
 </div></details>
 
 <details class="app"><summary><b>Docker container monitors</b><span class="d">Needs the socket mounted</span></summary>
