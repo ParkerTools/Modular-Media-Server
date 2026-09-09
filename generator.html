@@ -1328,6 +1328,7 @@ var ARCANE_SCRIPT = `#!/usr/bin/env bash
 #   bash deploy-to-arcane.sh
 #   bash deploy-to-arcane.sh --debug         show the request when something fails
 #   bash deploy-to-arcane.sh --permissions   list what your key is allowed to do
+#   bash deploy-to-arcane.sh --version       which build of this script you have
 #
 # PERMISSIONS. Arcane API keys are scoped, and a key cannot exceed the
 # permissions of the user who created it. This script needs, at minimum:
@@ -1342,6 +1343,7 @@ var ARCANE_SCRIPT = `#!/usr/bin/env bash
 #
 set -uo pipefail          # deliberately not -e: every call is checked by hand
 
+SCRIPT_VERSION="__BUILD_STAMP__"
 PROJECT_NAME_DEFAULT="__PROJECT_NAME__"
 
 # ── output ───────────────────────────────────────────────────────────────
@@ -1434,6 +1436,7 @@ for a in "$@"; do
   case "$a" in
     --permissions|--perms) SHOW_PERMS=1 ;;
     --debug) DEBUG=1 ;;
+    --version) printf 'deploy-to-arcane.sh %s\\n' "$SCRIPT_VERSION"; exit 0 ;;
     -h|--help) sed -n '2,22p' "$0" | sed 's/^# \\{0,1\\}//'; exit 0 ;;
     *) die "Unknown option: $a" ;;
   esac
@@ -1444,6 +1447,8 @@ if [[ ! -f docker-compose.yml ]]; then
 fi
 
 # ── connection details, asked for rather than passed in ──────────────────
+printf '%sdeploy-to-arcane.sh %s%s\\n' "$DIM" "$SCRIPT_VERSION" "$R"
+
 step "Arcane connection"
 printf '%sNothing you type here is saved. The key is not echoed, not exported,%s\\n' "$DIM" "$R"
 printf '%sand not visible to other processes.%s\\n\\n' "$DIM" "$R"
@@ -1716,7 +1721,8 @@ printf '\\n  %sOpen it:%s %s/projects/%s\\n\\n' "$B" "$R" "$ARCANE_URL" "$PROJEC
    over HTTPS cannot reach a LAN address over plain HTTP anyway. */
 function buildArcaneScript(state){
   var name = (state.domain ? state.domain.split(".")[0] : "media-server").replace(/[^a-z0-9-]/gi,"-").toLowerCase();
-  return ARCANE_SCRIPT.replace("__PROJECT_NAME__", name);
+  return ARCANE_SCRIPT.replace("__PROJECT_NAME__", name)
+                      .replace("__BUILD_STAMP__", "2026-09-09");
 }
 
 function buildAll(state){
@@ -2561,6 +2567,7 @@ renderCats(); renderStack(); renderPresets(); renderSteps();
 </script>
 </main>
 <div class="wrap"><div class="pager"><a class="prev" href="platforms.html"><span class="dir">← Previous</span><span class="ttl">Platforms</span><span class="sub">Docker on Windows, macOS, Linux or NAS</span></a><a class="next" href="setup.html"><span class="dir">Next →</span><span class="ttl">App setup</span><span class="sub">Configure each app, step by step</span></a></div></div>
+<div class="wrap"><p style="font-size:12px;color:var(--muted);text-align:right;margin:0 0 6px">generator build <code id="buildstamp">2026-09-09</code></p></div>
 <footer class="sitefoot"><div class="wrap">
 <div class="footgrid">
 <div class="footbrand"><div class="fb">modular<span style="color:var(--coral)">.</span>media</div>
