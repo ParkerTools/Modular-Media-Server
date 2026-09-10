@@ -515,7 +515,7 @@ Make sure Docker Desktop is running — you should see a whale in the menu bar a
 <div class="osnote" data-os="nas">
 <b>Synology and QNAP can do most of this without any typing.</b> Install <b>Container Manager</b> (Synology) or <b>Container Station</b> (QNAP) from your NAS app store, then use its Project or Application feature and paste the compose text from each step into it.
 Where a step gives a command, use the NAS interface instead — the compose text is the part that matters.
-</div>
+ <br><br><b>One thing to check first:</b> your user id. Over SSH, run <code>id yourname</code>. Synology accounts usually start at <b>1026</b> rather than 1000 — use whatever it prints wherever you see <code>PUID</code> below.</div>
 
 <div class="qs-meta"><span><b>7 steps</b> · about 30 minutes</span>
 <button class="qs-expand" id="qsx">Expand all</button></div>
@@ -556,6 +556,8 @@ cd ~/stacks/arcane</pre>
       - arcane-data:/app/data
       - /opt/stacks:/opt/stacks
     environment:
+      <span class="cm"># if you open Arcane from another computer, put this machine's</span>
+      <span class="cm"># address here instead — links are built from this value</span>
       - APP_URL=http://localhost:3552
       - PUID=1000
       - PGID=1000
@@ -576,6 +578,8 @@ volumes:
       - arcane-data:/app/data
       - <span class="hl">/Users/yourname</span>/stacks:/opt/stacks
     environment:
+      <span class="cm"># if you open Arcane from another computer, put this machine's</span>
+      <span class="cm"># address here instead — links are built from this value</span>
       - APP_URL=http://localhost:3552
       - PUID=501
       - PGID=20
@@ -596,6 +600,8 @@ volumes:
       - arcane-data:/app/data
       - <span class="hl">/volume1/docker/stacks</span>:/opt/stacks
     environment:
+      <span class="cm"># if you open Arcane from another computer, put this machine's</span>
+      <span class="cm"># address here instead — links are built from this value</span>
       - APP_URL=http://localhost:3552
       - PUID=1000
       - PGID=1000
@@ -706,6 +712,9 @@ If that lists your films, the path is right.
 <p>Set your timezone too — <a href="https://en.wikipedia.org/wiki/List_of_tz_database_time_zones" target="_blank" rel="noopener">the list is here</a>, and it looks like <code>America/New_York</code>.</p>
 <p>Press <b>Deploy</b>. The first start downloads a few hundred megabytes, so give it a minute.</p>
 <div class="qs-note"><code>:ro</code> on the end means read-only. Jellyfin never needs to change your files, so it is not allowed to. One less way to lose something.</div>
+<div class="osnote-inline" data-os="win lin"><b>The <code>user:</code> line</b> tells Jellyfin to run as you rather than as root, so anything it writes stays yours. <code>1000</code> is almost always right — <code>id -u</code> confirms it.</div>
+<div class="osnote-inline" data-os="mac"><b>No <code>user:</code> line here, deliberately.</b> Docker Desktop on macOS translates file ownership for you, so setting one usually causes permission errors rather than preventing them.</div>
+<div class="osnote-inline" data-os="nas"><b>No <code>user:</code> line here, deliberately.</b> Set the folder permissions in File Station instead — your NAS already manages who owns what, and Container Manager follows it.</div>
 </div></details></li>
 
 <li class="qs-step"><details><summary><span class="qs-title">Point Jellyfin at your films</span><span class="qs-toggle"></span></summary><div class="qs-body">
@@ -731,7 +740,7 @@ If that lists your films, the path is right.
       - "3001:3001"
     volumes:
       - /opt/stacks/uptime-kuma/data:/app/data
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro   <span class="cm"># see the note below</span>
     extra_hosts:
       <span class="cm"># lets Kuma reach apps in other projects, via the machine itself</span>
       - "host.docker.internal:host-gateway"
@@ -746,7 +755,7 @@ If that lists your films, the path is right.
       - "3001:3001"
     volumes:
       - /opt/stacks/uptime-kuma/data:/app/data
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro   <span class="cm"># see the note below</span>
     extra_hosts:
       <span class="cm"># lets Kuma reach apps in other projects, via the machine itself</span>
       - "host.docker.internal:host-gateway"
@@ -761,7 +770,7 @@ If that lists your films, the path is right.
       - "3001:3001"
     volumes:
       - /opt/stacks/uptime-kuma/data:/app/data
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro   <span class="cm"># see the note below</span>
     extra_hosts:
       <span class="cm"># lets Kuma reach apps in other projects, via the machine itself</span>
       - "host.docker.internal:host-gateway"
@@ -776,7 +785,7 @@ If that lists your films, the path is right.
       - "3001:3001"
     volumes:
       - /volume1/docker/stacks/uptime-kuma/data:/app/data
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro   <span class="cm"># see the note below</span>
     extra_hosts:
       <span class="cm"># lets Kuma reach apps in other projects, via the machine itself</span>
       - "host.docker.internal:host-gateway"
@@ -784,25 +793,34 @@ If that lists your films, the path is right.
       - TZ=<span class="hl">Europe/London</span>
     restart: unless-stopped</pre>
 <p>Deploy it, open <code>http://localhost:3001</code>, and make an account.</p>
+<div class="qs-warn"><b>About that <code>docker.sock</code> line.</b> It lets Uptime Kuma see your containers, and it is the one genuinely risky thing in this guide. The <code>:ro</code> on the end protects the socket <em>file</em> — it does <b>not</b> limit what can be asked of Docker through it. Anything with that mount can start a container with full access to your machine.
+<br><br>It is a reasonable trade on a home network for software you trust. If you would rather not, delete that line — the HTTP monitor in the next step needs none of it, and it answers the more useful question anyway.</div>
 </div></details></li>
 
 <li class="qs-step"><details><summary><span class="qs-title">Watch Jellyfin</span><span class="qs-toggle"></span></summary><div class="qs-body">
-<p>In Uptime Kuma, first tell it about Docker. Go to <b>Profile → Settings → Docker Hosts → Add Docker Host</b>:</p>
+<p>In Uptime Kuma, press <b>Add New Monitor</b>:</p>
+<div class="fields"><dl>
+<dt>Monitor type</dt><dd><b>HTTP(s)</b></dd>
+<dt>Friendly name</dt><dd>Jellyfin</dd>
+<dt>URL</dt><dd><code>http://host.docker.internal:8096</code></dd>
+<dt>Heartbeat interval</dt><dd>60 seconds</dd>
+<dt>Retries</dt><dd>2, so a brief blip does not wake you</dd>
+</dl></div>
+<p>Save. It should go green within a few seconds.</p>
+<div class="qs-note"><b>Why that odd address?</b> Containers can call each other by name, but only inside the same project. You made Jellyfin and Uptime Kuma as two separate Arcane projects, so <code>http://jellyfin:8096</code> would not resolve. <code>host.docker.internal</code> means "the computer all of this is running on", which reaches Jellyfin on the port it published. That is what the <code>extra_hosts</code> line in the last step was for.
+<br><br><code>localhost</code> would not work either — inside Uptime Kuma, that means Uptime Kuma itself.</div>
+<p><b>This is the monitor that matters.</b> It tells you the app is actually answering, which is the thing you care about.</p>
+
+<h4 style="font-family:'DM Sans';font-size:15px;font-weight:700;margin:20px 0 8px;color:var(--ink)">Optional: also watch the container</h4>
+<div class="qs-note"><b>Only if you kept the <code>docker.sock</code> line</b> in the last step. If you removed it — which is a perfectly reasonable choice — skip this; the HTTP monitor above already covers you.</div>
+<p>First tell Kuma about Docker. <b>Profile → Settings → Docker Hosts → Add Docker Host</b>:</p>
 <div class="fields"><dl>
 <dt>Friendly name</dt><dd>Local</dd>
 <dt>Connection type</dt><dd>Socket</dd>
 <dt>Path</dt><dd><code>/var/run/docker.sock</code></dd>
 </dl></div>
-<p>Save, then <b>Add New Monitor</b>:</p>
-<div class="fields"><dl>
-<dt>Monitor type</dt><dd>Docker Container</dd>
-<dt>Friendly name</dt><dd>Jellyfin</dd>
-<dt>Container name</dt><dd><code>jellyfin</code></dd>
-<dt>Docker host</dt><dd>Local</dd>
-</dl></div>
-<div class="qs-note"><b>Add a second monitor as well.</b> Type <b>HTTP(s)</b>, URL <code>http://host.docker.internal:8096</code>. The first one tells you the container is running; this one tells you the app inside it is actually answering. They fail in different ways, and the second is the one you care about.</div>
-<div class="qs-note"><b>Why that odd address?</b> Containers can call each other by name — but only inside the same project. You made Jellyfin and Uptime Kuma as two separate Arcane projects, so <code>http://jellyfin:8096</code> would not resolve. <code>host.docker.internal</code> means "the computer all of this is running on", which reaches Jellyfin on the port it published. That is what the <code>extra_hosts</code> line in the last step was for.
-<br><br><code>localhost</code> would not work either — inside Uptime Kuma, that means Uptime Kuma itself.</div>
+<p>Save, then add a second monitor with type <b>Docker Container</b>, container name <code>jellyfin</code>, and the Docker host you just made.</p>
+<div class="qs-note">The two fail differently: a container can be running while the app inside it is wedged. Together they tell you both that it exists and that it works.</div>
 </div></details></li>
 
 <li class="qs-step"><details><summary><span class="qs-title">Get a message when it breaks</span><span class="qs-toggle"></span></summary><div class="qs-body">
