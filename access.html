@@ -526,7 +526,7 @@ docker compose exec caddy caddy reload --config /etc/caddy/Caddyfile</pre>
 <p>By default every container sits in one Compose project, which means <code>docker compose down</code> stops your reverse proxy along with everything else. Rebuild an app at the wrong moment and you have locked yourself out of the machine you are rebuilding it on.</p>
 <p>The generator can split the connection layer — Caddy, Tailscale, Cloudflare Tunnel and Pocket ID — into its own <code>access/</code> project, so it keeps running while the apps come and go.</p>
 <div class="warning"><strong>This only works with a shared network.</strong> Separate Compose projects get separate default networks, so the proxy would no longer resolve <code>jellyfin</code> by name. Create one, once, before starting either stack:
-<pre>docker network create edge</pre>
+<pre>docker network create mms-edge</pre>
 The generated files declare it as external on both sides, so Docker expects you to have made it.</div>
 <p>Running order after that:</p>
 <pre><span class="c"># the connection layer, started once and left alone</span>
