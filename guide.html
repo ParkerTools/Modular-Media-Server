@@ -150,7 +150,7 @@ html[data-theme="dark"]{
   --warn-bg:#33201c;--tip-bg:#12313a;--line-teal:#2c5560;--line-peach:#4a3526;
   --code-fg:#8fdae5;--code-bg:#08151a;--code-txt:#dfeef0;--code-cm:#7fa8a4;
   --pill-teal-bg:#164048;--pill-coral-bg:#43231f;--pill-peach-fg:#e8c09a;--pill-coral-fg:#f6a89f;
-  --ok:#6cc79b;--bad:#f2857a;--warnfg:#e0b06a;
+  --ok:#6cc79b;--bad:#f2857a;--coral-text:#f5a49e;--warnfg:#e0b06a;
   --shadow:rgba(0,0,0,.30);--blob-a:rgba(254,217,183,.13);--blob-b:rgba(0,175,185,.10);
   color-scheme:dark;
 }
@@ -330,6 +330,19 @@ html[data-theme="dark"] .skiplink{color:#08151a}
   .chelp-grid{grid-template-columns:repeat(4,1fr)}
   .qs-next{grid-template-columns:repeat(3,1fr)}
 }
+
+/* platform switcher */
+.ostabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+.ostab{font-family:inherit;font-size:14px;font-weight:700;padding:9px 17px;border-radius:999px;
+  border:1px solid var(--line);background:var(--surface);color:var(--muted);cursor:pointer;transition:.14s}
+.ostab:hover{border-color:var(--teal);color:var(--blue)}
+.ostab.on{background:var(--blue);border-color:var(--blue);color:#fff}
+html[data-theme="dark"] .ostab.on{color:#08151a}
+.osnote-inline{background:var(--tint-teal);border-left:4px solid var(--teal);border-radius:0 12px 12px 0;
+  padding:12px 15px;margin:0 0 13px;font-size:13.5px;line-height:1.65}
+.osnote-inline b{color:var(--ink)}
+kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.85em;background:var(--surface);
+  border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:1px 6px;color:var(--ink)}
 </style>
 <script>
 (function(){
@@ -503,10 +516,27 @@ volumes:
 </div>
 
 <h3>Running the script</h3>
+
+<div class="ostabs" role="tablist" aria-label="Choose your operating system">
+<button class="ostab" data-os="win" role="tab">Windows</button>
+<button class="ostab" data-os="mac" role="tab">macOS</button>
+<button class="ostab" data-os="lin" role="tab">Linux</button>
+<button class="ostab" data-os="nas" role="tab">NAS</button>
+</div>
+
+<div class="warning" data-os="win"><strong>Not in PowerShell.</strong> In PowerShell, <code>curl</code> is an alias for a different command that does not understand these options — you will get <em>"A parameter cannot be found that matches parameter name 'fsSL'"</em>. The script is a bash script, so it needs a Linux shell anyway.
+<br><br>Press Start, type <b>Ubuntu</b>, and run the commands there. If you have no Ubuntu app, <a href="platforms.html#windows">install it first</a> — it takes about five minutes.</div>
+
+<div class="osnote-inline" data-os="mac"><b>Open Terminal</b> — <kbd>Cmd</kbd> + <kbd>Space</kbd>, type <b>Terminal</b>, press Enter.</div>
+<div class="osnote-inline" data-os="lin"><b>Open a terminal</b> — usually <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>T</kbd>.</div>
+<div class="osnote-inline" data-os="nas"><b>You need SSH enabled</b> on the NAS, and to be logged in over it. If you would rather not, use <a href="generator.html">the generator</a> and paste the result into Container Manager instead.</div>
+
 <pre><span class="c"># Fetch it, read it, then run it. Please actually read it.</span>
-curl -fsSL <span class="p">https://parkertools.github.io/Modular-Media-Server</span>/install.sh -o install.sh
+curl -fsSL https://parkertools.github.io/Modular-Media-Server/install.sh -o install.sh
 less install.sh
 bash install.sh</pre>
+
+<div class="tip" data-os="win"><strong>If <code>curl</code> is missing inside Ubuntu</strong>, install it once with <code>sudo apt install curl</code>. Some minimal images ship without it.</div>
 
 <div class="tip"><strong>It won't install Docker for you, on purpose.</strong> If Docker is missing it tells you the command and stops. Piping a downloaded script into a root shell should be something you decide to do, not something that happens as a side effect of running something else.</div>
 
@@ -641,6 +671,36 @@ You are responsible for ensuring anything you download, store or share is legall
     document.documentElement.setAttribute('data-theme',next);
     try{ localStorage.setItem('mms-theme',next); }catch(e){}
   });
+})();
+</script>
+<script>
+(function(){
+  function detect(){
+    var u=navigator.userAgent;
+    if(/Windows/i.test(u)) return "win";
+    if(/Mac OS X|Macintosh/i.test(u)) return "mac";
+    return "lin";
+  }
+  var os=detect();
+  try{ var saved=localStorage.getItem("mms-os"); if(saved) os=saved; }catch(e){}
+  function apply(){
+    document.querySelectorAll(".ostab").forEach(function(t){
+      t.classList.toggle("on", t.dataset.os===os);
+      t.setAttribute("aria-selected", t.dataset.os===os ? "true" : "false");
+    });
+    document.querySelectorAll("[data-os]").forEach(function(el){
+      if(el.classList.contains("ostab")) return;
+      el.style.display = el.dataset.os.split(/\s+/).indexOf(os)!==-1 ? "" : "none";
+    });
+  }
+  document.querySelectorAll(".ostab").forEach(function(t){
+    t.addEventListener("click",function(){
+      os=t.dataset.os;
+      try{ localStorage.setItem("mms-os", os); }catch(e){}
+      apply();
+    });
+  });
+  apply();
 })();
 </script>
 </body></html>
