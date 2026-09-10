@@ -402,6 +402,19 @@ docker system df</pre></div>
 <!-- ─────────── WON'T START ─────────── -->
 <h2 class="grphead" data-grp="start">A container won't start</h2>
 
+<details class="qa" data-cat="platform start" data-terms="curl fssl powershell parameter cannot be found invoke-webrequest windows install script alias">
+<summary>"A parameter cannot be found that matches parameter name 'fsSL'"</summary>
+<div class="qa-body">
+<p>You are in PowerShell. Windows has its own <code>curl</code> — an alias for <code>Invoke-WebRequest</code> — which does not understand these options, so it stops before downloading anything.</p>
+<p>Even if the download worked, it would not help: <code>install.sh</code> is a bash script and PowerShell cannot run it.</p>
+<p><b>Use the Ubuntu window instead.</b> Press Start, type <b>Ubuntu</b>, and run the same command there:</p>
+<pre>curl -fsSL https://parkertools.github.io/Modular-Media-Server/install.sh -o install.sh
+less install.sh
+bash install.sh</pre>
+<div class="tip"><strong>No Ubuntu app?</strong> From an admin terminal, run <code>wsl --install -d Ubuntu</code> and restart. Docker Desktop already uses WSL underneath, so this is the environment it expects. <a href="platforms.html#windows">Full steps</a>.</div>
+<div class="tip"><strong>Would rather not use a terminal at all?</strong> The <a href="generator.html">generator</a> does the same job in your browser and hands you the files.</div>
+</div></details>
+
 <details class="qa" data-cat="network media" data-terms="homarr tiles offline down red status dashboard internal external url">
 <summary>Every Homarr tile shows as offline</summary>
 <div class="qa-body">
