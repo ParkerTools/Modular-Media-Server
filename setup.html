@@ -822,7 +822,7 @@ docker compose exec sonarr ls /data/downloads</pre>
 <p>An HTTP monitor tells you the app is answering. A container monitor tells you the container is running. They fail in different ways, so both are useful.</p>
 <p>First check your Compose file has the socket mounted — in the generated stack this line is commented out by default:</p>
 <pre>volumes:
-  - /var/run/docker.sock:/var/run/docker.sock:ro</pre>
+  - /var/run/docker.sock:/var/run/docker.sock:ro   <span class="cm"># see the note below</span></pre>
 <p>Then in Uptime Kuma, <b>Profile → Settings → Docker Hosts → Add Docker Host</b>:</p>
 <div class="fields"><dl>
 <dt>Friendly Name</dt><dd>Local</dd>
@@ -830,7 +830,37 @@ docker compose exec sonarr ls /data/downloads</pre>
 <dt>Docker Daemon</dt><dd><code>/var/run/docker.sock</code></dd>
 </dl></div>
 <p>Save, then <b>Add New Monitor</b> with type <b>Docker Container</b>, container name <code>jellyfin</code>, and the Docker host you just made.</p>
-<div class="warning"><strong>The socket is a powerful thing to hand out</strong>, even read-only. If you would rather not, HTTP monitors answer the more useful question anyway — whether the app actually works.</div>
+<div class="warning"><strong><code>:ro</code> does not do what it looks like it does.</strong> It makes the socket <em>file</em> read-only. It does not restrict the Docker API reachable through it — anything holding that mount can still call <code>POST /containers/create</code> with <code>Privileged: true</code> and a host bind mount, which is root on the machine.
+<br><br>Treat any container with the socket as fully trusted. If you would rather not, HTTP monitors need none of it and answer the more useful question anyway. For a middle path, put a socket proxy in front — see below.</div>
+
+<h5>The safer way: a socket proxy</h5>
+<p>Instead of handing Uptime Kuma the whole Docker API, put a filter in front of it. The proxy holds the socket; Kuma talks to the proxy over the network and can only do what the proxy allows.</p>
+<pre>services:
+  socket-proxy:
+    image: lscr.io/linuxserver/socket-proxy:latest
+    container_name: socket-proxy
+    environment:
+      - CONTAINERS=1     <span class="c"># list and inspect — all Kuma needs</span>
+      - INFO=1
+      - POST=0           <span class="c"># refuse every write</span>
+      - EXEC=0
+      - IMAGES=0
+      - VOLUMES=0
+      - NETWORKS=0
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    read_only: true
+    tmpfs:
+      - /run             <span class="c"># required — the entrypoint writes its config here</span>
+    restart: unless-stopped</pre>
+<p>Then <b>remove the socket mount from Uptime Kuma</b> and point it at the proxy instead:</p>
+<div class="fields"><dl>
+<dt>Friendly name</dt><dd>Local</dd>
+<dt>Connection type</dt><dd><b>TCP / HTTP</b> — not Socket</dd>
+<dt>Docker daemon</dt><dd><code>tcp://socket-proxy:2375</code></dd>
+</dl></div>
+<div class="tip"><strong>No ports are published, deliberately.</strong> Containers on the same network reach port 2375 directly. Plenty of examples online publish <code>2375:2375</code> to the host — that puts an unauthenticated Docker API on your network and undoes the point.</div>
+<div class="warning"><strong>Arcane cannot use this.</strong> It creates and deploys containers, which requires <code>POST</code> — and <code>POST=1</code> hands back the ability to create a privileged container, which is the whole thing you were withholding. A container manager is root-equivalent by design. The answer for Arcane is to keep it off the internet, not to wrap it in a proxy that has to allow the dangerous call anyway.</div>
 </div></details>
 
 <details class="app"><summary><b>Status page</b><span class="d">Optional, and safe to share</span></summary>
