@@ -22,11 +22,11 @@
   --warn-bg:#fff0e3;--tip-bg:#e4f5f4;--line-teal:#a9dde0;--line-peach:#f4d3b6;
   --code-fg:#0e5a63;--code-bg:#15333b;--code-txt:#fdfcdc;--code-cm:#8fb3ae;
   --pill-teal-bg:#d3f0ef;--pill-coral-bg:#ffe0dc;--pill-peach-fg:#744b32;--pill-coral-fg:#96382f;
-  --ok:#2f7d5e;--bad:#b0463c;--warnfg:#a06a2c;--blue-hover:#005b73;
+  --ok:#2a7054;--bad:#b0463c;--warnfg:#8f5d24;--blue-hover:#005b73;
   --shadow:rgba(21,51,59,.045);--blob-a:var(--peach);--blob-b:rgba(0,175,185,.20);
-  --blue:#006C87;--teal:#00AFB9;--cream:#FDFCDC;--peach:#FED9B7;--coral:#F07167;--ink:#15333b;--muted:#4a626b;--white:#fffef7;--line:#cfe3e4}
+  --blue:#006C87;--teal:#00AFB9;--cream:#FDFCDC;--peach:#FED9B7;--coral:#F07167;--coral-text:#b34038;--ink:#15333b;--muted:#4a626b;--white:#fffef7;--line:#cfe3e4}
 *{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font-family:"DM Sans",sans-serif}
-a{color:var(--blue);text-decoration:none}a:hover{color:var(--coral);text-decoration:underline}
+a{color:var(--blue);text-decoration:none}a:hover{color:var(--coral-text);text-decoration:underline}
 .wrap{max-width:1240px;margin:auto;padding:0 24px}
 nav{height:78px;display:flex;align-items:center;justify-content:space-between}
 .brand{font-weight:700;font-size:18px;letter-spacing:-.04em;color:var(--ink)}.brand span{color:var(--coral)}
@@ -78,9 +78,9 @@ h2.ph{font-size:32px;margin:0 0 10px}.pd{color:var(--muted);font-size:15.5px;lin
 .stacklist{list-style:none;padding:0;margin:0 0 14px;max-height:340px;overflow:auto}
 .stacklist li{font-size:13.5px;padding:6px 9px;border-radius:8px;display:flex;justify-content:space-between;gap:8px;color:var(--ink)}
 .stacklist li.dep{color:var(--muted);font-size:12.5px;padding-left:20px}
-.stacklist li.dep:before{content:"└ ";color:var(--coral)}
+.stacklist li.dep:before{content:"└ ";color:var(--coral-text)}
 .stacklist li .x{color:var(--muted);cursor:pointer;font-size:15px;line-height:1}
-.stacklist li .x:hover{color:var(--coral)}
+.stacklist li .x:hover{color:var(--coral-text)}
 .empty{font-size:13px;color:var(--muted);padding:14px 0;text-align:center}
 .presets{border-top:1px solid var(--line);padding-top:14px}
 .presets b{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:9px}
@@ -209,7 +209,7 @@ details.qa,details.m,.shell,.genout{box-shadow:0 1px 2px rgba(21,51,59,.04),0 6p
 .dcard:nth-child(3){background:var(--tint-peach);border-color:var(--line-peach)}
 .dnum{position:absolute;top:20px;right:22px;font-family:Fraunces,serif;font-size:30px;color:var(--line);line-height:1}
 .dcard h4{font-family:Fraunces,serif;font-size:21px;letter-spacing:-.03em;margin:0 0 3px;color:var(--ink)}
-.dcard .dwho{font-size:12px;font-weight:700;color:var(--coral);margin:0 0 12px;text-transform:uppercase;letter-spacing:.07em}
+.dcard .dwho{font-size:12px;font-weight:700;color:var(--coral-text);margin:0 0 12px;text-transform:uppercase;letter-spacing:.07em}
 .dcard p{font-size:14.5px;margin:0 0 12px}
 .dcard pre{background:#15333b;color:#fdfcdc;padding:15px 17px;border-radius:13px;font-size:12.5px;line-height:1.7;margin:0 0 12px;overflow:auto}
 .dcard pre .cm{color:#8fb3ae}
@@ -232,7 +232,7 @@ details.qa,details.m,.shell,.genout{box-shadow:0 1px 2px rgba(21,51,59,.04),0 6p
 .dbadge{display:inline-block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;
   background:var(--blue);color:#fff;padding:5px 12px;border-radius:999px;margin-bottom:12px}
 .dcard-lead h4{font-family:Fraunces,serif;font-size:26px;letter-spacing:-.035em;margin:0 0 4px;color:var(--ink)}
-.dcard-lead .dwho{font-size:13px;font-weight:700;color:var(--coral);margin:0 0 14px;text-transform:none;letter-spacing:0}
+.dcard-lead .dwho{font-size:13px;font-weight:700;color:var(--coral-text);margin:0 0 14px;text-transform:none;letter-spacing:0}
 .dcard-lead p{font-size:15px;margin:0 0 13px}
 .dsteps{counter-reset:d;list-style:none;padding:0;margin:0 0 15px}
 .dsteps li{counter-increment:d;position:relative;padding:0 0 10px 34px;font-size:14.5px;line-height:1.65}
@@ -476,7 +476,7 @@ html[data-theme="dark"] .hint-ok{color:#6cc79b}
 
 .tree{background:var(--tint-teal);border:1px solid var(--line-teal);border-radius:14px;padding:15px 17px;margin:14px 0}
 .tree b{display:block;font-size:13.5px;color:var(--ink);margin-bottom:8px}
-.tree pre{margin:0 0 10px;font-size:12.5px;padding:13px 15px}
+.tree pre{margin:0 0 10px;font-size:12.5px;padding:13px 15px;background:var(--code-bg);color:var(--code-txt);border-radius:11px}
 .tree p{font-size:13.5px;margin:0}
 
 .clashopts{display:grid;gap:12px;margin-top:12px}
@@ -494,6 +494,12 @@ html[data-theme="dark"] .hint-ok{color:#6cc79b}
 .ostab.on{background:var(--blue);border-color:var(--blue);color:#fff}
 html[data-theme="dark"] .ostab.on{color:#08151a}
 pre .hl{color:var(--peach)}
+
+/* The base `pre` supplies no background — inside the output pane the wrapper
+   provides it. Any pre placed on a light card must set its own, or it renders
+   cream text on cream. */
+.dcard pre,.chelp-body pre,.qs-step pre,.card pre,.tip pre,.warning pre{
+  background:var(--code-bg);color:var(--code-txt);border-radius:12px}
 </style>
 <script>
 (function(){
@@ -550,7 +556,7 @@ pre .hl{color:var(--peach)}
 <div id="drivecheck"></div>
 
 <div class="fgrid" style="margin-top:20px">
-<div class="f"><label for="puid">PUID</label><input id="puid" value="1000"><div class="hint">The user your files belong to. This is filled in for your platform above. To check, run <code>id -u</code> on the server \u2014 whatever number it prints goes here.</div></div>
+<div class="f"><label for="puid">PUID</label><input id="puid" value="1000"><div class="hint">The user your files belong to. This is filled in for your platform above. To check, run <code>id -u</code> on the server — whatever number it prints goes here.</div></div>
 <div class="f"><label for="pgid">PGID</label><input id="pgid" value="1000"><div class="hint">The group id that should own your files.</div></div>
 <div class="f wide"><label for="tz">Timezone</label><input id="tz" placeholder="Europe/London"><div class="hint">An IANA name, like <code>America/New_York</code>. Detected from your browser.</div></div>
 </div>
@@ -610,6 +616,16 @@ pre .hl{color:var(--peach)}
 
 <h3 style="font-family:Fraunces,serif;font-size:26px;letter-spacing:-.04em;margin:38px 0 12px">Where do these files go?</h3>
 <p class="pd" style="margin-bottom:18px">Downloading them is half the job. Here is where they actually go — start with the first if you would rather not open a terminal.</p>
+
+<div class="card peach" id="bootstrapnote" style="display:none">
+<strong>This stack contains Arcane itself, so start with a terminal</strong>
+<p style="margin:10px 0 0">The routes below all assume an Arcane you can paste into. If Arcane is in the files you just generated, there is nothing to paste into yet — you have to bring the stack up once by hand, and it manages itself from then on.</p>
+<pre style="margin:12px 0">cd ~/Downloads/media-server   <span class="cm"># wherever you unzipped it</span>
+docker compose up -d
+docker compose logs -f arcane</pre>
+<p style="margin:0">Open <code>http://your-server:3552</code>, create your admin account, and set the projects directory. Arcane will find this stack and every one you add afterwards.</p>
+<div class="dnote" style="margin-top:12px"><b>Prefer the other routes?</b> Deselect Arcane here and install it on its own first — the <a href="index.html#quickstart">quickstart</a> covers that in one step. Then generate the rest of your stack and paste it in.</div>
+</div>
 
 <div class="dcard dcard-lead">
 <div class="dbadge">No terminal needed</div>
@@ -1145,7 +1161,7 @@ var STORAGE_DEFAULTS = {
          configRoot:"/Users/yourname/stacks/config", dataRoot:"/Users/yourname/server",
          mediaRoot:"/Users/yourname/Movies", downloadsRoot:"/Users/yourname/Downloads/server",
          photosRoot:"/Users/yourname/Pictures",
-         note:"Replace <code>yourname</code> with your account name. An external drive is under <code>/Volumes/</code>. On a Mac your user id is <b>501</b>, not 1000 \u2014 that is set below." },
+         note:"Replace <code>yourname</code> with your account name. An external drive is under <code>/Volumes/</code>. On a Mac your user id is <b>501</b>, not 1000 — that is set below." },
   lin: { puid:"1000", pgid:"1000",
          configRoot:"/opt/stacks/config", dataRoot:"/srv/server",
          mediaRoot:"/srv/media", downloadsRoot:"/srv/downloads",
@@ -1155,7 +1171,7 @@ var STORAGE_DEFAULTS = {
          configRoot:"/volume1/docker/config", dataRoot:"/volume1/server",
          mediaRoot:"/volume1/media", downloadsRoot:"/volume1/downloads",
          photosRoot:"/volume1/photos",
-         note:"Synology uses <code>/volume1</code>. On QNAP it is usually <code>/share</code>. Use folders you created in File Station first. <b>Check your user id before deploying</b> \u2014 Synology accounts usually start at 1026, not 1000. Run <code>id yourname</code> over SSH and put the numbers in the fields below." }
+         note:"Synology uses <code>/volume1</code>. On QNAP it is usually <code>/share</code>. Use folders you created in File Station first. <b>Check your user id before deploying</b> — Synology accounts usually start at 1026, not 1000. Run <code>id yourname</code> over SSH and put the numbers in the fields below." }
 };
 
 /* Hardlinks only work within one filesystem. Comparing the mount prefix
@@ -1226,7 +1242,7 @@ function buildCompose(state, which){
       ? ["#  Your applications. The connection layer is a separate project in",
          "#  ./access — start that one too, and create the shared network first:",
          "#    docker network create " + EDGE_NET]
-      : ["#  Settings live in .env beside this file \u2014 paths, timezone, secrets,",
+      : ["#  Settings live in .env beside this file — paths, timezone, secrets,",
          "#  and the image versions each service follows.",
          "#  Start with:  docker compose up -d"]);
 
@@ -1433,7 +1449,7 @@ function buildReadme(state){
   }
   L = L.concat([
     "## Before you share this folder","",
-    "`.env` contains real, working secrets \u2014 database passwords, session keys,",
+    "`.env` contains real, working secrets — database passwords, session keys,",
     "and any VPN credentials you entered. Anyone who reads it can sign in as you.",
     "",
     "- `.gitignore` already excludes it, so `git add .` will not catch it",
@@ -1547,20 +1563,24 @@ function validate(state){
   }
   if(sel.indexOf("homarr") !== -1){
     ok("Homarr will be your front page",
-       "Reach it at port 7575. It is deliberately not published by the reverse proxy \u2014 it stores credentials for every app it talks to.");
+       "Reach it at port 7575. It is deliberately not published by the reverse proxy — it stores credentials for every app it talks to.");
     warn("Do not change the Homarr key later",
          "SECRET_ENCRYPTION_KEY encrypts the credentials Homarr saves for your other apps. Rotating it makes every saved integration unreadable and you will re-enter them all.");
+  }
+  if(sel.indexOf("arcane") !== -1 && !state.alreadyRunning){
+    warn("Arcane is in this stack, so start it from a terminal once",
+         "You cannot paste Arcane into Arcane. Bring this stack up with docker compose the first time; after that Arcane manages everything, including itself.");
   }
   if(sel.indexOf("socket-proxy") !== -1){
     if(sel.indexOf("uptime-kuma") !== -1)
       ok("Socket proxy in place",
-         "Point Uptime Kuma at it: Settings \u2192 Docker Hosts \u2192 connection type TCP, host tcp://socket-proxy:2375. Do not mount the socket into Kuma as well.");
+         "Point Uptime Kuma at it: Settings → Docker Hosts → connection type TCP, host tcp://socket-proxy:2375. Do not mount the socket into Kuma as well.");
     else
       warn("Nothing is using the socket proxy",
            "It only helps apps that watch containers. Uptime Kuma is the one in this stack that would use it.");
     if(sel.indexOf("arcane") !== -1)
       warn("Arcane cannot use the socket proxy",
-           "It creates and deploys containers, which needs POST, and POST=1 hands back the ability to create a privileged one. A container manager is root-equivalent by design \u2014 keep Arcane off the internet rather than assuming the proxy contains it.");
+           "It creates and deploys containers, which needs POST, and POST=1 hands back the ability to create a privileged one. A container manager is root-equivalent by design — keep Arcane off the internet rather than assuming the proxy contains it.");
   }
   if(state.localOnly){
     ok("Local network only","Nothing is published. Reach the server on your LAN, or over Tailscale from outside.");
@@ -2414,10 +2434,10 @@ function renderStorage(){
     var h = el("div","hint"); h.innerHTML = hint; d.appendChild(h);
     f.appendChild(d);
   }
-  field("configRoot","Where settings are kept",state.configRoot,"Each app's own settings and database. Only a few hundred megabytes, but it is the part you would hate to lose \u2014 back this up.",true);
+  field("configRoot","Where settings are kept",state.configRoot,"Each app's own settings and database. Only a few hundred megabytes, but it is the part you would hate to lose — back this up.",true);
   if(state.layout === "unified"){
     field("dataRoot","Where your files go",state.dataRoot,
-      "One folder holding everything. The generator makes <code>media/</code> and <code>downloads/</code> inside it for you \u2014 point this at the drive with the most space.",true);
+      "One folder holding everything. The generator makes <code>media/</code> and <code>downloads/</code> inside it for you — point this at the drive with the most space.",true);
   } else {
     field("mediaRoot","Media root",state.mediaRoot,"Your library — <code>movies/</code>, <code>tv/</code>, <code>music/</code>.");
     field("downloadsRoot","Downloads",state.downloadsRoot,"Working space for in-progress downloads.");
@@ -2449,7 +2469,7 @@ function showDomainCheck(input){
     return;
   }
   h.className = "hint hint-" + r.level;
-  h.innerHTML = (r.level === "error" ? "\u26a0 " : "\u2713 ") + r.msg;
+  h.innerHTML = (r.level === "error" ? "⚠ " : "✓ ") + r.msg;
   if(input) input.classList.toggle("bad", r.level === "error");
 }
 
@@ -2461,7 +2481,7 @@ function updateDomainPreview(){
     state.selected.forEach(function(id){
       var m = M[id];
       if(m.proxy && CORE.NEVER_PROXY.indexOf(id) === -1)
-        names.push(m.proxy + "." + d + " \u2192 " + m.name);
+        names.push(m.proxy + "." + d + " → " + m.name);
     });
     dns.innerHTML = "<strong>DNS records you will need</strong><p style='margin:10px 0 0'>"
       + (names.length ? names.join("<br>") : "No public services selected.") + "</p>";
@@ -2470,7 +2490,7 @@ function updateDomainPreview(){
   if(pid){
     pid.innerHTML = "<strong>Passkeys need real HTTPS.</strong><p style='margin:10px 0 0'>"
       + "Pocket ID will live at <code>https://id." + d + "</code>. "
-      + "Browsers only allow passkey registration on a proper HTTPS origin \u2014 you cannot use a bare "
+      + "Browsers only allow passkey registration on a proper HTTPS origin — you cannot use a bare "
       + "LAN address. Finish DNS and certificates before setting it up.</p>";
   }
 }
@@ -2566,7 +2586,7 @@ function renderConn(){
     var ic = el("input"); ic.id = "cft"; ic.type = "password";
     ic.autocomplete = "off"; ic.spellcheck = false;
     ic.value = state.manual.CLOUDFLARE_TUNNEL_TOKEN || "";
-    ic.placeholder = "eyJhIjoi\u2026";
+    ic.placeholder = "eyJhIjoi…";
     ic.oninput = function(){ state.manual.CLOUDFLARE_TUNNEL_TOKEN = ic.value.trim(); };
     wrapc.appendChild(ic);
     var eyec = el("button","secretbtn"); eyec.type = "button"; eyec.textContent = "Reveal";
@@ -2577,19 +2597,19 @@ function renderConn(){
     };
     wrapc.appendChild(eyec); fc.appendChild(wrapc);
     var hc = el("div","hint");
-    hc.innerHTML = "Zero Trust dashboard \u2192 Networks \u2192 Tunnels \u2192 create a tunnel \u2192 copy the token. Leave blank to fill in later.";
+    hc.innerHTML = "Zero Trust dashboard → Networks → Tunnels → create a tunnel → copy the token. Leave blank to fill in later.";
     fc.appendChild(hc); gc.appendChild(fc); b.appendChild(gc);
 
     var cn = el("div","tip");
     cn.innerHTML = "<strong>Routing lives in Cloudflare, not in these files.</strong> After the tunnel connects, add a "
-      + "public hostname in the dashboard for each service and point it at the container \u2014 "
+      + "public hostname in the dashboard for each service and point it at the container — "
       + "<code>http://jellyfin:8096</code>, using the container name, because cloudflared shares the Docker network.";
     b.appendChild(cn);
 
     var cw = el("div","warning");
     cw.innerHTML = "<strong>Think before putting Jellyfin on it.</strong> Cloudflare terminates TLS, so they can see the traffic, "
       + "and their CDN terms restrict serving video that is not hosted on a Cloudflare service. The much-quoted "
-      + "\u201cSection 2.8\u201d was removed in 2023, but a CDN-specific restriction replaced it \u2014 so this is unsettled rather "
+      + "“Section 2.8” was removed in 2023, but a CDN-specific restriction replaced it — so this is unsettled rather "
       + "than clearly allowed. The free plan also caps requests at 100&nbsp;MB, which breaks larger Immich uploads. "
       + "Lightweight apps are a good fit; heavy media is the risky part.";
     b.appendChild(cw);
@@ -2636,12 +2656,12 @@ function renderCred(){
     '<p style="margin:10px 0 0">You need a paid one that supports <b>WireGuard</b> and allows peer-to-peer traffic. ' +
     'Free VPNs generally do neither. Expect somewhere around $5 a month.</p>' +
     '<p style="margin:10px 0 0">Once you have an account, look for <b>WireGuard configuration</b> in their dashboard ' +
-    'and generate a config file. Open it in any text editor \u2014 the two values below are inside it:</p>' +
+    'and generate a config file. Open it in any text editor — the two values below are inside it:</p>' +
     '<pre style="margin:10px 0">[Interface]\nPrivateKey = <span class="hl">this is your private key</span>\nAddress = <span class="hl">this is your address</span></pre>' +
-    '<p style="margin:0"><a href="hardware.html#providers">Provider comparison</a> \u00b7 ' +
+    '<p style="margin:0"><a href="hardware.html#providers">Provider comparison</a> · ' +
     '<a href="documentation.html#gluetun">How Gluetun uses these</a></p>' +
     '<p style="margin:10px 0 0"><b>Not ready?</b> Leave these blank. The generator writes <code>CHANGEME</code> ' +
-    'and qBittorrent simply will not start until you fill them in \u2014 which is the safe way round.</p>';
+    'and qBittorrent simply will not start until you fill them in — which is the safe way round.</p>';
   b.appendChild(noVpn);
 
   var g = el("div","fgrid");
@@ -2715,7 +2735,7 @@ function renderCred(){
 function maskValue(v){
   if(!v) return "";
   if(v === "CHANGEME") return v;
-  return "\u2022".repeat(Math.min(v.length, 40));
+  return "•".repeat(Math.min(v.length, 40));
 }
 /* Every value worth hiding in the file previews. */
 function secretValues(){
@@ -2732,7 +2752,7 @@ function maskBody(text){
   var vals = secretValues();
   vals.sort(function(a,b){ return b.length - a.length; });
   vals.forEach(function(v){
-    text = text.split(v).join("\u2022".repeat(Math.min(v.length, 40)));
+    text = text.split(v).join("•".repeat(Math.min(v.length, 40)));
   });
   return text;
 }
@@ -2751,7 +2771,7 @@ function renderSecrets(){
   need.forEach(function(s){
     var val = state.secrets[s.key] || "";
     var li = el("li");
-    li.appendChild(el("span","vi ok","\u2713"));
+    li.appendChild(el("span","vi ok","✓"));
     var tx = el("div","vtext");
     tx.appendChild(el("b",null,s.label));
 
@@ -2775,8 +2795,13 @@ function renderSecrets(){
     var cp = el("button","secretbtn","Copy");
     cp.type = "button";
     cp.onclick = function(){
-      navigator.clipboard.writeText(sp.dataset.real).then(function(){
-        cp.textContent = "Copied"; setTimeout(function(){ cp.textContent = "Copy"; }, 1500);
+      copyText(sp.dataset.real, function(worked){
+        cp.textContent = worked ? "Copied" : "Press Ctrl+C";
+        if(!worked && sp.dataset.shown !== "1"){
+          // Nothing was copied, so reveal it — otherwise there is no way to get it.
+          sp.textContent = sp.dataset.real; sp.dataset.shown = "1"; eye.textContent = "Hide";
+        }
+        setTimeout(function(){ cp.textContent = "Copy"; }, 2000);
       });
     };
     row.appendChild(cp);
@@ -2858,7 +2883,7 @@ function renderClash(){
       'Your Jellyfin accounts, library scan and monitors all survive.</p>' +
       '<button class="sbtn" id="dropclash">Remove ' + names + '</button></div>' +
       '<div><b>Start fresh</b><p>Delete the old projects in Arcane first, then deploy this one. ' +
-      'You will set up Jellyfin again from scratch \u2014 accounts, libraries and monitors included.</p></div>' +
+      'You will set up Jellyfin again from scratch — accounts, libraries and monitors included.</p></div>' +
     '</div></div>';
   var btn = $("dropclash");
   if(btn) btn.onclick = function(){
@@ -2894,8 +2919,8 @@ function renderArcaneHelp(){
           '<p>Unzip the download so <code>deploy-to-arcane.sh</code> sits beside ' +
           '<code>docker-compose.yml</code> and <code>.env</code>. It reads them from the current folder.</p></div>' +
         '<div><i>2</i><b>Make an API key</b>' +
-          '<p>In Arcane: <b>Settings \u2192 API Keys</b>. Grant only <code>environments:read</code>, ' +
-          '<code>projects:create</code> and <code>projects:deploy</code>. Copy it \u2014 it is shown once.</p></div>' +
+          '<p>In Arcane: <b>Settings → API Keys</b>. Grant only <code>environments:read</code>, ' +
+          '<code>projects:create</code> and <code>projects:deploy</code>. Copy it — it is shown once.</p></div>' +
         '<div><i>3</i><b>Run it</b>' +
           '<p><code>cd</code> into that folder and run <code>bash deploy-to-arcane.sh</code>. ' +
           'On Windows use Git Bash or WSL, not PowerShell.</p></div>' +
@@ -2916,7 +2941,7 @@ function renderArcaneHelp(){
           '<p>Failures also write <code>arcane-deploy.log</code> next to the script, and it waits for a ' +
           'keypress before closing so the error does not vanish with the window.</p>' +
           '<p><b>The key is never stored.</b> It is typed with the input hidden, held only in that shell ' +
-          'process, and cleared when the script finishes \u2014 not exported, not written to a file, and ' +
+          'process, and cleared when the script finishes — not exported, not written to a file, and ' +
           'not passed as an argument where <code>ps</code> would show it.</p>' +
           '<p><b>Prefer not to use the script?</b> Every route below does the same job by hand.</p>' +
         '</div></details>' +
@@ -2933,7 +2958,7 @@ function renderCaddyHelp(){
       '<div class="chelp-h"><b>Your Caddyfile</b><span>the second file, and where people get stuck</span></div>' +
       '<div class="chelp-grid">' +
         '<div><i>1</i><b>Put it beside the Compose file</b>' +
-          '<p>Same folder, named <code>Caddyfile</code>, no extension \u2014 the mount is <code>./Caddyfile</code>. Anywhere else and Caddy starts with no routes.</p></div>' +
+          '<p>Same folder, named <code>Caddyfile</code>, no extension — the mount is <code>./Caddyfile</code>. Anywhere else and Caddy starts with no routes.</p></div>' +
         '<div><i>2</i><b>Point DNS at this machine</b>' +
           '<p>An A record for every name in the file. Caddy requests a certificate per name.</p></div>' +
         '<div><i>3</i><b>Forward 80 and 443 only</b>' +
@@ -2943,15 +2968,41 @@ function renderCaddyHelp(){
       '</div>' +
       '<details class="chelp-more"><summary>Editing it later, and testing safely</summary>' +
         '<div class="chelp-body">' +
-          '<p><b>Adding a service</b> means adding a block and reloading. A reload is not a restart \u2014 no connections drop:</p>' +
+          '<p><b>Adding a service</b> means adding a block and reloading. A reload is not a restart — no connections drop:</p>' +
           '<pre>docker compose exec caddy caddy validate --config /etc/caddy/Caddyfile\n' +
           'docker compose exec caddy caddy reload --config /etc/caddy/Caddyfile</pre>' +
-          '<p><b>Testing without burning rate limits.</b> Certificate authorities limit failed attempts. While getting DNS right, put this at the top of the file \u2014 your browser will warn the certificate is untrusted, which is the point:</p>' +
+          '<p><b>Testing without burning rate limits.</b> Certificate authorities limit failed attempts. While getting DNS right, put this at the top of the file — your browser will warn the certificate is untrusted, which is the point:</p>' +
           '<pre>{\n    acme_ca https://acme-staging-v02.api.letsencrypt.org/directory\n}</pre>' +
-          '<p><b>Back up Caddy\u2019s data volume.</b> It holds your issued certificates; losing it means requesting them all again.</p>' +
-          '<p><b>Left out on purpose.</b> Arcane, qBittorrent and the *arr apps are not proxied \u2014 they hold the Docker socket, write files anywhere, or authenticate weakly. Reach them over Tailscale or your LAN. <a href="access.html">More on access</a>.</p>' +
+          '<p><b>Back up Caddy’s data volume.</b> It holds your issued certificates; losing it means requesting them all again.</p>' +
+          '<p><b>Left out on purpose.</b> Arcane, qBittorrent and the *arr apps are not proxied — they hold the Docker socket, write files anywhere, or authenticate weakly. Reach them over Tailscale or your LAN. <a href="access.html">More on access</a>.</p>' +
         '</div></details>' +
     '</div>';
+}
+
+/* navigator.clipboard is undefined outside a secure context — open this file
+   from file:// and the copy buttons throw before any promise exists. Fall back
+   to a hidden textarea, and always tell the person what happened. */
+function copyText(text, done){
+  function ok(){ done(true); }
+  function fail(){
+    try{
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly","");
+      ta.style.position = "fixed";
+      ta.style.left = "-9999px";
+      document.body.appendChild(ta);
+      ta.select();
+      var worked = document.execCommand("copy");
+      document.body.removeChild(ta);
+      done(!!worked);
+    }catch(e){ done(false); }
+  }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(ok, fail);
+  } else {
+    fail();
+  }
 }
 
 function buildFiles(){
@@ -2967,6 +3018,8 @@ function buildFiles(){
   renderCaddyHelp();
   renderArcaneHelp();
   renderClash();
+  var bn = $("bootstrapnote");
+  if(bn) bn.style.display = state.selected.indexOf("arcane") !== -1 ? "" : "none";
   var sn = $("splitnote");
   if(sn) sn.style.display = (state.splitAccess && state.selected.some(CORE.isAccess)) ? "" : "none";
   var sl = $("splitline");
@@ -3104,8 +3157,10 @@ function download(name, body){
 }
 $("copyone").onclick = function(){
   var b = this;
-  navigator.clipboard.writeText(files[activeFile].body).then(function(){
-    b.textContent = "Copied"; setTimeout(function(){ b.textContent = "Copy"; }, 1600);
+  // Always the real file, never the masked preview.
+  copyText(files[activeFile].body, function(worked){
+    b.textContent = worked ? "Copied" : "Copy failed — use Download";
+    setTimeout(function(){ b.textContent = "Copy"; }, worked ? 1600 : 2600);
   });
 };
 $("dlone").onclick = function(){ download(files[activeFile].name, files[activeFile].body); };
