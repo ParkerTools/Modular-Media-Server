@@ -21,9 +21,9 @@
   --warn-bg:#fff0e3;--tip-bg:#e4f5f4;--line-teal:#a9dde0;--line-peach:#f4d3b6;
   --code-fg:#0e5a63;--code-bg:#15333b;--code-txt:#fdfcdc;--code-cm:#8fb3ae;
   --pill-teal-bg:#d3f0ef;--pill-coral-bg:#ffe0dc;--pill-peach-fg:#744b32;--pill-coral-fg:#96382f;
-  --ok:#2f7d5e;--bad:#b0463c;--warnfg:#a06a2c;--blue-hover:#005b73;
+  --ok:#2a7054;--bad:#b0463c;--warnfg:#8f5d24;--blue-hover:#005b73;
   --shadow:rgba(21,51,59,.045);--blob-a:var(--peach);--blob-b:rgba(0,175,185,.20);
-  --blue:#006C87;--teal:#00AFB9;--cream:#FDFCDC;--peach:#FED9B7;--coral:#F07167;--ink:#15333b;--muted:#4a626b;--white:#fffef7;--line:#cfe3e4}
+  --blue:#006C87;--teal:#00AFB9;--cream:#FDFCDC;--peach:#FED9B7;--coral:#F07167;--coral-text:#b34038;--ink:#15333b;--muted:#4a626b;--white:#fffef7;--line:#cfe3e4}
 *{box-sizing:border-box}html{scroll-behavior:smooth}
 body{margin:0;color:var(--ink);font-family:"DM Sans",sans-serif;
   background-color:var(--cream);
@@ -36,7 +36,7 @@ body{margin:0;color:var(--ink);font-family:"DM Sans",sans-serif;
   background-repeat:repeat,no-repeat,no-repeat,no-repeat,no-repeat;
   background-size:220px 220px,auto,auto,auto,auto;
   background-attachment:fixed;background-blend-mode:soft-light,normal,normal,normal,normal}
-a{color:var(--blue);text-decoration:none}a:hover{color:var(--coral);text-decoration:underline}
+a{color:var(--blue);text-decoration:none}a:hover{color:var(--coral-text);text-decoration:underline}
 .wrap{max-width:1160px;margin:auto;padding:0 24px}
 nav{height:82px;display:flex;align-items:center;justify-content:space-between;position:relative}
 .brand{font-weight:700;font-size:18px;letter-spacing:-.04em;color:var(--ink)}.brand span{color:var(--coral)}
@@ -346,6 +346,7 @@ html[data-theme="dark"] .skiplink{color:#08151a}
 <a href="#kuma-telegram">Telegram alerts</a>
 <hr>
 <a href="#cloudflared">Cloudflare Tunnel</a>
+<a href="#homarr">Homarr dashboard</a>
 <a href="#pocketid">Pocket ID</a>
 <a href="#pid-clients">Adding a client</a>
 <a href="#pid-immich">Immich SSO</a>
@@ -989,6 +990,63 @@ docker compose logs -f cloudflared</pre>
 <p>Under <b>Access → Applications</b>, add a self-hosted application for the hostname, then a policy — allow specific email addresses, or a whole domain. Cloudflare then requires a one-time code before the request ever reaches your server.</p>
 <div class="tip"><strong>This is the piece that makes a tunnel reasonable</strong> for anything more sensitive than a status page. It also means a service with weak built-in auth is not directly exposed.</div>
 <div class="warning"><strong>It still does not make the administrative tools safe to publish.</strong> Arcane holds the Docker socket; qBittorrent can write files anywhere. Keep those on Tailscale or your LAN regardless.</div>
+</div></details>
+</section>
+
+
+<section id="homarr">
+<div class="kicker">Dashboard</div>
+<h2>Homarr</h2>
+<p class="lead">One page that lists everything you run, with live tiles instead of a bookmark folder. Set it up last, once the other apps exist for it to point at.</p>
+
+<details class="app" open><summary><b>First run</b><span class="pill first">Start here</span><span class="d">Account, then a board</span></summary>
+<div class="abody">
+<ol class="steps">
+<li>Open <code>http://your-server:7575</code>. The first account you create is the administrator.</li>
+<li>It starts with an empty board. Press <b>Edit mode</b> — everything after this is drag and drop.</li>
+<li>Add an <b>App</b> tile for each service. It only needs a name and a URL:
+<div class="fields"><dl>
+<dt>Name</dt><dd>Jellyfin</dd>
+<dt>Internal URL</dt><dd><code>http://jellyfin:8096</code> — used for status checks</dd>
+<dt>External URL</dt><dd><code>http://your-server:8096</code> — where clicking the tile sends you</dd>
+</dl></div></li>
+<li>Press <b>Save</b> to leave edit mode.</li>
+</ol>
+<div class="tip"><strong>The two URLs are not the same thing, and this is the part people get wrong.</strong> The internal one is how Homarr checks whether the app is up, so it uses the container name. The external one is what your browser opens, so it needs an address your browser can reach. Put the container name in both and every tile appears down.</div>
+</div></details>
+
+<details class="app"><summary><b>Live status and widgets</b><span class="d">Where the Docker socket comes in</span></summary>
+<div class="abody">
+<p>Tiles can show whether a container is running, and widgets can read your other apps directly — what is downloading, what is playing, how full the disk is.</p>
+<h5>Container status</h5>
+<p>This needs the Docker socket, which is commented out in the generated file. Uncomment it, and read the warning first:</p>
+<pre>volumes:
+  - homarr_appdata:/appdata
+  - /var/run/docker.sock:/var/run/docker.sock:ro</pre>
+<div class="warning"><strong><code>:ro</code> does not restrict the Docker API.</strong> It makes the socket file read-only; anything holding that mount can still create a privileged container. If you would rather not, the tiles still work — they just show links rather than running state. A <a href="#kuma">socket proxy</a> is the middle path.</div>
+<h5>App integrations</h5>
+<p>Widgets for Sonarr, Radarr, qBittorrent and Jellyfin each need that app's API key. In Homarr, edit the tile and add an integration:</p>
+<div class="fields"><dl>
+<dt>Integration</dt><dd>the app type</dd>
+<dt>URL</dt><dd>the internal one, e.g. <code>http://sonarr:8989</code></dd>
+<dt>API key</dt><dd>from that app's Settings → General</dd>
+</dl></div>
+<p>These credentials are stored encrypted, using the key below.</p>
+</div></details>
+
+<details class="app"><summary><b>The encryption key</b><span class="pill after">Do not lose this</span><span class="d">Different format from every other secret here</span></summary>
+<div class="abody">
+<p>Homarr requires <code>SECRET_ENCRYPTION_KEY</code>: <b>64 hexadecimal characters</b>. Every other secret in this project is base64, and Homarr will not start with the wrong shape. The generator produces the right one; by hand it is:</p>
+<pre>openssl rand -hex 32</pre>
+<div class="warning"><strong>Never change it after setting up integrations.</strong> It encrypts the API keys Homarr holds for your other apps. Rotate it and every saved integration becomes unreadable — Homarr will still run, but each one has to be entered again.</div>
+<div class="tip"><strong>Back up <code>homarr_appdata</code></strong> along with your other config. That volume holds your board layout and the encrypted credentials; the key alone will not rebuild it.</div>
+</div></details>
+
+<details class="app"><summary><b>Where to reach it</b><span class="d">And why it is not published</span></summary>
+<div class="abody">
+<p>The generated Caddyfile deliberately does not proxy Homarr, for the same reason it skips Arcane and the *arr apps: a dashboard holds credentials for every service it talks to, which makes it a poor thing to put on the internet.</p>
+<p>Reach it on your own network at <code>http://your-server:7575</code>, or from outside over <a href="access.html">Tailscale</a>, which does not publish anything.</p>
+<div class="tip"><strong>Make it your browser home page.</strong> That is the whole point of it — one address that gets you to everything else.</div>
 </div></details>
 </section>
 
