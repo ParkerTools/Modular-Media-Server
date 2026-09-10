@@ -73,7 +73,7 @@ SELECTED=()
 ALL_MODULES=(
   arcane jellyfin jellyseerr sonarr radarr lidarr bazarr
   gluetun qbittorrent jackett immich kima uptime-kuma
-  archivebox tubearchivist caddy tailscale cloudflared pocket-id
+  archivebox tubearchivist caddy tailscale cloudflared socket-proxy pocket-id
 )
 
 module_label() {
@@ -96,6 +96,7 @@ module_label() {
     caddy)         echo "Caddy — reverse proxy with automatic HTTPS" ;;
     tailscale)     echo "Tailscale — private mesh network (host install is simpler)" ;;
     cloudflared)   echo "Cloudflare Tunnel — no open ports; routing set in Cloudflare" ;;
+    socket-proxy)  echo "Docker Socket Proxy — filtered, read-only Docker API" ;;
     pocket-id)     echo "Pocket ID — passkey single sign-on (needs Caddy + domain)" ;;
     *)             echo "$1" ;;
   esac
@@ -605,7 +606,7 @@ emit_arcane() {
   # Docker management in a browser. Mounts the Docker socket, which is
   # equivalent to root on this host — do not expose it to the internet.
   arcane:
-    image: ghcr.io/getarcaneapp/arcane:latest
+    image: ghcr.io/getarcaneapp/arcane:${ARCANE_TAG:-latest}
     container_name: arcane
     ports:
       - "3552:3552"
@@ -627,7 +628,7 @@ emit_jellyfin() {
   cat <<'YAML'
 
   jellyfin:
-    image: jellyfin/jellyfin:latest
+    image: jellyfin/jellyfin:${JELLYFIN_TAG:-latest}
     container_name: jellyfin
     user: "${PUID}:${PGID}"
     ports:
@@ -662,7 +663,7 @@ emit_jellyseerr() {
   cat <<'YAML'
 
   jellyseerr:
-    image: fallenbagel/jellyseerr:latest
+    image: fallenbagel/jellyseerr:${JELLYSEERR_TAG:-latest}
     container_name: jellyseerr
     ports:
       - "5055:5055"
@@ -675,10 +676,14 @@ YAML
 }
 
 emit_arr() { # emit_arr <name> <port> <extra volume line>
+  # The tag variable is named after the service, so it has to be built before
+  # the heredoc — ${$1_TAG} is not valid substitution.
+  local tagvar
+  tagvar="$(printf '%s' "$1" | tr '[:lower:]' '[:upper:]')_TAG"
   cat <<YAML
 
   $1:
-    image: lscr.io/linuxserver/$1:latest
+    image: lscr.io/linuxserver/$1:\${${tagvar}:-latest}
     container_name: $1
     ports:
       - "$2:$2"
@@ -698,7 +703,7 @@ emit_bazarr() {
   cat <<'YAML'
 
   bazarr:
-    image: lscr.io/linuxserver/bazarr:latest
+    image: lscr.io/linuxserver/bazarr:${BAZARR_TAG:-latest}
     container_name: bazarr
     ports:
       - "6767:6767"
@@ -724,7 +729,7 @@ emit_gluetun() {
   # Everything that routes through the VPN publishes its ports here,
   # because those containers share this container's network stack.
   gluetun:
-    image: qmcgaw/gluetun:latest
+    image: qmcgaw/gluetun:\${GLUETUN_TAG:-latest}
     container_name: gluetun
     cap_add:
       - NET_ADMIN
@@ -761,7 +766,7 @@ emit_qbittorrent() {
   # network_mode ties this container to Gluetun. If the VPN drops,
   # this container loses its network too. That is the point.
   qbittorrent:
-    image: lscr.io/linuxserver/qbittorrent:latest
+    image: lscr.io/linuxserver/qbittorrent:${QBITTORRENT_TAG:-latest}
     container_name: qbittorrent
     network_mode: "service:gluetun"
     volumes:
@@ -784,7 +789,7 @@ emit_jackett() {
     cat <<'YAML'
 
   jackett:
-    image: lscr.io/linuxserver/jackett:latest
+    image: lscr.io/linuxserver/jackett:${JACKETT_TAG:-latest}
     container_name: jackett
     network_mode: "service:gluetun"
     volumes:
@@ -802,7 +807,7 @@ YAML
     cat <<'YAML'
 
   jackett:
-    image: lscr.io/linuxserver/jackett:latest
+    image: lscr.io/linuxserver/jackett:${JACKETT_TAG:-latest}
     container_name: jackett
     ports:
       - "9117:9117"
@@ -821,7 +826,7 @@ emit_immich() {
   cat <<'YAML'
 
   immich-server:
-    image: ghcr.io/immich-app/immich-server:release
+    image: ghcr.io/immich-app/immich-server:${IMMICH_SERVER_TAG:-release}
     container_name: immich_server
     ports:
       - "2283:2283"
@@ -841,21 +846,21 @@ emit_immich() {
     restart: unless-stopped
 
   immich-machine-learning:
-    image: ghcr.io/immich-app/immich-machine-learning:release
+    image: ghcr.io/immich-app/immich-machine-learning:${IMMICH_MACHINE_LEARNING_TAG:-release}
     container_name: immich_ml
     volumes:
       - ${CONFIG_ROOT}/immich/ml-cache:/cache
     restart: unless-stopped
 
   immich-redis:
-    image: docker.io/valkey/valkey:8-bookworm
+    image: docker.io/valkey/valkey:${VALKEY_TAG:-8-bookworm}
     container_name: immich_redis
     healthcheck:
       test: redis-cli ping || exit 1
     restart: unless-stopped
 
   immich-postgres:
-    image: ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0
+    image: ghcr.io/immich-app/postgres:${POSTGRES_TAG:-14-vectorchord0.4.3-pgvectors0.2.0}
     container_name: immich_postgres
     environment:
       - POSTGRES_PASSWORD=${IMMICH_DB_PASSWORD}
@@ -874,7 +879,7 @@ emit_kima() {
   # All-in-one container: it runs its own Postgres and Redis internally,
   # so there are no separate database services to add.
   kima:
-    image: chevron7locked/kima:latest
+    image: chevron7locked/kima:${KIMA_TAG:-latest}
     container_name: kima
     ports:
       - "3030:3030"
@@ -896,7 +901,7 @@ emit_uptime_kuma() {
   cat <<'YAML'
 
   uptime-kuma:
-    image: louislam/uptime-kuma:1
+    image: louislam/uptime-kuma:${UPTIME_KUMA_TAG:-1}
     container_name: uptime-kuma
     ports:
       - "3001:3001"
@@ -915,7 +920,7 @@ emit_archivebox() {
   cat <<'YAML'
 
   archivebox:
-    image: archivebox/archivebox:latest
+    image: archivebox/archivebox:${ARCHIVEBOX_TAG:-latest}
     container_name: archivebox
     ports:
       - "8000:8000"
@@ -937,7 +942,7 @@ emit_tubearchivist() {
   cat <<'YAML'
 
   tubearchivist:
-    image: bbilly1/tubearchivist:latest
+    image: bbilly1/tubearchivist:${TUBEARCHIVIST_TAG:-latest}
     container_name: tubearchivist
     ports:
       - "8001:8000"
@@ -960,7 +965,7 @@ emit_tubearchivist() {
     restart: unless-stopped
 
   tubearchivist-redis:
-    image: redis:7
+    image: redis:${REDIS_TAG:-7}
     container_name: tubearchivist_redis
     volumes:
       - ${CONFIG_ROOT}/tubearchivist/redis:/data
@@ -969,7 +974,7 @@ emit_tubearchivist() {
     restart: unless-stopped
 
   tubearchivist-es:
-    image: bbilly1/tubearchivist-es:latest
+    image: bbilly1/tubearchivist-es:${TUBEARCHIVIST_ES_TAG:-latest}
     container_name: tubearchivist_es
     environment:
       - ELASTIC_PASSWORD=${TA_ES_PASSWORD}
@@ -989,7 +994,7 @@ emit_caddy() {
   # Terminates HTTPS and routes by hostname. Only this container should
   # have ports open to the world — 80 and 443, nothing else.
   caddy:
-    image: caddy:latest
+    image: caddy:${CADDY_TAG:-latest}
     container_name: caddy
     ports:
       - "80:80"
@@ -1011,7 +1016,7 @@ emit_tailscale() {
   # Installing Tailscale on the host is usually simpler and covers every
   # service at once; use this when you cannot install on the host.
   tailscale:
-    image: tailscale/tailscale:latest
+    image: tailscale/tailscale:${TAILSCALE_TAG:-latest}
     container_name: tailscale
     hostname: media-server
     cap_add:
@@ -1029,6 +1034,32 @@ emit_tailscale() {
 YAML
 }
 
+emit_socket_proxy() {
+  cat <<'YAML'
+
+  # Grants a narrow, read-only slice of the Docker API. Mounting the raw socket
+  # into an app is root-equivalent; :ro on that mount protects the socket file,
+  # not the API behind it. This does the job properly.
+  socket-proxy:
+    image: lscr.io/linuxserver/socket-proxy:${SOCKET_PROXY_TAG:-latest}
+    container_name: socket-proxy
+    environment:
+      - CONTAINERS=1        # list and inspect containers
+      - INFO=1              # daemon info, used for health checks
+      - POST=0              # refuse every write, including container create
+      - EXEC=0
+      - IMAGES=0
+      - VOLUMES=0
+      - NETWORKS=0
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    read_only: true
+    tmpfs:
+      - /run
+    restart: unless-stopped
+YAML
+}
+
 emit_cloudflared() {
   cat <<'YAML'
 
@@ -1036,7 +1067,7 @@ emit_cloudflared() {
   # Which hostname maps to which service is configured in the Zero Trust
   # dashboard, not in this file.
   cloudflared:
-    image: cloudflare/cloudflared:latest
+    image: cloudflare/cloudflared:${CLOUDFLARED_TAG:-latest}
     container_name: cloudflared
     command: tunnel --no-autoupdate run
     environment:
@@ -1051,7 +1082,7 @@ emit_pocket_id() {
   # Passkey-only identity provider. APP_URL must match the address you
   # visit exactly — passkeys are bound to that origin.
   pocket-id:
-    image: ghcr.io/pocket-id/pocket-id:v2
+    image: ghcr.io/pocket-id/pocket-id:${POCKET_ID_TAG:-v2}
     container_name: pocket-id
     expose:
       - "1411"
@@ -1133,11 +1164,13 @@ build_compose() {
   selected caddy         && emit_caddy
   selected tailscale     && emit_tailscale
   selected cloudflared   && emit_cloudflared
+  selected socket-proxy  && emit_socket_proxy
   selected pocket-id     && emit_pocket_id
   # Kima's docs recommend a named volume for /data rather than a bind mount.
   selected kima && printf '\nvolumes:\n  kima_data:\n'
   return 0
 }
+
 
 build_env() { # build_env <real|example>
   local mode="$1" secret placeholder="CHANGEME"
@@ -1295,6 +1328,7 @@ service_url() {
     pocket-id) echo "https://id.${BASE_DOMAIN:-your-domain}" ;;
     tailscale) echo "(no web interface)" ;;
     cloudflared) echo "(no web interface)" ;;
+    socket-proxy) echo "(no web interface)" ;;
     *) echo "" ;;
   esac
 }
