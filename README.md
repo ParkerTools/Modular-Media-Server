@@ -17,7 +17,7 @@ Start with one thing. Add another when you need it.
 | **[Quickstart](https://parkertools.github.io/Modular-Media-Server/#quickstart)** | Empty machine to a monitored server in about 30 minutes |
 | **[Setup guide](https://parkertools.github.io/Modular-Media-Server/guide.html)** | Two routes — manage from a browser, or generate files yourself |
 | **[Platform guides](https://parkertools.github.io/Modular-Media-Server/platforms.html)** | Docker on Windows, macOS, Linux and NAS |
-| **[Compose generator](https://parkertools.github.io/Modular-Media-Server/generator.html)** | 18 modules, dependency resolution, secrets in your browser |
+| **[Compose generator](https://parkertools.github.io/Modular-Media-Server/generator.html)** | 20 modules, dependency resolution, secrets in your browser |
 | **[App setup](https://parkertools.github.io/Modular-Media-Server/setup.html)** | Configuring each app and wiring them together |
 | **[Access & accounts](https://parkertools.github.io/Modular-Media-Server/access.html)** | Remote access, Pocket ID single sign-on, user management |
 | **[Hardware & cost](https://parkertools.github.io/Modular-Media-Server/hardware.html)** | What to run it on, and honest pricing |
@@ -31,9 +31,9 @@ Start with one thing. Add another when you need it.
 **Downloads** Gluetun · qBittorrent · Jackett
 **Photos & music** Immich · Kima
 **Monitoring & archives** Uptime Kuma · ArchiveBox · Tube Archivist
-**Connection** Caddy · Tailscale
+**Connection** Caddy · Cloudflare Tunnel · Tailscale
 **Authentication** Pocket ID
-**Management** Arcane
+**Management** Arcane · Docker Socket Proxy
 
 ## Two ways to generate a stack
 
@@ -87,7 +87,7 @@ Google Fonts.
 |---|---|---|
 | 1 · Documentation | Done | Docker/Compose intros, Arcane, storage, permissions, networking, per-module reference, legal notices |
 | 2 · Compose files | Done | Generated on demand rather than kept static — the generator and `install.sh` emit identical output, checked by CI |
-| 3 · Generator | Done | 19 modules, dependency resolution, storage layouts, credentials, secrets, validation, ZIP download |
+| 3 · Generator | Done | 20 modules, dependency resolution, storage layouts, credentials, secrets, validation, ZIP download |
 | 4 · Hardware & hosting | Done | Requirements, device guidance, self-hosting, VPS comparison, costs, buying guidance |
 | 5 · Utilities | Partly | Documented and linked on the hardware page; no per-utility setup guides |
 
