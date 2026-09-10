@@ -83,6 +83,8 @@ h2{font-size:30px;margin:6px 0 12px}
 .pager a{display:block;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px 19px;text-decoration:none}
 .pager a:hover{border-color:var(--teal);text-decoration:none}
 .pager .dir{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);display:block;margin-bottom:4px}
+.pager .prev{text-align:left}
+@media(min-width:760px){.pager .next{text-align:right}}
 .pager .ttl{font-family:Fraunces,serif;font-size:18px;color:var(--blue);display:block}
 .sitefoot{border-top:1px solid var(--line);margin-top:16px;padding:34px 0 28px}
 .footbase{font-size:12.5px;color:var(--muted);line-height:1.7}
@@ -150,14 +152,15 @@ html[data-theme="dark"] body{background-blend-mode:overlay,normal,normal,normal,
 
 <section id="storage">
 <h2>What is stored in your browser</h2>
-<p>Two small preferences, using <code>localStorage</code>. Both stay on your device, are readable only by this site, and are never sent anywhere.</p>
+<p>Three small preferences, using <code>localStorage</code>. All stay on your device, are readable only by this site, and are never sent anywhere.</p>
 <div class="tbl"><table>
 <thead><tr><th>Key</th><th>What it holds</th><th>Why</th></tr></thead>
 <tbody>
 <tr><td><code>mms-theme</code></td><td><code>light</code> or <code>dark</code></td><td>Remembers your theme so the site does not flip back each visit</td></tr>
+<tr><td><code>mms-os</code></td><td>An operating system, e.g. <code>win</code></td><td>Remembers which platform's instructions you chose, so the guides do not reset to a different one each visit</td></tr>
 <tr><td><code>mms-amz-region</code></td><td>An Amazon store, e.g. <code>com</code></td><td>Remembers which regional store you chose on the hardware page</td></tr>
 </tbody></table></div>
-<p>Neither is a cookie, neither identifies you, and clearing your browser data removes both with no consequence beyond losing those two preferences.</p>
+<p>None is a cookie, none identifies you, and clearing your browser data removes them with no consequence beyond losing those preferences.</p>
 </section>
 
 <section id="third-party">
@@ -194,7 +197,7 @@ html[data-theme="dark"] body{background-blend-mode:overlay,normal,normal,normal,
 <h2>Your choices</h2>
 <ul>
 <li><strong style="color:var(--ink)">Block the fonts.</strong> The site remains fully functional with a fallback typeface.</li>
-<li><strong style="color:var(--ink)">Clear the two stored preferences</strong> at any time through your browser's site data settings.</li>
+<li><strong style="color:var(--ink)">Clear the stored preferences</strong> at any time through your browser's site data settings.</li>
 <li><strong style="color:var(--ink)">Avoid the affiliate links</strong> by searching Amazon yourself. The hardware page tells you exactly what specifications to look for, so the links are a convenience rather than a requirement.</li>
 <li><strong style="color:var(--ink)">Read the source.</strong> Every page is static HTML in a <a href="https://github.com/parkertools/Modular-Media-Server" target="_blank" rel="noopener">public repository</a>. Nothing here is hidden from you.</li>
 </ul>
