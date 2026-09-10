@@ -898,6 +898,18 @@ curl -s https://ipinfo.io/ip     <span class="c"># must be different</span></pre
 <h5>Official sources</h5><div class="srcs"><a href="https://docs.linuxserver.io/images/docker-socket-proxy/" target="_blank" rel="noopener">Docs</a><a href="https://github.com/linuxserver/docker-socket-proxy" target="_blank" rel="noopener">GitHub</a></div>
 </div></details>
 
+<details class="m" id="homarr"><summary><b>Homarr</b><span class="pill mod">Easy</span><span class="d">A dashboard front page for everything else</span></summary>
+<div class="mbody">
+<div class="spec"><div><b>Port</b><span>7575</span></div><div><b>CPU</b><span>Low</span></div><div><b>RAM</b><span>~200 MB</span></div><div><b>Storage</b><span>Small, in a named volume</span></div></div>
+<h5>Purpose</h5><p>One page listing every service you run, with live status tiles and widgets that read from your other apps — what is downloading, what is playing, how full the disk is. It is the page you set as your browser home.</p>
+<h5>Configuration</h5><p>Requires <code>SECRET_ENCRYPTION_KEY</code>, a <b>64-character hex</b> string. This is not the same format as the other secrets in this project, which are base64 — Homarr will not start with the wrong shape. The generator produces the right one.</p>
+<div class="warning"><strong>Do not change that key once you have set integrations up.</strong> It encrypts the credentials Homarr stores for your other apps. Rotate it and every saved integration becomes unreadable, and you re-enter all of them.</div>
+<h5>Docker integration</h5><p>Live container status needs the Docker socket, commented out by default. It is the raw socket: <code>:ro</code> restricts the socket file, not the API behind it. The tiles work without it — they just show link cards rather than running state.</p>
+<div class="warning"><strong>Not published by the generated Caddyfile.</strong> A dashboard holds credentials for every app it talks to, which makes it a poor thing to put on the internet. Reach it on your LAN or over Tailscale.</div>
+<h5>Alternatives</h5><p>Dashy and Homepage cover similar ground with YAML configuration instead of a drag-and-drop interface. Homarr is here because it needs no config file to get started, which suits a generated stack.</p>
+<h5>Official sources</h5><div class="srcs"><a href="https://homarr.dev/" target="_blank" rel="noopener">Docs</a><a href="https://github.com/homarr-labs/homarr" target="_blank" rel="noopener">GitHub</a></div>
+</div></details>
+
 <div class="mcat" id="m-auth"><span class="bar"></span>Authentication</div>
 
 <details class="m"><summary><b>Pocket ID</b><span class="pill adv">Advanced</span><span class="d">Passkey single sign-on</span></summary>
@@ -966,6 +978,7 @@ curl -s https://ipinfo.io/ip     <span class="c"># must be different</span></pre
 <tr><td>Pocket ID</td><td>1411</td><td>Not published — reached through Caddy</td></tr>
 <tr><td>Cloudflare Tunnel</td><td>None</td><td>Outbound only — nothing to publish</td></tr>
 <tr><td>Docker Socket Proxy</td><td>2375</td><td>Internal only — never published to the host</td></tr>
+<tr><td>Homarr</td><td>7575</td><td>Not proxied — holds credentials for other apps</td></tr>
 </tbody></table></div>
 <div class="tip"><strong>On a Synology NAS, DSM reserves many ports.</strong> If a container will not start because a port is in use, shift the host side — <code>"8097:8096"</code> — which breaks nothing.</div>
 </section>
@@ -991,6 +1004,7 @@ curl -s https://ipinfo.io/ip     <span class="c"># must be different</span></pre
 <tr><td>VPN_SERVER_COUNTRIES</td><td>Optional. Blank uses the provider default.</td></tr>
 <tr><td>TS_AUTHKEY</td><td>Tailscale auth key from the admin console.</td></tr>
 <tr><td>CLOUDFLARE_TUNNEL_TOKEN</td><td>Tunnel token from the Cloudflare Zero Trust dashboard.</td></tr>
+<tr><td>HOMARR_SECRET_ENCRYPTION_KEY</td><td>64 hex characters. Encrypts Homarr's stored integration credentials — never change it after setup.</td></tr>
 <tr><td>ARCANE_APP_URL</td><td>Where you reach Arcane. Must match the address you actually use.</td></tr>
 <tr><td>ARCANE_ENCRYPTION_KEY</td><td>Generated. Encrypts stored values.</td></tr>
 <tr><td>ARCANE_JWT_SECRET</td><td>Generated. Must stay stable across restarts.</td></tr>
