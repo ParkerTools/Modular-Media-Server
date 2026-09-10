@@ -539,18 +539,30 @@ bash install.sh</pre>
 <pre>bash install.sh --preset automated --dry-run</pre>
 
 <h3>What it writes</h3>
-<div class="card"><strong>In the directory you choose</strong>
-<ul style="margin-bottom:0">
-<li><code>docker-compose.yml</code> — your services, with every value pulled from the environment file</li>
-<li><code>.env</code> — real paths and generated secrets, written mode 600</li>
-<li><code>.env.example</code> — the same shape with placeholders, safe to commit</li>
-<li><code>.gitignore</code> — already ignoring <code>.env</code></li>
-<li><code>README.md</code> — your service addresses and the commands you'll want</li>
-</ul></div>
+<p>Both routes produce the same set of files:</p>
+<div class="tbl"><table>
+<thead><tr><th>File</th><th>What it is</th></tr></thead>
+<tbody>
+<tr><td><code>docker-compose.yml</code></td><td>Every service you picked, wired together</td></tr>
+<tr><td><code>.env</code></td><td>Your real settings and generated secrets. Never commit this</td></tr>
+<tr><td><code>.env.example</code></td><td>The same file with placeholders, safe to share</td></tr>
+<tr><td><code>.gitignore</code></td><td>Already excludes <code>.env</code></td></tr>
+<tr><td><code>README.md</code></td><td>What you built, and the commands to run it</td></tr>
+<tr><td><code>Caddyfile</code></td><td>Only if you picked Caddy</td></tr>
+</tbody></table></div>
+<p>The generator hands them over as a single <b>ZIP</b>. The script writes them into a folder.</p>
 
-<p>Secrets come from <code>openssl rand</code>, falling back to <code>/dev/urandom</code>. Each one is generated separately, so no two services share a password. An existing <code>.env</code> is backed up with a timestamp rather than overwritten.</p>
-
-<div class="warning"><strong>qBittorrent will not be written without a VPN.</strong> Select it and Gluetun is added automatically. If you don't supply credentials, the script writes <code>CHANGEME</code> placeholders and tells you the stack won't start until you fill them in — it won't quietly generate a torrent client with a direct connection to your home address.</div>
+<h3>Options worth knowing about</h3>
+<p>Four choices in the generator change the shape of what you get. None are required, and none are on by default.</p>
+<div class="tbl"><table>
+<thead><tr><th>Option</th><th>What it does</th></tr></thead>
+<tbody>
+<tr><td>Local network only</td><td>Removes anything that publishes to the internet. Tailscale stays, since it is a private network rather than a public address</td></tr>
+<tr><td>Separate connection layer</td><td>Puts Caddy, Tailscale and Cloudflare Tunnel in their own <code>access/</code> project, so restarting your apps never drops remote access</td></tr>
+<tr><td>Arcane deploy script</td><td>Adds <code>deploy-to-arcane.sh</code>, which creates the project in Arcane and starts it in one command</td></tr>
+<tr><td>I already followed the quickstart</td><td>Points out anything that would clash with what you already have running</td></tr>
+</tbody></table></div>
+<div class="tip"><strong>Caddy and Cloudflare Tunnel are mutually exclusive.</strong> They solve the same problem in opposite directions, so picking one drops the other. <a href="access.html#pickone">Which to choose</a>.</div>
 
 <h3>After it finishes</h3>
 <div class="flow"><span>cd into the directory</span><b>→</b><span>read the .env</span><b>→</b><span>docker compose up -d</span><b>→</b><span>set passwords</span></div>
