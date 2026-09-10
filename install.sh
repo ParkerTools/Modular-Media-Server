@@ -57,6 +57,8 @@ PGID_VALUE=""
 CONFIG_ROOT=""
 MEDIA_ROOT=""
 DOWNLOADS_ROOT=""
+DATA_ROOT=""
+LAYOUT="${LAYOUT:-}"
 PHOTOS_ROOT=""
 
 VPN_PROVIDER=""
@@ -73,7 +75,7 @@ SELECTED=()
 ALL_MODULES=(
   arcane jellyfin jellyseerr sonarr radarr lidarr bazarr
   gluetun qbittorrent jackett immich kima uptime-kuma
-  archivebox tubearchivist caddy tailscale cloudflared socket-proxy pocket-id
+  archivebox tubearchivist homarr caddy tailscale cloudflared socket-proxy pocket-id
 )
 
 module_label() {
@@ -97,6 +99,7 @@ module_label() {
     tailscale)     echo "Tailscale — private mesh network (host install is simpler)" ;;
     cloudflared)   echo "Cloudflare Tunnel — no open ports; routing set in Cloudflare" ;;
     socket-proxy)  echo "Docker Socket Proxy — filtered, read-only Docker API" ;;
+    homarr)        echo "Homarr — dashboard front page for everything else" ;;
     pocket-id)     echo "Pocket ID — passkey single sign-on (needs Caddy + domain)" ;;
     *)             echo "$1" ;;
   esac
@@ -159,6 +162,14 @@ gen_hex32() {
     openssl rand -hex 16
   else
     LC_ALL=C tr -dc 'a-f0-9' </dev/urandom | head -c 32
+  fi
+}
+
+gen_hex64() { # Homarr rejects base64 — its key must be 64 hex characters
+  if has openssl; then
+    openssl rand -hex 32
+  else
+    LC_ALL=C tr -dc 'a-f0-9' </dev/urandom | head -c 64
   fi
 }
 
@@ -473,25 +484,48 @@ INSTALL_DIR="${INSTALL_DIR/#\~/$HOME}"
 
 case "$PLATFORM" in
   wsl)
-    DEF_MEDIA="$HOME/media"; DEF_DL="$HOME/downloads"; DEF_PHOTOS="$HOME/photos"
+    DEF_MEDIA="$HOME/media"; DEF_DL="$HOME/downloads"; DEF_PHOTOS="$HOME/photos"; DEF_DATA="$HOME/server"
     say "  ${DIM}Keep these inside WSL (under $HOME), not on /mnt/c. Paths on the${R}"
     say "  ${DIM}Windows drive are far slower and lose Linux file permissions.${R}"
     say ""
     ;;
   macos|gitbash)
-    DEF_MEDIA="$HOME/media"; DEF_DL="$HOME/downloads"; DEF_PHOTOS="$HOME/photos"
+    DEF_MEDIA="$HOME/media"; DEF_DL="$HOME/downloads"; DEF_PHOTOS="$HOME/photos"; DEF_DATA="$HOME/server"
     say "  ${DIM}Anything under your home folder needs to be shared with Docker${R}"
     say "  ${DIM}Desktop under Settings → Resources → File sharing.${R}"
     say ""
     ;;
   *)
-    DEF_MEDIA="/srv/media"; DEF_DL="/srv/downloads"; DEF_PHOTOS="/srv/photos"
+    DEF_MEDIA="/srv/media"; DEF_DL="/srv/downloads"; DEF_PHOTOS="/srv/photos"; DEF_DATA="/srv/server"
     ;;
 esac
 
 CONFIG_ROOT="$(ask "  Application config:" "$INSTALL_DIR/config")"
-MEDIA_ROOT="$(ask "  Media library:" "$DEF_MEDIA")"
-DOWNLOADS_ROOT="$(ask "  Downloads:" "$DEF_DL")"
+
+# One parent folder lets finished downloads be hardlinked into the library
+# instead of copied, which is the difference between a file taking one slot on
+# disk and two. Splitting them is supported, but it is the worse default.
+if [[ -z "${LAYOUT:-}" ]]; then
+  echo
+  echo "  Storage layout"
+  echo "    1) One shared folder   media and downloads under one parent (recommended)"
+  echo "    2) Separate folders    different drives; every import is copied"
+  LAYOUT_PICK="$(ask "  Which?" "1")"
+  case "$LAYOUT_PICK" in
+    2|split|separate) LAYOUT="split" ;;
+    *) LAYOUT="unified" ;;
+  esac
+fi
+
+if [[ "$LAYOUT" == "unified" ]]; then
+  DATA_ROOT="$(ask "  Where everything goes:" "$DEF_DATA")"
+  DATA_ROOT="${DATA_ROOT/#\~/$HOME}"
+  MEDIA_ROOT="$DATA_ROOT/media"
+  DOWNLOADS_ROOT="$DATA_ROOT/downloads"
+else
+  MEDIA_ROOT="$(ask "  Media library:" "$DEF_MEDIA")"
+  DOWNLOADS_ROOT="$(ask "  Downloads:" "$DEF_DL")"
+fi
 selected immich && PHOTOS_ROOT="$(ask "  Photos:" "$DEF_PHOTOS")"
 
 if [[ "$PLATFORM" == "wsl" ]] && [[ "$MEDIA_ROOT" == /mnt/[a-z]/* ]]; then
@@ -1034,6 +1068,28 @@ emit_tailscale() {
 YAML
 }
 
+emit_homarr() {
+  cat <<'YAML'
+
+  # The front door. It stores credentials for the apps it talks to, so the
+  # encryption key below is not optional and must not change later.
+  homarr:
+    image: ghcr.io/homarr-labs/homarr:${HOMARR_TAG:-latest}
+    container_name: homarr
+    ports:
+      - "7575:7575"
+    volumes:
+      - homarr_appdata:/appdata
+      # Uncomment for live container status. Read the note: this is the raw
+      # socket, and :ro does not restrict the API behind it.
+      #  - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - SECRET_ENCRYPTION_KEY=${HOMARR_SECRET_ENCRYPTION_KEY}
+      - TZ=${TZ}
+    restart: unless-stopped
+YAML
+}
+
 emit_socket_proxy() {
   cat <<'YAML'
 
@@ -1165,9 +1221,18 @@ build_compose() {
   selected tailscale     && emit_tailscale
   selected cloudflared   && emit_cloudflared
   selected socket-proxy  && emit_socket_proxy
+  selected homarr        && emit_homarr
   selected pocket-id     && emit_pocket_id
-  # Kima's docs recommend a named volume for /data rather than a bind mount.
-  selected kima && printf '\nvolumes:\n  kima_data:\n'
+  # Named volumes, collected into one block. Emitting a second `volumes:` key
+  # would be invalid YAML, which is what happened when a second module needed
+  # one.
+  local vols=()
+  selected kima   && vols+=("kima_data")
+  selected homarr && vols+=("homarr_appdata")
+  if (( ${#vols[@]} )); then
+    printf '\nvolumes:\n'
+    for v in "${vols[@]}"; do printf '  %s:\n' "$v"; done
+  fi
   return 0
 }
 
@@ -1184,6 +1249,7 @@ STACK_DIR=$INSTALL_DIR
 CONFIG_ROOT=$CONFIG_ROOT
 MEDIA_ROOT=$MEDIA_ROOT
 DOWNLOADS_ROOT=$DOWNLOADS_ROOT
+DATA_ROOT=$DATA_ROOT
 EOF
   selected immich && echo "PHOTOS_ROOT=$PHOTOS_ROOT"
   cat <<EOF
@@ -1194,6 +1260,15 @@ PGID=$PGID_VALUE
 TZ=$TZ_VALUE
 EOF
 
+  if selected homarr; then
+    cat <<EOF
+
+# ── Homarr ───────────────────────────────────────────────────────────────
+# 64 hex characters. Encrypts the credentials Homarr stores for your other
+# apps — changing it later makes every saved integration unreadable.
+HOMARR_SECRET_ENCRYPTION_KEY=$( [[ "$mode" == "example" ]] && echo "$placeholder" || gen_hex64 )
+EOF
+  fi
   if selected arcane; then
     if [[ "$mode" == "example" ]]; then
       secret="$placeholder"
@@ -1329,6 +1404,7 @@ service_url() {
     tailscale) echo "(no web interface)" ;;
     cloudflared) echo "(no web interface)" ;;
     socket-proxy) echo "(no web interface)" ;;
+    homarr) echo "http://$HOST_ADDR:7575" ;;
     *) echo "" ;;
   esac
 }
