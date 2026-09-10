@@ -66,7 +66,7 @@ h2.ph{font-size:32px;margin:0 0 10px}.pd{color:var(--muted);font-size:15.5px;lin
 .mod p{font-size:12.5px;margin:0;line-height:1.5;overflow-wrap:anywhere}
 .mod .flag{display:inline-block;margin-top:6px;font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:999px;background:var(--pill-coral-bg);color:var(--pill-coral-fg)}
 .mod .flag.auto{background:var(--peach);color:var(--pill-peach-fg)}
-.mod .tick{position:absolute;top:13px;right:13px;width:16px;height:16px;border-radius:50%;border:1.5px solid var(--line);background:#fff}
+.mod .tick{position:absolute;top:13px;right:13px;width:16px;height:16px;border-radius:50%;border:1.5px solid var(--line);background:var(--surface)}
 .mod.on .tick{background:var(--teal);border-color:var(--teal)}
 .mod.on .tick:after{content:"";position:absolute;left:4px;top:5px;width:7px;height:3.5px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg)}
 
@@ -94,7 +94,6 @@ h2.ph{font-size:32px;margin:0 0 10px}.pd{color:var(--muted);font-size:15.5px;lin
 .f .hint{font-size:12px;color:var(--muted);line-height:1.5}
 .f input,.f select{font-family:inherit;font-size:14px;color:var(--ink);background:var(--white);border:1px solid var(--line);border-radius:11px;padding:11px 13px;outline:none;width:100%}
 .f input:focus,.f select:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,175,185,.12)}
-.f input.bad{border-color:var(--coral);background:#fff6f4}
 .wide{grid-column:1/-1}
 .toggle{display:flex;gap:10px;margin:6px 0 20px;flex-wrap:wrap}
 .tg{flex:1;min-width:230px;background:var(--white);border:1px solid var(--line);border-radius:16px;padding:16px;cursor:pointer}
@@ -485,6 +484,16 @@ html[data-theme="dark"] .hint-ok{color:#6cc79b}
 .clashopts>div{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
 .clashopts b{display:block;font-size:14px;color:var(--ink);margin-bottom:5px}
 .clashopts p{font-size:13px;margin:0 0 10px;line-height:1.55}
+
+/* Platform tabs on the storage step. These were rendering as bare buttons —
+   the classes were reused from the quickstart without the rules. */
+.ostabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+.ostab{font-family:inherit;font-size:14px;font-weight:700;padding:9px 17px;border-radius:999px;
+  border:1px solid var(--line);background:var(--surface);color:var(--muted);cursor:pointer;transition:.14s}
+.ostab:hover{border-color:var(--teal);color:var(--blue)}
+.ostab.on{background:var(--blue);border-color:var(--blue);color:#fff}
+html[data-theme="dark"] .ostab.on{color:#08151a}
+pre .hl{color:var(--peach)}
 </style>
 <script>
 (function(){
@@ -848,6 +857,23 @@ var MODULES = {
       "    restart: unless-stopped"].join("\n");}},
 
   /* ── monitoring & archives ── */
+  homarr:{cat:"manage",name:"Homarr",port:7575,proxy:null,
+    desc:"A dashboard for everything else. Drag-and-drop tiles, live status, and widgets that read your other apps.",
+    secrets:[{key:"HOMARR_SECRET_ENCRYPTION_KEY",label:"Homarr encryption key",format:"hex"}],
+    volume:"homarr_appdata",
+    compose:function(c){return ["",
+      "  # The front door. It stores credentials for the apps it talks to, so",
+      "  # the encryption key below is not optional and must not change later.",
+      "  homarr:","    image: ghcr.io/homarr-labs/homarr:${HOMARR_TAG:-latest}",
+      "    container_name: homarr","    ports:","      - \"7575:7575\"",
+      "    volumes:","      - homarr_appdata:/appdata",
+      "      # Uncomment for live container status. Read the note: this is the",
+      "      # raw socket, and :ro does not restrict the API behind it.",
+      "      #  - /var/run/docker.sock:/var/run/docker.sock:ro",
+      "    environment:",
+      "      - SECRET_ENCRYPTION_KEY=${HOMARR_SECRET_ENCRYPTION_KEY}",
+      "      - TZ=${TZ}","    restart: unless-stopped"].join("\n");}},
+
   "socket-proxy":{cat:"manage",name:"Docker Socket Proxy",
     desc:"A filtered, read-only Docker API for apps that only need to watch containers. Managers like Arcane cannot use it.",
     compose:function(){return ["",
@@ -1002,7 +1028,7 @@ var PRESETS = {
 };
 
 // Never proxy these publicly, whatever the user picks.
-var NEVER_PROXY = ["arcane","qbittorrent","sonarr","radarr","lidarr","bazarr","jackett","tubearchivist","archivebox"];
+var NEVER_PROXY = ["arcane","qbittorrent","sonarr","radarr","lidarr","bazarr","jackett","tubearchivist","archivebox","homarr"];
 
 
 /* Domain validation. Deliberately structural rather than a list of valid
@@ -1080,7 +1106,7 @@ function ctx(state){
 function orderOf(id){
   var order = ["arcane","jellyfin","jellyseerr","sonarr","radarr","lidarr","bazarr","gluetun",
     "qbittorrent","jackett","immich","kima","uptime-kuma","archivebox","tubearchivist",
-    "tailscale","cloudflared","caddy","pocket-id"];
+    "tailscale","cloudflared","caddy","homarr","pocket-id"];
   var i = order.indexOf(id); return i === -1 ? 99 : i;
 }
 
@@ -1518,6 +1544,12 @@ function validate(state){
   if(sel.indexOf("pocket-id") !== -1){
     if(sel.indexOf("caddy") === -1) err("Pocket ID needs a reverse proxy","Passkeys require HTTPS.");
     else ok("Pocket ID will be served over HTTPS","Register two passkeys on separate devices.");
+  }
+  if(sel.indexOf("homarr") !== -1){
+    ok("Homarr will be your front page",
+       "Reach it at port 7575. It is deliberately not published by the reverse proxy \u2014 it stores credentials for every app it talks to.");
+    warn("Do not change the Homarr key later",
+         "SECRET_ENCRYPTION_KEY encrypts the credentials Homarr saves for your other apps. Rotating it makes every saved integration unreadable and you will re-enter them all.");
   }
   if(sel.indexOf("socket-proxy") !== -1){
     if(sel.indexOf("uptime-kuma") !== -1)
@@ -2063,7 +2095,7 @@ function buildAll(state){
   return files;
 }
 
-return {CATS:CATS, MODULES:MODULES, PRESETS:PRESETS, resolve:resolve, validate:validate, checkDomain:checkDomain, ACCESS_MODULES:ACCESS_MODULES, isAccess:isAccess, STORAGE_DEFAULTS:STORAGE_DEFAULTS, QUICKSTART_SERVICES:QUICKSTART_SERVICES, mountOf:mountOf, sameFilesystem:sameFilesystem, PUBLIC_MODULES:PUBLIC_MODULES, conflictsOf:conflictsOf,
+return {CATS:CATS, MODULES:MODULES, PRESETS:PRESETS, resolve:resolve, validate:validate, checkDomain:checkDomain, ACCESS_MODULES:ACCESS_MODULES, isAccess:isAccess, STORAGE_DEFAULTS:STORAGE_DEFAULTS, NEVER_PROXY:NEVER_PROXY, QUICKSTART_SERVICES:QUICKSTART_SERVICES, mountOf:mountOf, sameFilesystem:sameFilesystem, PUBLIC_MODULES:PUBLIC_MODULES, conflictsOf:conflictsOf,
         buildAll:buildAll, buildCompose:buildCompose, buildEnv:buildEnv,
         buildCaddyfile:buildCaddyfile, buildReadme:buildReadme,
         collectSecrets:collectSecrets, collectManual:collectManual, serviceUrl:serviceUrl};
@@ -2095,15 +2127,21 @@ var step = 0, files = [], activeFile = 0;
 function $(id){ return document.getElementById(id); }
 function el(t,c,x){ var e=document.createElement(t); if(c)e.className=c; if(x!==undefined)e.textContent=x; return e; }
 
-function rand(){
+function rand(fmt){
   var b = new Uint8Array(32);
   (window.crypto||window.msCrypto).getRandomValues(b);
+  if(fmt === "hex"){
+    // Homarr will not accept base64 — its key must be 64 hex characters.
+    return Array.prototype.map.call(b, function(x){
+      return ("0"+x.toString(16)).slice(-2);
+    }).join("");
+  }
   var s = btoa(String.fromCharCode.apply(null, b));
   return s.replace(/\+/g,"-").replace(/\//g,"_").replace(/=/g,"").slice(0,43);
 }
 function genSecrets(){
   var need = CORE.collectSecrets(state), fresh = {};
-  need.forEach(function(s){ fresh[s.key] = rand(); });
+  need.forEach(function(s){ fresh[s.key] = rand(s.format); });
   state.secrets = fresh;
 }
 
@@ -2422,8 +2460,7 @@ function updateDomainPreview(){
     var names = [];
     state.selected.forEach(function(id){
       var m = M[id];
-      if(m.proxy && ["arcane","qbittorrent","sonarr","radarr","lidarr","bazarr",
-                     "jackett","tubearchivist","archivebox"].indexOf(id) === -1)
+      if(m.proxy && CORE.NEVER_PROXY.indexOf(id) === -1)
         names.push(m.proxy + "." + d + " \u2192 " + m.name);
     });
     dns.innerHTML = "<strong>DNS records you will need</strong><p style='margin:10px 0 0'>"
@@ -2486,7 +2523,7 @@ function renderConn(){
     var names = [];
     state.selected.forEach(function(id){
       var m = M[id];
-      if(m.proxy && ["arcane","qbittorrent","sonarr","radarr","lidarr","bazarr","jackett","tubearchivist","archivebox"].indexOf(id)===-1)
+      if(m.proxy && CORE.NEVER_PROXY.indexOf(id) === -1)
         names.push(m.proxy + "." + (state.domain || "example.com") + " → " + m.name);
     });
     var c = el("div","card"); c.id = "dnsbox";
