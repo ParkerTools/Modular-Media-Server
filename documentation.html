@@ -708,7 +708,7 @@ docker compose exec sonarr ping -c2 gluetun</pre>
 
 <div class="mcat" id="m-dl"><span class="bar"></span>Downloads</div>
 
-<details class="m"><summary><b>Gluetun</b><span class="pill mod">Moderate</span><span class="d">VPN container with a kill switch</span></summary>
+<details class="m" id="gluetun"><summary><b>Gluetun</b><span class="pill mod">Moderate</span><span class="d">VPN container with a kill switch</span></summary>
 <div class="mbody">
 <div class="spec"><div><b>Port</b><span>Publishes for others</span></div><div><b>CPU</b><span>Low</span></div><div><b>RAM</b><span>Low</span></div><div><b>Storage</b><span>Tiny</span></div></div>
 <h5>Purpose</h5><p>A VPN client in a container. Other containers can route all their traffic through it, and if the VPN drops they lose their network entirely rather than falling back to your real connection.</p>
@@ -886,6 +886,18 @@ curl -s https://ipinfo.io/ip     <span class="c"># must be different</span></pre
 <h5>Official sources</h5><div class="srcs"><a href="https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/" target="_blank" rel="noopener">Docs</a><a href="https://github.com/cloudflare/cloudflared" target="_blank" rel="noopener">GitHub</a></div>
 </div></details>
 
+<details class="m" id="socket-proxy"><summary><b>Docker Socket Proxy</b><span class="pill mod">Moderate</span><span class="d">A filtered Docker API for apps that only watch</span></summary>
+<div class="mbody">
+<div class="spec"><div><b>Port</b><span>2375, internal only</span></div><div><b>CPU</b><span>Negligible</span></div><div><b>RAM</b><span>Under 20 MB</span></div><div><b>Storage</b><span>None</span></div></div>
+<h5>Purpose</h5><p>Holds the Docker socket itself and exposes a narrowed API over the network. Apps that only need to see which containers exist talk to it instead of the socket.</p>
+<h5>Why it exists</h5><p>Mounting <code>/var/run/docker.sock</code> into a container is root-equivalent on that host. Adding <code>:ro</code> makes the socket <em>file</em> read-only; it does not restrict the API behind it, so a compromised app can still create a privileged container. The proxy restricts the API itself.</p>
+<h5>Configuration</h5><p>Generated with <code>CONTAINERS=1</code> and <code>INFO=1</code>, everything else off, including <code>POST</code> and <code>EXEC</code>. It runs on a read-only filesystem with a <code>/run</code> tmpfs, which its entrypoint requires.</p>
+<h5>Using it from Uptime Kuma</h5><p>Settings → Docker Hosts → connection type <b>TCP</b>, host <code>tcp://socket-proxy:2375</code>. Remove the socket mount from Uptime Kuma once the proxy is doing the work.</p>
+<div class="warning"><strong>Arcane cannot use it.</strong> Creating and deploying containers requires <code>POST</code>, and <code>POST=1</code> restores the ability to create a privileged container — the exact capability being withheld. A container manager is root-equivalent by design; keep it off the internet instead.</div>
+<div class="warning"><strong>Never publish port 2375 to the host.</strong> The generated config deliberately has no <code>ports:</code> entry. Containers on the same network reach it directly; exposing it puts an unauthenticated Docker API on your LAN.</div>
+<h5>Official sources</h5><div class="srcs"><a href="https://docs.linuxserver.io/images/docker-socket-proxy/" target="_blank" rel="noopener">Docs</a><a href="https://github.com/linuxserver/docker-socket-proxy" target="_blank" rel="noopener">GitHub</a></div>
+</div></details>
+
 <div class="mcat" id="m-auth"><span class="bar"></span>Authentication</div>
 
 <details class="m"><summary><b>Pocket ID</b><span class="pill adv">Advanced</span><span class="d">Passkey single sign-on</span></summary>
@@ -953,6 +965,7 @@ curl -s https://ipinfo.io/ip     <span class="c"># must be different</span></pre
 <tr><td>Arcane</td><td>3552</td><td>Never expose publicly</td></tr>
 <tr><td>Pocket ID</td><td>1411</td><td>Not published — reached through Caddy</td></tr>
 <tr><td>Cloudflare Tunnel</td><td>None</td><td>Outbound only — nothing to publish</td></tr>
+<tr><td>Docker Socket Proxy</td><td>2375</td><td>Internal only — never published to the host</td></tr>
 </tbody></table></div>
 <div class="tip"><strong>On a Synology NAS, DSM reserves many ports.</strong> If a container will not start because a port is in use, shift the host side — <code>"8097:8096"</code> — which breaks nothing.</div>
 </section>
