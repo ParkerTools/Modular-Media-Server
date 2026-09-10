@@ -474,6 +474,17 @@ html[data-theme="dark"] .hint-ok{color:#6cc79b}
 .mod.blocked .tick{display:none}
 .flag.block{background:var(--pill-coral-bg);color:var(--pill-coral-fg)}
 .flag.swap{background:var(--pill-teal-bg);color:var(--code-fg)}
+
+.tree{background:var(--tint-teal);border:1px solid var(--line-teal);border-radius:14px;padding:15px 17px;margin:14px 0}
+.tree b{display:block;font-size:13.5px;color:var(--ink);margin-bottom:8px}
+.tree pre{margin:0 0 10px;font-size:12.5px;padding:13px 15px}
+.tree p{font-size:13.5px;margin:0}
+
+.clashopts{display:grid;gap:12px;margin-top:12px}
+@media(min-width:760px){.clashopts{grid-template-columns:1fr 1fr}}
+.clashopts>div{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.clashopts b{display:block;font-size:14px;color:var(--ink);margin-bottom:5px}
+.clashopts p{font-size:13px;margin:0 0 10px;line-height:1.55}
 </style>
 <script>
 (function(){
@@ -502,6 +513,8 @@ html[data-theme="dark"] .hint-ok{color:#6cc79b}
 <div class="pane on" id="pane-0">
 <h2 class="ph">Choose your modules</h2>
 <p class="pd">Click to add or remove. Required dependencies are pulled in for you and shown in amber — qBittorrent will always bring Gluetun with it.</p>
+<label class="optline" id="qsline"><input type="checkbox" id="qsopt"> <span><b>I already followed the quickstart</b> — you have Arcane, Jellyfin and Uptime Kuma running. Tick this and the generator will point out anything that would clash.</span></label>
+<div id="qsclash"></div>
 <label class="optline" id="localline"><input type="checkbox" id="localopt"> <span><b>Local network only</b> — nothing published to the internet. Tailscale stays available, since it is a private network rather than a public address; the reverse proxy, tunnel and single sign-on are hidden.</span></label>
 <div class="build">
 <div id="cats"></div>
@@ -520,12 +533,15 @@ html[data-theme="dark"] .hint-ok{color:#6cc79b}
 <p class="pd">Where things live on your server. The layout choice below matters more than it looks — it decides whether finished downloads are moved instantly or copied, using twice the disk.</p>
 
 <div class="toggle" id="layout"></div>
+<div id="storageos" class="ostabs"></div>
+<div id="storageosnote"></div>
 <div id="layoutnote"></div>
 
 <div class="fgrid" id="storagefields"></div>
+<div id="drivecheck"></div>
 
 <div class="fgrid" style="margin-top:20px">
-<div class="f"><label for="puid">PUID</label><input id="puid" value="1000"><div class="hint">Run <code>id</code> on your server. On Docker Desktop, leave at 1000.</div></div>
+<div class="f"><label for="puid">PUID</label><input id="puid" value="1000"><div class="hint">The user your files belong to. This is filled in for your platform above. To check, run <code>id -u</code> on the server \u2014 whatever number it prints goes here.</div></div>
 <div class="f"><label for="pgid">PGID</label><input id="pgid" value="1000"><div class="hint">The group id that should own your files.</div></div>
 <div class="f wide"><label for="tz">Timezone</label><input id="tz" placeholder="Europe/London"><div class="hint">An IANA name, like <code>America/New_York</code>. Detected from your browser.</div></div>
 </div>
@@ -579,7 +595,7 @@ html[data-theme="dark"] .hint-ok{color:#6cc79b}
 <div class="card teal" id="splitnote" style="display:none">
 <strong>You split the connection layer, so there are two projects</strong>
 <p style="margin:10px 0 0">Create the shared network once on the host, before starting either stack — separate Compose projects get separate networks, and without it the proxy cannot resolve your apps by name:</p>
-<pre style="margin:10px 0">docker network create edge</pre>
+<pre style="margin:10px 0">docker network create mms-edge</pre>
 <p style="margin:0">Then start <code>access/</code> first and leave it running. After that, <code>docker compose down</code> on your apps never takes remote access with it.</p>
 </div>
 
@@ -714,7 +730,7 @@ var MODULES = {
     desc:"Media server for films, TV and music.",
     compose:function(c){
       var v = c.unified ? "      - ${DATA_ROOT}/media:/media:ro" : "      - ${MEDIA_ROOT}:/media:ro";
-      return ["","  jellyfin:","    image: jellyfin/jellyfin:latest","    container_name: jellyfin",
+      return ["","  jellyfin:","    image: jellyfin/jellyfin:${JELLYFIN_TAG:-latest}","    container_name: jellyfin",
       "    user: \"${PUID}:${PGID}\"","    ports:","      - \"8096:8096\"","    volumes:",
       "      - ${CONFIG_ROOT}/jellyfin/config:/config","      - ${CONFIG_ROOT}/jellyfin/cache:/cache",v,
       "    environment:","      - TZ=${TZ}",
@@ -723,7 +739,7 @@ var MODULES = {
 
   jellyseerr:{cat:"media",name:"Jellyseerr",port:5055,proxy:"requests",recommends:["jellyfin"],
     desc:"Request and discovery front end for your household.",
-    compose:function(){return ["","  jellyseerr:","    image: fallenbagel/jellyseerr:latest",
+    compose:function(){return ["","  jellyseerr:","    image: fallenbagel/jellyseerr:${JELLYSEERR_TAG:-latest}",
       "    container_name: jellyseerr","    ports:","      - \"5055:5055\"","    volumes:",
       "      - ${CONFIG_ROOT}/jellyseerr:/app/config","    environment:","      - TZ=${TZ}",
       "    restart: unless-stopped"].join("\n");}},
@@ -740,7 +756,7 @@ var MODULES = {
     compose:function(c){
       var v = c.unified ? ["      - ${DATA_ROOT}:/data"]
                         : ["      - ${MEDIA_ROOT}/movies:/movies","      - ${MEDIA_ROOT}/tv:/tv"];
-      return ["","  bazarr:","    image: lscr.io/linuxserver/bazarr:latest","    container_name: bazarr",
+      return ["","  bazarr:","    image: lscr.io/linuxserver/bazarr:${BAZARR_TAG:-latest}","    container_name: bazarr",
       "    ports:","      - \"6767:6767\"","    volumes:","      - ${CONFIG_ROOT}/bazarr:/config"]
       .concat(v).concat(["    environment:","      - PUID=${PUID}","      - PGID=${PGID}",
       "      - TZ=${TZ}","    restart: unless-stopped"]).join("\n");}},
@@ -760,7 +776,7 @@ var MODULES = {
         : ["      - OPENVPN_USER=${OPENVPN_USER}","      - OPENVPN_PASSWORD=${OPENVPN_PASSWORD}"];
       return ["","  # Containers using network_mode: service:gluetun publish their ports here,",
       "  # because they share this container's network stack.",
-      "  gluetun:","    image: qmcgaw/gluetun:latest","    container_name: gluetun",
+      "  gluetun:","    image: qmcgaw/gluetun:${GLUETUN_TAG:-latest}","    container_name: gluetun",
       "    cap_add:","      - NET_ADMIN","    devices:","      - /dev/net/tun:/dev/net/tun",
       "    ports:"].concat(ports).concat(["    volumes:","      - ${CONFIG_ROOT}/gluetun:/gluetun",
       "    environment:","      - VPN_SERVICE_PROVIDER=${VPN_SERVICE_PROVIDER}",
@@ -774,7 +790,7 @@ var MODULES = {
       var v = c.unified ? "      - ${DATA_ROOT}:/data" : "      - ${DOWNLOADS_ROOT}:/downloads";
       return ["","  # Tied to Gluetun's network. If the VPN drops, this loses its",
       "  # connection too — that is the kill switch working as intended.",
-      "  qbittorrent:","    image: lscr.io/linuxserver/qbittorrent:latest",
+      "  qbittorrent:","    image: lscr.io/linuxserver/qbittorrent:${QBITTORRENT_TAG:-latest}",
       "    container_name: qbittorrent","    network_mode: \"service:gluetun\"","    volumes:",
       "      - ${CONFIG_ROOT}/qbittorrent:/config",v,"    environment:","      - PUID=${PUID}",
       "      - PGID=${PGID}","      - TZ=${TZ}","      - WEBUI_PORT=8080","    depends_on:",
@@ -782,12 +798,12 @@ var MODULES = {
 
   jackett:{cat:"dl",name:"Jackett",port:9117,desc:"Indexer proxy for the *arr apps.",
     compose:function(c){
-      if(c.has("gluetun")) return ["","  jackett:","    image: lscr.io/linuxserver/jackett:latest",
+      if(c.has("gluetun")) return ["","  jackett:","    image: lscr.io/linuxserver/jackett:${JACKETT_TAG:-latest}",
         "    container_name: jackett","    network_mode: \"service:gluetun\"","    volumes:",
         "      - ${CONFIG_ROOT}/jackett:/config","    environment:","      - PUID=${PUID}",
         "      - PGID=${PGID}","      - TZ=${TZ}","    depends_on:","      gluetun:",
         "        condition: service_started","    restart: unless-stopped"].join("\n");
-      return ["","  jackett:","    image: lscr.io/linuxserver/jackett:latest",
+      return ["","  jackett:","    image: lscr.io/linuxserver/jackett:${JACKETT_TAG:-latest}",
         "    container_name: jackett","    ports:","      - \"9117:9117\"","    volumes:",
         "      - ${CONFIG_ROOT}/jackett:/config","    environment:","      - PUID=${PUID}",
         "      - PGID=${PGID}","      - TZ=${TZ}","    restart: unless-stopped"].join("\n");}},
@@ -796,7 +812,7 @@ var MODULES = {
   immich:{cat:"photos",name:"Immich",port:2283,proxy:"photos",oidc:true,
     desc:"Photo and video library with phone backup. Brings its own database.",
     secrets:[{key:"IMMICH_DB_PASSWORD",label:"Immich database password"}],
-    compose:function(){return ["","  immich-server:","    image: ghcr.io/immich-app/immich-server:release",
+    compose:function(){return ["","  immich-server:","    image: ghcr.io/immich-app/immich-server:${IMMICH_SERVER_TAG:-release}",
       "    container_name: immich_server","    ports:","      - \"2283:2283\"","    volumes:",
       "      - ${PHOTOS_ROOT}:/usr/src/app/upload","      - /etc/localtime:/etc/localtime:ro",
       "    environment:","      - DB_HOSTNAME=immich_postgres","      - DB_USERNAME=postgres",
@@ -804,12 +820,12 @@ var MODULES = {
       "      - REDIS_HOSTNAME=immich_redis","      - TZ=${TZ}","    depends_on:",
       "      - immich-redis","      - immich-postgres","    restart: unless-stopped","",
       "  immich-machine-learning:",
-      "    image: ghcr.io/immich-app/immich-machine-learning:release","    container_name: immich_ml",
+      "    image: ghcr.io/immich-app/immich-machine-learning:${IMMICH_MACHINE_LEARNING_TAG:-release}","    container_name: immich_ml",
       "    volumes:","      - ${CONFIG_ROOT}/immich/ml-cache:/cache","    restart: unless-stopped","",
-      "  immich-redis:","    image: docker.io/valkey/valkey:8-bookworm","    container_name: immich_redis",
+      "  immich-redis:","    image: docker.io/valkey/valkey:${VALKEY_TAG:-8-bookworm}","    container_name: immich_redis",
       "    healthcheck:","      test: redis-cli ping || exit 1","    restart: unless-stopped","",
       "  immich-postgres:",
-      "    image: ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0",
+      "    image: ghcr.io/immich-app/postgres:${POSTGRES_TAG:-14-vectorchord0.4.3-pgvectors0.2.0}",
       "    container_name: immich_postgres","    environment:",
       "      - POSTGRES_PASSWORD=${IMMICH_DB_PASSWORD}","      - POSTGRES_USER=postgres",
       "      - POSTGRES_DB=immich","      - POSTGRES_INITDB_ARGS=--data-checksums","    volumes:",
@@ -823,7 +839,7 @@ var MODULES = {
     compose:function(c){
       var m = c.unified ? "      - ${DATA_ROOT}/media/music:/music" : "      - ${MEDIA_ROOT}/music:/music";
       return ["","  # All-in-one image: Postgres and Redis run inside the container.",
-      "  kima:","    image: chevron7locked/kima:latest","    container_name: kima","    ports:",
+      "  kima:","    image: chevron7locked/kima:${KIMA_TAG:-latest}","    container_name: kima","    ports:",
       "      - \"3030:3030\"","    volumes:",m,"      - kima_data:/data","    environment:",
       "      - SESSION_SECRET=${KIMA_SESSION_SECRET}",
       "      - SETTINGS_ENCRYPTION_KEY=${KIMA_ENCRYPTION_KEY}","      - TZ=${TZ}",
@@ -832,15 +848,45 @@ var MODULES = {
       "    restart: unless-stopped"].join("\n");}},
 
   /* ── monitoring & archives ── */
+  "socket-proxy":{cat:"manage",name:"Docker Socket Proxy",
+    desc:"A filtered, read-only Docker API for apps that only need to watch containers. Managers like Arcane cannot use it.",
+    compose:function(){return ["",
+      "  # A filtered Docker API for apps that only need to LOOK at containers.",
+      "  # Mounting the raw socket is root-equivalent; :ro on that mount protects",
+      "  # the socket file, not the API behind it. This restricts the API itself.",
+      "  #",
+      "  # In Uptime Kuma: Settings -> Docker Hosts -> connection type TCP,",
+      "  # host tcp://socket-proxy:2375. Do not mount the socket into Kuma too.",
+      "  #",
+      "  # Arcane cannot use this. It creates and deploys containers, which needs",
+      "  # POST, and POST=1 hands back the ability to create a privileged one.",
+      "  # A container manager is root-equivalent by nature; keep it off the",
+      "  # internet rather than assuming a proxy contains it.",
+      "  #",
+      "  # No ports are published on purpose. Containers on this network reach",
+      "  # 2375 directly; exposing it to the host would undo the point.",
+      "  socket-proxy:","    image: lscr.io/linuxserver/socket-proxy:${SOCKET_PROXY_TAG:-latest}",
+      "    container_name: socket-proxy",
+      "    environment:",
+      "      - CONTAINERS=1        # list and inspect containers",
+      "      - INFO=1              # daemon info, used for health checks",
+      "      - POST=0              # refuse every write, including container create",
+      "      - EXEC=0","      - IMAGES=0","      - VOLUMES=0","      - NETWORKS=0",
+      "    volumes:",
+      "      - /var/run/docker.sock:/var/run/docker.sock:ro",
+      "    read_only: true",
+      "    tmpfs:","      - /run",
+      "    restart: unless-stopped"].join("\n");}},
+
   "uptime-kuma":{cat:"monitor",name:"Uptime Kuma",port:3001,desc:"Monitoring and status pages.",
-    compose:function(){return ["","  uptime-kuma:","    image: louislam/uptime-kuma:1",
+    compose:function(){return ["","  uptime-kuma:","    image: louislam/uptime-kuma:${UPTIME_KUMA_TAG:-1}",
       "    container_name: uptime-kuma","    ports:","      - \"3001:3001\"","    volumes:",
       "      - ${CONFIG_ROOT}/uptime-kuma:/app/data","    extra_hosts:","      # reaches services running in other Compose projects, via the host","      - \"host.docker.internal:host-gateway\"","    environment:","      - TZ=${TZ}",
       "    restart: unless-stopped"].join("\n");}},
 
   archivebox:{cat:"monitor",name:"ArchiveBox",port:8000,desc:"Web page archiving.",
     secrets:[{key:"ARCHIVEBOX_PASSWORD",label:"ArchiveBox admin password"}],
-    compose:function(){return ["","  archivebox:","    image: archivebox/archivebox:latest",
+    compose:function(){return ["","  archivebox:","    image: archivebox/archivebox:${ARCHIVEBOX_TAG:-latest}",
       "    container_name: archivebox","    ports:","      - \"8000:8000\"","    volumes:",
       "      - ${CONFIG_ROOT}/archivebox:/data","    environment:","      - ALLOWED_HOSTS=*",
       "      - PUBLIC_INDEX=False","      - PUBLIC_SNAPSHOTS=False","      - PUBLIC_ADD_VIEW=False",
@@ -853,7 +899,7 @@ var MODULES = {
              {key:"TA_ES_PASSWORD",label:"Tube Archivist Elasticsearch password"}],
     compose:function(c){
       var m = c.unified ? "      - ${DATA_ROOT}/media/youtube:/youtube" : "      - ${MEDIA_ROOT}/youtube:/youtube";
-      return ["","  tubearchivist:","    image: bbilly1/tubearchivist:latest",
+      return ["","  tubearchivist:","    image: bbilly1/tubearchivist:${TUBEARCHIVIST_TAG:-latest}",
       "    container_name: tubearchivist","    ports:","      - \"8001:8000\"","    volumes:",m,
       "      - ${CONFIG_ROOT}/tubearchivist/cache:/cache","    environment:",
       "      - ES_URL=http://tubearchivist-es:9200",
@@ -861,11 +907,11 @@ var MODULES = {
       "      - HOST_GID=${PGID}","      - TA_HOST=http://localhost:8001","      - TA_USERNAME=admin",
       "      - TA_PASSWORD=${TA_PASSWORD}","      - ELASTIC_PASSWORD=${TA_ES_PASSWORD}",
       "      - TZ=${TZ}","    depends_on:","      - tubearchivist-es","      - tubearchivist-redis",
-      "    restart: unless-stopped","","  tubearchivist-redis:","    image: redis:7",
+      "    restart: unless-stopped","","  tubearchivist-redis:","    image: redis:${REDIS_TAG:-7}",
       "    container_name: tubearchivist_redis","    volumes:",
       "      - ${CONFIG_ROOT}/tubearchivist/redis:/data","    depends_on:","      - tubearchivist-es",
       "    restart: unless-stopped","","  tubearchivist-es:",
-      "    image: bbilly1/tubearchivist-es:latest","    container_name: tubearchivist_es",
+      "    image: bbilly1/tubearchivist-es:${TUBEARCHIVIST_ES_TAG:-latest}","    container_name: tubearchivist_es",
       "    environment:","      - ELASTIC_PASSWORD=${TA_ES_PASSWORD}",
       "      - ES_JAVA_OPTS=-Xms512m -Xmx512m","      - xpack.security.enabled=true",
       "      - discovery.type=single-node",
@@ -878,7 +924,7 @@ var MODULES = {
     desc:"Reverse proxy with automatic HTTPS. The only container that should face the internet.",
     compose:function(){return ["","  # Terminates HTTPS and routes by hostname. Forward only 80",
       "  # and 443 on your router — never the application ports.",
-      "  caddy:","    image: caddy:latest","    container_name: caddy","    ports:",
+      "  caddy:","    image: caddy:${CADDY_TAG:-latest}","    container_name: caddy","    ports:",
       "      - \"80:80\"","      - \"443:443\"","    volumes:",
       "      - ./Caddyfile:/etc/caddy/Caddyfile:ro","      - ${CONFIG_ROOT}/caddy/data:/data",
       "      - ${CONFIG_ROOT}/caddy/config:/config","    environment:","      - TZ=${TZ}",
@@ -890,7 +936,7 @@ var MODULES = {
     compose:function(){return ["","  # Outbound-only connection to Cloudflare — nothing is opened on your",
       "  # router. Which hostname maps to which service is configured in the",
       "  # Zero Trust dashboard, not in this file.",
-      "  cloudflared:","    image: cloudflare/cloudflared:latest","    container_name: cloudflared",
+      "  cloudflared:","    image: cloudflare/cloudflared:${CLOUDFLARED_TAG:-latest}","    container_name: cloudflared",
       "    command: tunnel --no-autoupdate run","    environment:",
       "      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}","    restart: unless-stopped"].join("\n");}},
 
@@ -900,7 +946,7 @@ var MODULES = {
     compose:function(){return ["","  # Reaches your services without exposing anything publicly.",
       "  # Installing Tailscale directly on the host is usually simpler than this;",
       "  # use the container when you cannot install on the host.",
-      "  tailscale:","    image: tailscale/tailscale:latest","    container_name: tailscale",
+      "  tailscale:","    image: tailscale/tailscale:${TAILSCALE_TAG:-latest}","    container_name: tailscale",
       "    hostname: media-server","    cap_add:","      - NET_ADMIN","      - SYS_MODULE",
       "    devices:","      - /dev/net/tun:/dev/net/tun","    volumes:",
       "      - ${CONFIG_ROOT}/tailscale:/var/lib/tailscale","    environment:",
@@ -914,7 +960,7 @@ var MODULES = {
     compose:function(){return ["","  # Passkey-only identity provider. APP_URL must exactly match the",
       "  # address you visit — passkeys are bound to that origin.",
       "  # Reachable only through Caddy; it publishes no host port.",
-      "  pocket-id:","    image: ghcr.io/pocket-id/pocket-id:v2","    container_name: pocket-id",
+      "  pocket-id:","    image: ghcr.io/pocket-id/pocket-id:${POCKET_ID_TAG:-v2}","    container_name: pocket-id",
       "    expose:","      - \"1411\"","    volumes:",
       "      - ${CONFIG_ROOT}/pocket-id:/app/data","    environment:",
       "      - APP_URL=${POCKETID_URL}",
@@ -929,7 +975,7 @@ var MODULES = {
              {key:"ARCANE_JWT_SECRET",label:"Arcane JWT secret"}],
     compose:function(){return ["","  # Mounts the Docker socket, which is equivalent to root on this host.",
       "  # Keep it on your LAN or behind Tailscale. Never proxy it publicly.",
-      "  arcane:","    image: ghcr.io/getarcaneapp/arcane:latest","    container_name: arcane",
+      "  arcane:","    image: ghcr.io/getarcaneapp/arcane:${ARCANE_TAG:-latest}","    container_name: arcane",
       "    ports:","      - \"3552:3552\"","    volumes:",
       "      - /var/run/docker.sock:/var/run/docker.sock","      - ${CONFIG_ROOT}/arcane:/app/data",
       "      - .:/app/data/projects","    environment:","      - APP_URL=${ARCANE_APP_URL}",
@@ -939,7 +985,7 @@ var MODULES = {
 };
 
 function arr(id, port, c, sub){
-  return ["","  "+id+":","    image: lscr.io/linuxserver/"+id+":latest","    container_name: "+id,
+  return ["","  "+id+":","    image: lscr.io/linuxserver/"+id+":${"+id.toUpperCase()+"_TAG:-latest}","    container_name: "+id,
   "    ports:","      - \""+port+":"+port+"\"","    volumes:","      - ${CONFIG_ROOT}/"+id+":/config"]
   .concat(arrVols(c,sub)).concat(["    environment:","      - PUID=${PUID}","      - PGID=${PGID}",
   "      - TZ=${TZ}","    restart: unless-stopped"]).join("\n");
@@ -1055,8 +1101,56 @@ function conflictsOf(id){
    tunnel, and the identity provider that needs a public HTTPS origin do not. */
 var PUBLIC_MODULES = ["caddy","cloudflared","pocket-id"];
 
+/* Storage defaults differ per platform, and getting them wrong is the most
+   expensive mistake on this page — it is discovered weeks later as a full
+   disk. Windows is the WSL view, because that is where Docker actually runs. */
+/* The quickstart tells people to run these three by hand. Anyone who did
+   that and comes here will hit a container-name conflict on deploy, which
+   is a confusing failure for someone who just succeeded at something. */
+var QUICKSTART_SERVICES = ["arcane","jellyfin","uptime-kuma"];
+
+var STORAGE_DEFAULTS = {
+  win: { puid:"1000", pgid:"1000",
+         configRoot:"/opt/stacks/config", dataRoot:"/mnt/d/server",
+         mediaRoot:"/mnt/d/media", downloadsRoot:"/mnt/d/downloads",
+         photosRoot:"/mnt/d/photos",
+         note:"Your Windows drives appear under <code>/mnt</code> — <code>D:</code> is <code>/mnt/d</code>. Keep media and downloads on the same drive letter." },
+  mac: { puid:"501", pgid:"20",
+         configRoot:"/Users/yourname/stacks/config", dataRoot:"/Users/yourname/server",
+         mediaRoot:"/Users/yourname/Movies", downloadsRoot:"/Users/yourname/Downloads/server",
+         photosRoot:"/Users/yourname/Pictures",
+         note:"Replace <code>yourname</code> with your account name. An external drive is under <code>/Volumes/</code>. On a Mac your user id is <b>501</b>, not 1000 \u2014 that is set below." },
+  lin: { puid:"1000", pgid:"1000",
+         configRoot:"/opt/stacks/config", dataRoot:"/srv/server",
+         mediaRoot:"/srv/media", downloadsRoot:"/srv/downloads",
+         photosRoot:"/srv/photos",
+         note:"Anywhere you own works. A second drive is usually under <code>/mnt</code> or <code>/media</code>." },
+  nas: { puid:"1000", pgid:"1000",
+         configRoot:"/volume1/docker/config", dataRoot:"/volume1/server",
+         mediaRoot:"/volume1/media", downloadsRoot:"/volume1/downloads",
+         photosRoot:"/volume1/photos",
+         note:"Synology uses <code>/volume1</code>. On QNAP it is usually <code>/share</code>. Use folders you created in File Station first. <b>Check your user id before deploying</b> \u2014 Synology accounts usually start at 1026, not 1000. Run <code>id yourname</code> over SSH and put the numbers in the fields below." }
+};
+
+/* Hardlinks only work within one filesystem. Comparing the mount prefix
+   catches the common cases — two Windows drive letters, two NAS volumes,
+   an external disk on a Mac — without pretending to be exhaustive. */
+function mountOf(p){
+  if(!p) return "";
+  var m = p.match(/^\/(mnt|Volumes|media|run\/media)\/[^/]+/);
+  if(m) return m[0];
+  m = p.match(/^\/volume\d+/);
+  if(m) return m[0];
+  m = p.match(/^\/share\/[^/]+/);
+  if(m) return m[0];
+  return "/";
+}
+function sameFilesystem(a,b){ return mountOf(a) === mountOf(b); }
+
+var STORAGE_DEFAULTS_EXPORT = STORAGE_DEFAULTS;
+
 var ACCESS_MODULES = ["caddy","tailscale","cloudflared","pocket-id"];
-var EDGE_NET = "edge";
+var EDGE_NET = "mms-edge";
 
 function isAccess(id){ return ACCESS_MODULES.indexOf(id) !== -1; }
 
@@ -1173,6 +1267,19 @@ function buildEnv(state, example){
   }
   if(state.selected.indexOf("immich") !== -1) L.push("PHOTOS_ROOT="+state.photosRoot);
 
+  L.push("","# ── Image versions ──────────────────────────────────────────────────────",
+    "# Every image defaults to :latest, so each `docker compose pull` is an",
+    "# unannounced upgrade with no way back. That is a deliberate trade: a",
+    "# static site cannot keep a version matrix current, and stale pins rot",
+    "# into security holes faster than they prevent breakage.",
+    "#",
+    "# To pin one, uncomment and set it. Everything else keeps following latest.",
+    "#   JELLYFIN_TAG=10.10.3",
+    "#   GLUETUN_TAG=v3.40.0",
+    "#",
+    "# Gluetun is the one most worth pinning: its config format has changed",
+    "# between releases, and when it breaks qBittorrent loses its network.");
+
   L.push("","# ── Ownership and time ───────────────────────────────────────────────────",
     "PUID="+state.puid,"PGID="+state.pgid,"TZ="+state.tz);
 
@@ -1182,6 +1289,8 @@ function buildEnv(state, example){
   }
   if(state.selected.indexOf("arcane") !== -1){
     L.push("","# ── Arcane ───────────────────────────────────────────────────────────────",
+      "# The address you open Arcane at. Links are built from this value, so",
+      "# change localhost to this machine's address if you use it from elsewhere.",
       "ARCANE_APP_URL=http://localhost:3552",
       "ARCANE_ENCRYPTION_KEY="+v(state.secrets.ARCANE_ENCRYPTION_KEY),
       "ARCANE_JWT_SECRET="+v(state.secrets.ARCANE_JWT_SECRET));
@@ -1304,6 +1413,13 @@ function buildReadme(state){
       "    docker compose down       # stop everything",""]);
   }
   L = L.concat([
+    "## Before you share this folder","",
+    "`.env` contains real, working secrets \u2014 database passwords, session keys,",
+    "and any VPN credentials you entered. Anyone who reads it can sign in as you.",
+    "",
+    "- `.gitignore` already excludes it, so `git add .` will not catch it",
+    "- Do not paste it into an issue, a forum, or a screenshot",
+    "- If it has been exposed, regenerate the secrets and redeploy","",
     "## What is here","","| Service | Address |","| --- | --- |"]);
   state.selected.slice().sort(function(a,b){ return orderOf(a)-orderOf(b); }).forEach(function(id){
     if(MODULES[id]) L.push("| " + MODULES[id].name + " | " + serviceUrl(id, state) + " |");
@@ -1410,6 +1526,17 @@ function validate(state){
     if(sel.indexOf("caddy") === -1) err("Pocket ID needs a reverse proxy","Passkeys require HTTPS.");
     else ok("Pocket ID will be served over HTTPS","Register two passkeys on separate devices.");
   }
+  if(sel.indexOf("socket-proxy") !== -1){
+    if(sel.indexOf("uptime-kuma") !== -1)
+      ok("Socket proxy in place",
+         "Point Uptime Kuma at it: Settings \u2192 Docker Hosts \u2192 connection type TCP, host tcp://socket-proxy:2375. Do not mount the socket into Kuma as well.");
+    else
+      warn("Nothing is using the socket proxy",
+           "It only helps apps that watch containers. Uptime Kuma is the one in this stack that would use it.");
+    if(sel.indexOf("arcane") !== -1)
+      warn("Arcane cannot use the socket proxy",
+           "It creates and deploys containers, which needs POST, and POST=1 hands back the ability to create a privileged one. A container manager is root-equivalent by design \u2014 keep Arcane off the internet rather than assuming the proxy contains it.");
+  }
   if(state.localOnly){
     ok("Local network only","Nothing is published. Reach the server on your LAN, or over Tailscale from outside.");
     if(sel.indexOf("tailscale") === -1)
@@ -1431,7 +1558,21 @@ function validate(state){
   if(sel.indexOf("tailscale") !== -1 && !state.manual.TS_AUTHKEY){
     warn("No Tailscale auth key","A CHANGEME placeholder is written; the container will not connect until you replace it.");
   }
+  if(state.alreadyRunning){
+    var clash = sel.filter(function(id){ return QUICKSTART_SERVICES.indexOf(id) !== -1; });
+    if(clash.length)
+      err("These are already running",
+          clash.join(", ") + " will refuse to start, because a container with that name already exists. " +
+          "Remove them from this stack, or delete the existing project in Arcane first.");
+    else
+      ok("No overlap with what you already run","Nothing here clashes with the quickstart services.");
+  }
   if(state.layout === "unified") ok("Unified storage layout","Imports can hardlink instead of copying.");
+  else if(state.mediaRoot && state.downloadsRoot && !sameFilesystem(state.mediaRoot, state.downloadsRoot))
+    warn("Media and downloads are on different drives",
+      mountOf(state.mediaRoot) + " and " + mountOf(state.downloadsRoot) + " are separate filesystems, so " +
+      "every finished download is copied rather than filed instantly. A 40 GB film occupies 80 GB until you " +
+      "delete the download, and while it is seeding you cannot.");
   else warn("Split storage layout",
     "Downloads and media are separate mounts, so imports will copy and use twice the space. Changing later means re-importing.");
 
@@ -1820,7 +1961,7 @@ fi
 if [[ -f access/docker-compose.yml ]]; then
   step "Connection layer"
   warn "This stack expects a shared Docker network, created once on the host:"
-  printf '      docker network create edge\\n'
+  printf '      docker network create mms-edge\\n'
   warn "Arcane cannot create it for you. Do that first if you have not already."
   echo
   ACCESS_JSON=""
@@ -1929,7 +2070,7 @@ function buildAll(state){
   return files;
 }
 
-return {CATS:CATS, MODULES:MODULES, PRESETS:PRESETS, resolve:resolve, validate:validate, checkDomain:checkDomain, ACCESS_MODULES:ACCESS_MODULES, isAccess:isAccess, PUBLIC_MODULES:PUBLIC_MODULES, conflictsOf:conflictsOf,
+return {CATS:CATS, MODULES:MODULES, PRESETS:PRESETS, resolve:resolve, validate:validate, checkDomain:checkDomain, ACCESS_MODULES:ACCESS_MODULES, isAccess:isAccess, STORAGE_DEFAULTS:STORAGE_DEFAULTS, QUICKSTART_SERVICES:QUICKSTART_SERVICES, mountOf:mountOf, sameFilesystem:sameFilesystem, PUBLIC_MODULES:PUBLIC_MODULES, conflictsOf:conflictsOf,
         buildAll:buildAll, buildCompose:buildCompose, buildEnv:buildEnv,
         buildCaddyfile:buildCaddyfile, buildReadme:buildReadme,
         collectSecrets:collectSecrets, collectManual:collectManual, serviceUrl:serviceUrl};
@@ -1948,10 +2089,10 @@ var state = {
   selected:[], chosen:[], auto:[], layout:"unified",
   configRoot:"/srv/media-server/config", dataRoot:"/srv/data",
   mediaRoot:"/srv/media", downloadsRoot:"/srv/downloads", photosRoot:"/srv/photos",
-  puid:"1000", pgid:"1000", tz:"",
+  puid:"1000", pgid:"1000", tz:(function(){ try{ return Intl.DateTimeFormat().resolvedOptions().timeZone || ""; }catch(e){ return ""; } })(),
   domain:"", vpnType:"wireguard", vpnProvider:"", vpnKey:"", vpnAddr:"",
   vpnUser:"", vpnPass:"", vpnCountry:"",
-  secrets:{}, manual:{}, showSecrets:false, arcaneDeploy:false, splitAccess:false, localOnly:false
+  secrets:{}, manual:{}, showSecrets:false, arcaneDeploy:false, splitAccess:false, localOnly:false, alreadyRunning:false
 };
 try{ state.tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ""; }catch(e){}
 
@@ -2150,12 +2291,69 @@ function renderPresets(){
 }
 
 /* ── storage ── */
+/* Applies the defaults for a platform, but never overwrites a path the user
+   has already changed — switching tabs to read the note should not wipe work. */
+/* Two folders on different drives cannot share a file, so the space saving
+   quietly disappears. Nothing tells you — the disk just fills up. */
+function showDriveCheck(){
+  var box = $("drivecheck");
+  if(!box) return;
+  if(state.layout === "unified"){
+    var root = state.dataRoot || "";
+    box.innerHTML = root
+      ? '<div class="tree"><b>What you will end up with</b><pre>' +
+        root + '/\n  media/\n    movies/\n    tv/\n  downloads/\n    complete/\n    incomplete/</pre>' +
+        '<p>If your films are somewhere else already, move them into <code>' + root +
+        '/media/</code> before you start, or point this at the folder they are already in.</p></div>'
+      : "";
+    return;
+  }
+  if(!state.mediaRoot || !state.downloadsRoot){ box.innerHTML = ""; return; }
+  if(CORE.sameFilesystem(state.mediaRoot, state.downloadsRoot)){
+    box.innerHTML = '<div class="tip"><strong>These are on the same drive.</strong> ' +
+      'You could use the shared folder option above and stop downloads being copied.</div>';
+  } else {
+    box.innerHTML = '<div class="warning"><strong>These are on different drives.</strong> ' +
+      '<code>' + CORE.mountOf(state.mediaRoot) + '</code> and <code>' + CORE.mountOf(state.downloadsRoot) +
+      '</code> are separate, so every finished download will be copied across rather than filed instantly. ' +
+      'A 40&nbsp;GB film takes 80&nbsp;GB until you delete the download, and while it is seeding you cannot. ' +
+      'Put both on the same drive if you can.</div>';
+  }
+}
+
+function applyStorageDefaults(os, force){
+  var d = CORE.STORAGE_DEFAULTS[os];
+  if(!d) return;
+  ["configRoot","dataRoot","mediaRoot","downloadsRoot","photosRoot","puid","pgid"].forEach(function(k){
+    var untouched = !state.storageTouched || !state.storageTouched[k];
+    if(force || untouched) state[k] = d[k];
+  });
+  state.storageOs = os;
+}
+
 function renderStorage(){
+  if(!state.storageOs){
+    var u = navigator.userAgent, guess = "lin";
+    if(/Windows/i.test(u)) guess = "win";
+    else if(/Mac OS X|Macintosh/i.test(u)) guess = "mac";
+    applyStorageDefaults(guess, true);
+  }
+
+  var ost = $("storageos"); ost.innerHTML = "";
+  [["win","Windows"],["mac","macOS"],["lin","Linux"],["nas","NAS"]].forEach(function(p){
+    var b = el("button","ostab"+(state.storageOs===p[0]?" on":""), p[1]);
+    b.type = "button";
+    b.onclick = function(){ applyStorageDefaults(p[0], true); renderStorage(); };
+    ost.appendChild(b);
+  });
+  $("storageosnote").innerHTML =
+    '<div class="tip">' + CORE.STORAGE_DEFAULTS[state.storageOs].note + '</div>';
+
   var t = $("layout"); t.innerHTML = "";
   [{id:"unified",title:"One shared folder",rec:true,
-    body:"Downloads and media sit under a single parent, mounted once as /data. Finished downloads are hardlinked into your library instantly, using no extra space."},
+    body:"Downloads and your library live inside one folder. A finished download is filed into your library instantly and takes up no extra space, because both names point at the same file."},
    {id:"split",title:"Separate folders",rec:false,
-    body:"Media and downloads are mounted separately. Simpler to picture, but every import copies the file, so a finished download occupies twice the disk."}
+    body:"Downloads and your library are separate folders, possibly on different drives. Easier to picture, but every finished download gets copied, so it takes up the space twice."}
   ].forEach(function(o){
     var d = el("div","tg"+(state.layout===o.id?" on":""));
     var b = el("b"); b.appendChild(document.createTextNode(o.title));
@@ -2165,6 +2363,7 @@ function renderStorage(){
     t.appendChild(d);
   });
 
+  showDriveCheck();
   $("layoutnote").innerHTML = state.layout === "unified"
     ? '<div class="tip"><strong>Why this matters.</strong> Sonarr and Radarr can hardlink — giving one file two names for free — but only when downloads and library are on the same filesystem <em>and</em> visible through one mount. Two separate mounts silently double your disk use, and changing it later means re-importing everything.</div>'
     : '<div class="warning"><strong>This will copy every import.</strong> A finished 40&nbsp;GB download becomes 80&nbsp;GB until you delete the original, and seeding means you often cannot. Choose the shared folder unless you have a specific reason not to.</div>';
@@ -2174,15 +2373,20 @@ function renderStorage(){
     var d = el("div","f"+(wide?" wide":""));
     var lab = el("label",null,label); lab.setAttribute("for","fld-"+id); d.appendChild(lab);
     var i = el("input"); i.id = "fld-"+id; i.value = val;
-    i.oninput = function(){ state[id] = i.value; };
+    i.oninput = function(){
+      state[id] = i.value;
+      state.storageTouched = state.storageTouched || {};
+      state.storageTouched[id] = true;
+      showDriveCheck();
+    };
     d.appendChild(i);
     var h = el("div","hint"); h.innerHTML = hint; d.appendChild(h);
     f.appendChild(d);
   }
-  field("configRoot","Config root",state.configRoot,"Application settings and databases. Small, but the thing you most want backed up.",true);
+  field("configRoot","Where settings are kept",state.configRoot,"Each app's own settings and database. Only a few hundred megabytes, but it is the part you would hate to lose \u2014 back this up.",true);
   if(state.layout === "unified"){
-    field("dataRoot","Data root",state.dataRoot,
-      "Downloads and media both live under here, as <code>downloads/</code> and <code>media/</code>.",true);
+    field("dataRoot","Where your files go",state.dataRoot,
+      "One folder holding everything. The generator makes <code>media/</code> and <code>downloads/</code> inside it for you \u2014 point this at the drive with the most space.",true);
   } else {
     field("mediaRoot","Media root",state.mediaRoot,"Your library — <code>movies/</code>, <code>tv/</code>, <code>music/</code>.");
     field("downloadsRoot","Downloads",state.downloadsRoot,"Working space for in-progress downloads.");
@@ -2394,6 +2598,22 @@ function renderCred(){
     return;
   }
 
+  /* Asking for a VPN key without saying where one comes from strands anyone
+     who has never bought one. This is the moment they need the answer. */
+  var noVpn = el("div","card teal");
+  noVpn.innerHTML =
+    '<strong>Do not have a VPN yet?</strong>' +
+    '<p style="margin:10px 0 0">You need a paid one that supports <b>WireGuard</b> and allows peer-to-peer traffic. ' +
+    'Free VPNs generally do neither. Expect somewhere around $5 a month.</p>' +
+    '<p style="margin:10px 0 0">Once you have an account, look for <b>WireGuard configuration</b> in their dashboard ' +
+    'and generate a config file. Open it in any text editor \u2014 the two values below are inside it:</p>' +
+    '<pre style="margin:10px 0">[Interface]\nPrivateKey = <span class="hl">this is your private key</span>\nAddress = <span class="hl">this is your address</span></pre>' +
+    '<p style="margin:0"><a href="hardware.html#providers">Provider comparison</a> \u00b7 ' +
+    '<a href="documentation.html#gluetun">How Gluetun uses these</a></p>' +
+    '<p style="margin:10px 0 0"><b>Not ready?</b> Leave these blank. The generator writes <code>CHANGEME</code> ' +
+    'and qBittorrent simply will not start until you fill them in \u2014 which is the safe way round.</p>';
+  b.appendChild(noVpn);
+
   var g = el("div","fgrid");
   function fld(key,label,hint,ph,wide,secret){
     var d = el("div","f"+(wide?" wide":""));
@@ -2585,6 +2805,41 @@ function renderReview(){
 
 /* Shown only when the deploy script is included. It assumes Arcane is already
    running, which is a chicken-and-egg problem worth naming up front. */
+/* Names the clash and offers to resolve it, rather than letting Docker
+   deliver the news as "Conflict. The container name is already in use." */
+function renderClash(){
+  var box = $("qsclash");
+  if(!box) return;
+  if(!state.alreadyRunning){ box.innerHTML = ""; return; }
+  var clash = state.selected.filter(function(id){
+    return CORE.QUICKSTART_SERVICES.indexOf(id) !== -1;
+  });
+  if(!clash.length){
+    box.innerHTML = '<div class="tip"><strong>Nothing clashes.</strong> None of what you have picked is already running.</div>';
+    return;
+  }
+  var names = clash.map(function(id){ return M[id].name; }).join(", ");
+  box.innerHTML =
+    '<div class="warning"><strong>' + names + ' ' + (clash.length > 1 ? 'are' : 'is') +
+    ' already running from the quickstart.</strong> Docker will refuse to start a second container with the same name, ' +
+    'and the port is taken too. You have two choices:' +
+    '<div class="clashopts">' +
+      '<div><b>Keep what you have</b><p>Leave the quickstart projects alone and drop these from the new stack. ' +
+      'Your Jellyfin accounts, library scan and monitors all survive.</p>' +
+      '<button class="sbtn" id="dropclash">Remove ' + names + '</button></div>' +
+      '<div><b>Start fresh</b><p>Delete the old projects in Arcane first, then deploy this one. ' +
+      'You will set up Jellyfin again from scratch \u2014 accounts, libraries and monitors included.</p></div>' +
+    '</div></div>';
+  var btn = $("dropclash");
+  if(btn) btn.onclick = function(){
+    clash.forEach(function(id){
+      state.selected = state.selected.filter(function(x){ return x !== id; });
+      state.chosen   = state.chosen.filter(function(x){ return x !== id; });
+    });
+    applyDeps();
+  };
+}
+
 function renderArcaneHelp(){
   var box = $("arcanehelp");
   if(!box) return;
@@ -2681,6 +2936,7 @@ function buildFiles(){
   showFile();
   renderCaddyHelp();
   renderArcaneHelp();
+  renderClash();
   var sn = $("splitnote");
   if(sn) sn.style.display = (state.splitAccess && state.selected.some(CORE.isAccess)) ? "" : "none";
   var sl = $("splitline");
@@ -2846,6 +3102,7 @@ $("revealbtn").onclick = function(){ state.showSecrets = !state.showSecrets; sho
 $("arcopt").onclick = function(){ state.arcaneDeploy = this.checked; buildFiles(); };
 $("splitopt").onclick = function(){ state.splitAccess = this.checked; buildFiles(); };
 $("localopt").onclick = function(){ state.localOnly = this.checked; applyDeps(); };
+$("qsopt").onclick = function(){ state.alreadyRunning = this.checked; renderClash(); };
 $("regen").onclick = function(){
   genSecrets();
   state.showSecrets = false;   // new values start hidden again
