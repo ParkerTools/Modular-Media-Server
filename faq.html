@@ -399,6 +399,51 @@ docker system df</pre></div>
 <!-- ─────────── WON'T START ─────────── -->
 <h2 class="grphead" data-grp="start">A container won't start</h2>
 
+<details class="qa" data-k="socket proxy uptime kuma docker host tcp 2375 container monitor not working">
+<summary>I added the socket proxy and container monitoring stopped working</summary>
+<div class="qa-body">
+<p>The proxy does not replace the socket mount automatically — you have to point the app at it.</p>
+<p>In Uptime Kuma: <b>Settings → Docker Hosts</b>, and either edit the existing host or add one:</p>
+<pre>Connection type   TCP / HTTP     (not Socket)
+Docker daemon     tcp://socket-proxy:2375</pre>
+<p>Then remove the <code>/var/run/docker.sock</code> volume from Uptime Kuma itself. Leaving both in place works, but keeps the raw socket exposed, which was the thing you added the proxy to avoid.</p>
+<div class="warning"><strong>Arcane will not work through the proxy.</strong> Creating and deploying containers requires <code>POST</code>, which the proxy refuses on purpose. Leave Arcane on the raw socket and keep it off the internet.</div>
+</div></details>
+
+<details class="qa" data-k="image tag version pin latest upgrade broke rollback jellyfin gluetun">
+<summary>An update broke something. How do I go back?</summary>
+<div class="qa-body">
+<p>Every image defaults to <code>:latest</code>, so a <code>docker compose pull</code> can bring a new major version without warning. To go back, pin the version in <code>.env</code>:</p>
+<pre>JELLYFIN_TAG=10.10.3</pre>
+<p>Then <code>docker compose up -d</code>. The variable name is the service in capitals with <code>_TAG</code> on the end — <code>SONARR_TAG</code>, <code>GLUETUN_TAG</code>, and so on. Anything you do not pin keeps following latest.</p>
+<div class="tip"><strong>Gluetun is the one most worth pinning.</strong> Its configuration format has changed between releases, and when Gluetun fails to start, qBittorrent loses its network entirely.</div>
+</div></details>
+
+<details class="qa" data-k="container name already in use conflict port allocated quickstart duplicate jellyfin">
+<summary>"The container name is already in use"</summary>
+<div class="qa-body">
+<p>Something with that name is already running — usually because you followed the quickstart first, and the stack you just generated includes the same service again.</p>
+<pre>docker ps -a --filter name=jellyfin</pre>
+<p>Two ways out:</p>
+<ul>
+<li><b>Keep what you have.</b> Remove the duplicate from the generated stack. In the generator, tick <em>I already followed the quickstart</em> and it will point out the clashes and offer to drop them. Your existing accounts and library scan survive.</li>
+<li><b>Start fresh.</b> Delete the old project in Arcane first, then deploy the new one. You will set the app up again from scratch.</li>
+</ul>
+<p>The same applies to <code>port is already allocated</code> — a different name, same cause.</p>
+</div></details>
+
+<details class="qa" data-k="qbittorrent gluetun vpn network restart no internet stalled">
+<summary>qBittorrent has no network after the VPN restarted</summary>
+<div class="qa-body">
+<p>Expected, and a consequence of how the kill switch works. qBittorrent uses <code>network_mode: service:gluetun</code>, so it has no network stack of its own — it borrows Gluetun's. When Gluetun restarts, that stack is replaced, and qBittorrent is left holding one that no longer exists.</p>
+<p>Restart it:</p>
+<pre>docker compose restart qbittorrent</pre>
+<p>Or bring both up together, in order:</p>
+<pre>docker compose up -d --force-recreate gluetun qbittorrent</pre>
+<div class="tip"><strong>This is the trade-off working, not failing.</strong> The alternative is a download client that keeps running when the VPN drops, which is the thing the design exists to prevent.</div>
+<p>If Gluetun is restarting on its own, check its logs — a changed config format after an image update is the usual cause, which is why pinning <code>GLUETUN_TAG</code> in <code>.env</code> is worth doing.</p>
+</div></details>
+
 <details class="qa" data-cat="start" data-terms="restart loop restarting crash boot exited container keeps stopping">
 <summary><span class="tag w">Common</span>A container keeps restarting over and over</summary>
 <div class="qabody">
