@@ -840,9 +840,9 @@ docker compose exec sonarr ls /data/downloads</pre>
     image: lscr.io/linuxserver/socket-proxy:latest
     container_name: socket-proxy
     environment:
-      - CONTAINERS=1     <span class="c"># list and inspect — all Kuma needs</span>
+      - CONTAINERS=1     <span class="cm"># list and inspect — all Kuma needs</span>
       - INFO=1
-      - POST=0           <span class="c"># refuse every write</span>
+      - POST=0           <span class="cm"># refuse every write</span>
       - EXEC=0
       - IMAGES=0
       - VOLUMES=0
@@ -851,7 +851,7 @@ docker compose exec sonarr ls /data/downloads</pre>
       - /var/run/docker.sock:/var/run/docker.sock:ro
     read_only: true
     tmpfs:
-      - /run             <span class="c"># required — the entrypoint writes its config here</span>
+      - /run             <span class="cm"># required — the entrypoint writes its config here</span>
     restart: unless-stopped</pre>
 <p>Then <b>remove the socket mount from Uptime Kuma</b> and point it at the proxy instead:</p>
 <div class="fields"><dl>
