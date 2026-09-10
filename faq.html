@@ -402,7 +402,63 @@ docker system df</pre></div>
 <!-- ─────────── WON'T START ─────────── -->
 <h2 class="grphead" data-grp="start">A container won't start</h2>
 
-<details class="qa" data-k="socket proxy uptime kuma docker host tcp 2375 container monitor not working">
+<details class="qa" data-cat="network media" data-terms="homarr tiles offline down red status dashboard internal external url">
+<summary>Every Homarr tile shows as offline</summary>
+<div class="qa-body">
+<p>Almost always the two URL fields being given the same value. They are not the same thing:</p>
+<div class="tbl"><table>
+<thead><tr><th>Field</th><th>What it is for</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>Internal URL</td><td>Homarr checks this to decide up or down</td><td><code>http://jellyfin:8096</code></td></tr>
+<tr><td>External URL</td><td>Where clicking the tile sends your browser</td><td><code>http://192.168.1.50:8096</code></td></tr>
+</tbody></table></div>
+<p>The internal one uses the container name, because Homarr is asking from inside Docker. The external one has to be an address your browser can reach. Put the container name in both and the tile opens nothing; put your LAN address in both and the check may still work but is really testing your router.</p>
+<div class="tip"><strong>If Homarr is in a different Compose project</strong> from the app, container names will not resolve at all — separate projects get separate networks. Use <code>http://host.docker.internal:8096</code> for the internal URL instead, and make sure Homarr has the <code>extra_hosts</code> line.</div>
+</div></details>
+
+<details class="qa" data-cat="start" data-terms="homarr wont start exits secret encryption key 64 hex invalid base64 crash">
+<summary>Homarr will not start</summary>
+<div class="qa-body">
+<p>Check the log first:</p>
+<pre>docker compose logs --tail 30 homarr</pre>
+<p>If it mentions the encryption key, the format is wrong. Homarr needs <b>exactly 64 hexadecimal characters</b> — every other secret in this project is base64, and pasting one of those here will not work.</p>
+<pre>openssl rand -hex 32</pre>
+<p>Put the result in <code>HOMARR_SECRET_ENCRYPTION_KEY</code> in your <code>.env</code>, then <code>docker compose up -d homarr</code>.</p>
+<div class="warning"><strong>Only do this on a fresh install.</strong> If Homarr has been running and you already added integrations, replacing the key makes every saved credential unreadable — see the next entry.</div>
+</div></details>
+
+<details class="qa" data-cat="faq" data-terms="homarr integrations broken decrypt api key lost rotated encryption changed">
+<summary>My Homarr integrations stopped working after I changed something</summary>
+<div class="qa-body">
+<p>If you changed <code>HOMARR_SECRET_ENCRYPTION_KEY</code>, that is the cause. It encrypts the API keys Homarr stores for your other apps. Homarr still starts, the board still loads, but every integration fails because nothing can be decrypted.</p>
+<p>Two ways out:</p>
+<ul>
+<li><b>Put the old key back</b> if you still have it. Everything returns.</li>
+<li><b>Re-enter the integrations.</b> Edit each tile and paste its API key again. Tedious but harmless — the board layout survives.</li>
+</ul>
+<div class="tip"><strong>Back up <code>homarr_appdata</code> and your <code>.env</code> together.</strong> Either one alone will not restore a working dashboard.</div>
+</div></details>
+
+<details class="qa" data-cat="network faq" data-terms="homarr container status widget docker socket not showing running state">
+<summary>Homarr does not show whether containers are running</summary>
+<div class="qa-body">
+<p>That feature needs the Docker socket, which the generated file leaves commented out. Uncomment it and restart:</p>
+<pre>volumes:
+  - homarr_appdata:/appdata
+  - /var/run/docker.sock:/var/run/docker.sock:ro</pre>
+<div class="warning"><strong>Know what you are granting.</strong> <code>:ro</code> makes the socket <em>file</em> read-only — it does not restrict the Docker API behind it. Anything with that mount can create a privileged container. Tiles work fine without it; they simply show links instead of running state.</div>
+<p>For a middle path, run a <a href="setup.html#kuma">socket proxy</a> and point Homarr at that rather than the raw socket.</p>
+</div></details>
+
+<details class="qa" data-cat="network faq" data-terms="homarr remote access outside published proxy caddy tailscale dashboard public">
+<summary>Can I reach Homarr from outside my house?</summary>
+<div class="qa-body">
+<p>The generated Caddyfile deliberately does not publish it, for the same reason it skips Arcane and the *arr apps: a dashboard holds API keys for every service it talks to. Exposing it puts all of those behind one login.</p>
+<p>Use <a href="access.html">Tailscale</a> instead. It publishes nothing — your phone joins your own network, and <code>http://your-server:7575</code> works from anywhere as if you were at home.</p>
+<div class="tip"><strong>If you still want it public</strong>, add the block to your Caddyfile by hand and put an authentication layer in front. Decide that deliberately rather than by default.</div>
+</div></details>
+
+<details class="qa" data-cat="network" data-terms="socket proxy uptime kuma docker host tcp 2375 container monitor not working">
 <summary>I added the socket proxy and container monitoring stopped working</summary>
 <div class="qa-body">
 <p>The proxy does not replace the socket mount automatically — you have to point the app at it.</p>
@@ -413,7 +469,7 @@ Docker daemon     tcp://socket-proxy:2375</pre>
 <div class="warning"><strong>Arcane will not work through the proxy.</strong> Creating and deploying containers requires <code>POST</code>, which the proxy refuses on purpose. Leave Arcane on the raw socket and keep it off the internet.</div>
 </div></details>
 
-<details class="qa" data-k="image tag version pin latest upgrade broke rollback jellyfin gluetun">
+<details class="qa" data-cat="start faq" data-terms="image tag version pin latest upgrade broke rollback jellyfin gluetun">
 <summary>An update broke something. How do I go back?</summary>
 <div class="qa-body">
 <p>Every image defaults to <code>:latest</code>, so a <code>docker compose pull</code> can bring a new major version without warning. To go back, pin the version in <code>.env</code>:</p>
@@ -422,7 +478,7 @@ Docker daemon     tcp://socket-proxy:2375</pre>
 <div class="tip"><strong>Gluetun is the one most worth pinning.</strong> Its configuration format has changed between releases, and when Gluetun fails to start, qBittorrent loses its network entirely.</div>
 </div></details>
 
-<details class="qa" data-k="container name already in use conflict port allocated quickstart duplicate jellyfin">
+<details class="qa" data-cat="start" data-terms="container name already in use conflict port allocated quickstart duplicate jellyfin">
 <summary>"The container name is already in use"</summary>
 <div class="qa-body">
 <p>Something with that name is already running — usually because you followed the quickstart first, and the stack you just generated includes the same service again.</p>
@@ -435,7 +491,7 @@ Docker daemon     tcp://socket-proxy:2375</pre>
 <p>The same applies to <code>port is already allocated</code> — a different name, same cause.</p>
 </div></details>
 
-<details class="qa" data-k="qbittorrent gluetun vpn network restart no internet stalled">
+<details class="qa" data-cat="vpn network" data-terms="qbittorrent gluetun vpn network restart no internet stalled">
 <summary>qBittorrent has no network after the VPN restarted</summary>
 <div class="qa-body">
 <p>Expected, and a consequence of how the kill switch works. qBittorrent uses <code>network_mode: service:gluetun</code>, so it has no network stack of its own — it borrows Gluetun's. When Gluetun restarts, that stack is replaced, and qBittorrent is left holding one that no longer exists.</p>
