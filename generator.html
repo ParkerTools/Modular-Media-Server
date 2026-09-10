@@ -1200,7 +1200,8 @@ function buildCompose(state, which){
       ? ["#  Your applications. The connection layer is a separate project in",
          "#  ./access — start that one too, and create the shared network first:",
          "#    docker network create " + EDGE_NET]
-      : ["#  Settings live in .env beside this file.",
+      : ["#  Settings live in .env beside this file \u2014 paths, timezone, secrets,",
+         "#  and the image versions each service follows.",
          "#  Start with:  docker compose up -d"]);
 
   var out = ["# ─────────────────────────────────────────────────────────────────────────",
@@ -1268,17 +1269,9 @@ function buildEnv(state, example){
   if(state.selected.indexOf("immich") !== -1) L.push("PHOTOS_ROOT="+state.photosRoot);
 
   L.push("","# ── Image versions ──────────────────────────────────────────────────────",
-    "# Every image defaults to :latest, so each `docker compose pull` is an",
-    "# unannounced upgrade with no way back. That is a deliberate trade: a",
-    "# static site cannot keep a version matrix current, and stale pins rot",
-    "# into security holes faster than they prevent breakage.",
-    "#",
-    "# To pin one, uncomment and set it. Everything else keeps following latest.",
-    "#   JELLYFIN_TAG=10.10.3",
-    "#   GLUETUN_TAG=v3.40.0",
-    "#",
-    "# Gluetun is the one most worth pinning: its config format has changed",
-    "# between releases, and when it breaks qBittorrent loses its network.");
+    "# Images follow :latest unless you pin them here. Gluetun is the one most",
+    "# worth pinning — a broken update leaves qBittorrent with no network.",
+    "#   GLUETUN_TAG=v3.40.0      JELLYFIN_TAG=10.10.3");
 
   L.push("","# ── Ownership and time ───────────────────────────────────────────────────",
     "PUID="+state.puid,"PGID="+state.pgid,"TZ="+state.tz);
