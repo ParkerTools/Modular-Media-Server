@@ -140,7 +140,7 @@ html[data-theme="dark"]{
   --warn-bg:#33201c;--tip-bg:#12313a;--line-teal:#2c5560;--line-peach:#4a3526;
   --code-fg:#8fdae5;--code-bg:#08151a;--code-txt:#dfeef0;--code-cm:#7fa8a4;
   --pill-teal-bg:#164048;--pill-coral-bg:#43231f;--pill-peach-fg:#e8c09a;--pill-coral-fg:#f6a89f;
-  --ok:#6cc79b;--bad:#f2857a;--warnfg:#e0b06a;
+  --ok:#6cc79b;--bad:#f2857a;--coral-text:#f5a49e;--warnfg:#e0b06a;
   --shadow:rgba(0,0,0,.30);--blob-a:rgba(254,217,183,.13);--blob-b:rgba(0,175,185,.10);
   color-scheme:dark;
 }
@@ -614,14 +614,29 @@ sudo sh get-docker.sh</pre>
   }
   picks.forEach(function(b){ b.addEventListener('click',function(){ show(b.dataset.p); }); });
   // detect the visitor's platform and open that one first
+  var NAMES={win:'windows',mac:'macos',lin:'linux',nas:'nas'};
+  var CODES={windows:'win',macos:'mac',linux:'lin',nas:'nas'};
+
+  // An explicit link wins, then whatever the visitor chose elsewhere on the
+  // site, then a guess from the browser.
   var h=(location.hash||'').replace('#','');
+  var saved=null;
+  try{ saved=localStorage.getItem('mms-os'); }catch(e){}
   if(['windows','macos','linux','nas'].indexOf(h)>-1){ show(h); }
+  else if(saved && NAMES[saved]){ show(NAMES[saved]); }
   else {
     var ua=navigator.userAgent;
     if(/Windows/i.test(ua)) show('windows');
     else if(/Mac OS X|Macintosh/i.test(ua)) show('macos');
     else if(/Linux|X11/i.test(ua)) show('linux');
   }
+
+  // Remember a manual choice for the other pages.
+  picks.forEach(function(b){
+    b.addEventListener('click',function(){
+      try{ localStorage.setItem('mms-os', CODES[b.dataset.p] || 'lin'); }catch(e){}
+    });
+  });
 })();
 </script>
 <script>
