@@ -366,6 +366,23 @@ html[data-theme="dark"] .skiplink{color:#08151a}
 <p>If WSL was already installed some time ago, make sure it's version 2:</p>
 <pre>wsl --set-default-version 2
 wsl --status</pre>
+<div class="tip"><strong>Docker Desktop also creates its own hidden Linux systems</strong> named <code>docker-desktop</code> and <code>docker-desktop-data</code>. Those are internal — leave them alone. Ubuntu is the one you type in.</div>
+</li>
+
+<li class="stp">
+<h3>Know where your files are</h3>
+<p>This is the detail that trips up every Windows user, and it takes ten seconds to learn. Inside Ubuntu, your Windows drives appear under <code>/mnt</code>:</p>
+<div class="tbl"><table>
+<thead><tr><th>In Windows</th><th>In Ubuntu, and in every compose file</th></tr></thead>
+<tbody>
+<tr><td><code>C:\</code></td><td><code>/mnt/c</code></td></tr>
+<tr><td><code>D:\Movies</code></td><td><code>/mnt/d/Movies</code></td></tr>
+<tr><td><code>E:\Media\TV</code></td><td><code>/mnt/e/Media/TV</code></td></tr>
+</tbody></table></div>
+<p>Backslashes become forward slashes, and the drive letter becomes lowercase. Check a path before you use it:</p>
+<pre>ls /mnt/d/Movies</pre>
+<p>If that lists your files, the path is right. If it says "No such file or directory", the drive letter or folder name is wrong.</p>
+<div class="warning"><strong>Keep the stack itself out of <code>/mnt</code>.</strong> Files under <code>/mnt</code> live on the Windows filesystem, which is noticeably slower from Linux and handles permissions differently. Put your configuration in the Linux filesystem — <code>/opt/stacks</code> — and only reach into <code>/mnt</code> for large media you already have there.</div>
 </li>
 
 <li class="stp">
